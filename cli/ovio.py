@@ -34,7 +34,7 @@ app = typer.Typer(
     add_completion=False,
     invoke_without_command=True
 )
-console = Console()
+console = Console(force_terminal=True, legacy_windows=False)
 
 # Load .env file
 def load_env():
@@ -474,38 +474,53 @@ def main(
         console.print("[bold green]✅ Committed and pushed successfully![/bold green]")
         return
 
-    # 6. Interactive Decision Prompt
-    prompt_str = (
-        "[bold green][Enter][/bold green] Commit & Push  |  "
-        "[bold cyan]\\[c][/bold cyan] Commit only  |  "
-        "[bold yellow]\\[e][/bold yellow] Edit text  |  "
-        "[bold red]\\[q][/bold red] Cancel"
-    )
-    console.print(prompt_str)
+    # 6. Interactive Decision Loop
+    current_commit = clean_commit
 
-    try:
-        user_choice = Prompt.ask("[bold cyan]>[/bold cyan]", default="").strip().lower()
-    except (KeyboardInterrupt, EOFError):
-        user_choice = "q"
+    while True:
+        prompt_str = (
+            "[bold green][Enter][/bold green] Commit & Push  |  "
+            "[bold cyan]\\[c][/bold cyan] Commit only  |  "
+            "[bold yellow]\\[e][/bold yellow] Edit text  |  "
+            "[bold red]\\[q][/bold red] Cancel"
+        )
+        console.print(prompt_str)
 
-    if user_choice in ("", "y", "p"):
-        res = subprocess.run(["git", "commit", "-m", clean_commit])
-        if res.returncode == 0:
-            console.print("[bold green]✅ Committed successfully! Pushing to remote...[/bold green]")
-            subprocess.run(["git", "push"])
+        try:
+            user_choice = Prompt.ask("[bold cyan]>[/bold cyan]", default="").strip().lower()
+        except (KeyboardInterrupt, EOFError):
+            user_choice = "q"
+
+        if user_choice in ("", "y", "p"):
+            res = subprocess.run(["git", "commit", "-m", current_commit])
+            if res.returncode == 0:
+                console.print("[bold green]✅ Committed successfully! Pushing to remote...[/bold green]")
+                subprocess.run(["git", "push"])
+            else:
+                console.print("[yellow]ℹ️ Note: Nothing staged to commit (working tree clean).[/yellow]")
+            break
+        elif user_choice == "c":
+            res = subprocess.run(["git", "commit", "-m", current_commit])
+            if res.returncode == 0:
+                console.print("[bold green]✅ Committed locally![/bold green]")
+            else:
+                console.print("[yellow]ℹ️ Note: Nothing staged to commit (working tree clean).[/yellow]")
+            break
+        elif user_choice == "e":
+            edited = Prompt.ask("\n[bold yellow]Edit commit message[/bold yellow]", default=current_commit.splitlines()[0]).strip()
+            if edited:
+                current_commit = edited
+                console.print("\n[bold cyan]📝 Updated Commit Preview:[/bold cyan]")
+                console.print(Panel(
+                    Text(current_commit, style="bold green"),
+                    title="[bold white]✨ Updated Conventional Commit[/bold white]",
+                    border_style="cyan",
+                    padding=(1, 2)
+                ))
+            continue
         else:
-            console.print(f"[bold red][!] git commit exited with code {res.returncode}[/bold red]")
-    elif user_choice == "c":
-        res = subprocess.run(["git", "commit", "-m", clean_commit])
-        if res.returncode == 0:
-            console.print("[bold green]✅ Committed locally![/bold green]")
-    elif user_choice == "e":
-        edited = Prompt.ask("\n[bold yellow]Edit commit message[/bold yellow]").strip()
-        if edited:
-            subprocess.run(["git", "commit", "-m", edited])
-            console.print("[bold green]✅ Committed with edited message![/bold green]")
-    else:
-        console.print("[dim]❌ Commit cancelled.[/dim]")
+            console.print("[dim]❌ Commit cancelled.[/dim]")
+            break
 
 if __name__ == "__main__":
     app()
