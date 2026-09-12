@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: #ecebe4;
+  --paper-deep: #deddd5;
+  --paper-light: #faf9f6;
+  --paper-card: #f5f4ee;
+  --ink: #161413;
+  --ink-soft: #4a4642;
+  --ink-faint: #737069;
+  --muted: #8e8b83;
+  --line: rgba(22, 20, 19, 0.12);
+  --line-light: rgba(22, 20, 19, 0.06);
+  --line-strong: rgba(22, 20, 19, 0.24);
+  --accent: #ff571a;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: var(--paper);
+}
+
+body {
+  background-color: var(--paper);
+  color: var(--ink);
+  font-family: Geist, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Subtle paper grain texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  pointer-events: none;
+  opacity: 0.28;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--paper-light);
+}
+
+/* Typography styles */
+.font-serif-display {
+  font-family: 'Instrument Serif', Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.micro-label {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+/* Button & Pill styles from substrate-friction */
+.pill-dark {
+  background: var(--ink);
+  color: var(--paper-light);
+  border-radius: 9999px;
+  padding: 8px 20px;
+  font-size: 13.5px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 2px rgba(22, 20, 19, 0.08);
+}
+.pill-dark:hover {
+  background: #000;
+  transform: translateY(-1px);
+}
+.pill-dark:active {
+  transform: translateY(0);
+}
+
+.pill-dashed {
+  position: relative;
+  background: var(--paper-light);
+  color: var(--ink);
+  border-radius: 9999px;
+  border: 1px dashed var(--line-strong);
+  padding: 8px 20px;
+  font-size: 13.5px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pill-dashed:hover {
+  border-color: var(--ink);
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+.paper-card {
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.paper-card:hover {
+  border-color: var(--line-strong);
+}
+
+/* Hairline technical borders */
+.hairline-border {
+  border: 1px solid var(--line);
+}
+.hairline-border-b {
+  border-bottom: 1px solid var(--line);
+}
+.hairline-border-t {
+  border-top: 1px solid var(--line);
+}
+.hairline-border-r {
+  border-right: 1px solid var(--line);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--paper);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 3px;
+}
