@@ -311,7 +311,7 @@ python cli/ovio.py --install-alias
 
 ## 🌐 Web Documentation Studio
 
-ovio also includes a technical documentation studio built with React, Vite, and Tailwind CSS. It features a minimal, light-mode warm paper aesthetic inspired by `substrate-friction` and `tasteskill.dev`.
+ovio includes a technical documentation studio built with React, Vite, and Tailwind CSS featuring a minimal, warm paper editorial design.
 
 ### Running the Web App
 ```bash
