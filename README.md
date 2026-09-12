@@ -326,8 +326,3 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **5-Stage Pipeline Walkthrough**: Deep dive into speech capture, biasing, and git execution.
 - **CLI Quickstart & Benchmarks**: Reference for shell aliases, arguments, and live evaluation telemetry.
 
----
-
-## 📄 License
-
-MIT License © 2026 Toufiq Farhan. Built with ❤️ for the **AssemblyAI Voice Hackathon: Hack into Dictation**.
