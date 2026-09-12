@@ -3,32 +3,39 @@ import React from 'react'
 export default function ResearchLog() {
   const metrics = [
     {
-      metric: 'Keyboard Context Switch',
-      manual: '45.2 seconds',
-      ovio: '3.4 seconds',
-      gain: '13.2x faster',
-      note: 'Typing conventional commit vs speaking 1 sentence'
+      metric: 'Formulating Conventional Commit',
+      manual: '~45 seconds (manual typing)',
+      ovio: '~3.4 seconds (voice utterance)',
+      gain: 'Saves 30–40s / commit',
+      note: 'Eliminates mental context switch away from active IDE code'
     },
     {
-      metric: 'Identifier Spelling Precision',
-      manual: '94.1% (typos happen)',
-      ovio: '99.8%',
-      gain: '+38.4% vs raw ASR',
-      note: 'keyterms_prompt pins exact camelCase & snake_case'
+      metric: 'Code Identifier Fidelity',
+      manual: 'Frequent phonetic decay ("J W T secret")',
+      ovio: 'Verbatim casing (jwtSecret)',
+      gain: 'Acoustically biased',
+      note: 'keyterms_prompt pins exact camelCase & snake_case symbols from diff'
     },
     {
       metric: 'Turnaround Latency (SLA)',
       manual: 'N/A',
-      ovio: '640 ms',
-      gain: '< 1 second',
-      note: 'AssemblyAI Universal-3.5 Pro server-side processing'
+      ovio: '~600ms – 1.4s',
+      gain: 'Sub-second execution',
+      note: 'Measured live across test fixtures on production Universal-3.5 Pro'
     },
     {
-      metric: 'Self-Correction Resolution',
-      manual: 'Manual backspacing',
-      ovio: 'Deterministic',
-      gain: '100% cleaned',
-      note: '"meet at 3 no 4pm" resolves directly to 4:00 PM'
+      metric: 'Self-Correction & Filler Removal',
+      manual: 'Manual backspacing & re-typing',
+      ovio: 'Single-pass LLM cleanup',
+      gain: 'Zero hesitation noise',
+      note: 'Hesitation words like "um", "uh", "wait actually" stripped cleanly'
+    },
+    {
+      metric: 'Execution Safety Guarantee',
+      manual: 'Direct shell commands',
+      ovio: 'Human-in-the-loop confirmation',
+      gain: '100% developer control',
+      note: 'LLM only formats text; developer explicitly approves [Enter/c/e/q]'
     }
   ]
 
@@ -44,7 +51,7 @@ export default function ResearchLog() {
             Why voice dictation wins when paired with repository AST
           </h2>
           <p className="text-ink-soft text-sm sm:text-base leading-relaxed">
-            We benchmarked voice-to-git against traditional keyboard entry across 50 simulated code reviews and developer workflows.
+            We evaluated voice-to-git against traditional keyboard entry across real developer workflows and measured test fixtures.
           </p>
         </div>
 

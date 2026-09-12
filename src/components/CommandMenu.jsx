@@ -33,7 +33,7 @@ export default function CommandMenu({ isOpen, onClose, onSelectCommand }) {
       items: [
         { id: 'pipeline', title: 'The 5-Step Pipeline', desc: 'Speech → AST Biasing → Universal-3.5 Pro → Conventional Commit', icon: GitCommit, action: () => { window.location.hash = '#pipeline'; onClose(false); } },
         { id: 'biasing', title: 'AST Keyterms Biasing', desc: 'How ovio extracts symbols to eliminate misspellings', icon: FileCode, action: () => { window.location.hash = '#biasing'; onClose(false); } },
-        { id: 'cli', title: 'CLI Quickstart (`git speak`)', desc: 'Install and configure the terminal tool in 30 seconds', icon: Terminal, action: () => { window.location.hash = '#cli'; onClose(false); } },
+        { id: 'cli', title: 'CLI Quickstart (`ovio`)', desc: 'Install and configure the terminal tool in 30 seconds', icon: Terminal, action: () => { window.location.hash = '#cli'; onClose(false); } },
       ]
     },
     {

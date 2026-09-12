@@ -73,7 +73,7 @@ export default function Navbar({ onOpenCommandMenu }) {
             className="pill-dark text-xs py-1.5 px-3.5 whitespace-nowrap"
           >
             <Terminal className="w-3.5 h-3.5 shrink-0" />
-            <span>git speak</span>
+            <span>ovio</span>
           </a>
         </div>
       </div>

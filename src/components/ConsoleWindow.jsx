@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Terminal, Play, Copy, Check, ChevronRight, Zap, GitBranch, ArrowUpRight } from 'lucide-react'
+import { Terminal, Copy, Check, Zap } from 'lucide-react'
 
 export const TERMINAL_SESSIONS = {
   auth: {
@@ -10,7 +10,11 @@ export const TERMINAL_SESSIONS = {
     filesCount: 3,
     keyterms: ['authService', 'verifyToken', 'JWT_SECRET', 'TokenExpiredError'],
     verbatim: 'uh so in auth service we added verifyToken to check the JWT_SECRET wait also handled expired token errors properly',
-    commit: `feat(auth): add verifyToken and handle expired token errors\n\n- Implement token verification against JWT_SECRET in authService\n- Add explicit error handling for expired and malformed tokens`,
+    commitTitle: 'feat(auth): add verifyToken and handle expired token errors',
+    commitBullets: [
+      '- Implement token verification against JWT_SECRET in authService',
+      '- Add explicit error handling for expired and malformed tokens'
+    ],
     latency: 640,
   },
   db: {
@@ -20,7 +24,11 @@ export const TERMINAL_SESSIONS = {
     filesCount: 2,
     keyterms: ['UserOrganization', 'foreignKey', 'cascadeDelete', 'organizationId'],
     verbatim: 'we added a foreign key constraint for UserOrganization with cascade delete and uh make sure we indexed organizationId actually',
-    commit: `feat(db): add cascade delete and index to UserOrganization\n\n- Add foreign key constraint with onDelete: Cascade on UserOrganization\n- Index organizationId to optimize join queries`,
+    commitTitle: 'feat(db): add cascade delete and index to UserOrganization',
+    commitBullets: [
+      '- Add foreign key constraint with onDelete: Cascade on UserOrganization',
+      '- Index organizationId to optimize join queries'
+    ],
     latency: 718,
   },
   ui: {
@@ -30,16 +38,30 @@ export const TERMINAL_SESSIONS = {
     filesCount: 2,
     keyterms: ['useThemePreference', 'darkModeToggle', 'hairlineBorder', 'localStorage'],
     verbatim: 'um in navbar component we added the theme preference switcher with local storage persistence and wait fixed the mobile drawer toggle',
-    commit: `feat(ui): add theme switcher to Navbar and fix mobile drawer\n\n- Integrate useThemePreference with localStorage persistence in Navbar\n- Resolve mobile drawer toggle click event boundary issue`,
+    commitTitle: 'feat(ui): add theme switcher to Navbar and fix mobile drawer',
+    commitBullets: [
+      '- Integrate useThemePreference with localStorage persistence in Navbar',
+      '- Resolve mobile drawer toggle click event boundary issue'
+    ],
     latency: 580,
   }
 }
+
+const ASCII_BANNER = `  ___   __      __  ___   ___  
+ / _ \\  \\ \\    / / |_ _| / _ \\ 
+| | | |  \\ \\  / /   | | | | | |
+| |_| |   \\ \\/ /    | | | |_| |
+ \\___/     \\__/    |___| \\___/ `
+
+const RULE = '────────────────────────────────────────────────────────────────────'
 
 export default function ConsoleWindow() {
   const [activeSession, setActiveSession] = useState('auth')
   const [copied, setCopied] = useState(false)
   const [copiedCmd, setCopiedCmd] = useState(false)
   const session = TERMINAL_SESSIONS[activeSession]
+
+  const fullCommitText = `${session.commitTitle}\n\n${session.commitBullets.join('\n')}`
 
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text)
@@ -48,7 +70,7 @@ export default function ConsoleWindow() {
   }
 
   const handleCopyCmd = () => {
-    navigator.clipboard.writeText('git speak')
+    navigator.clipboard.writeText('ovio')
     setCopiedCmd(true)
     setTimeout(() => setCopiedCmd(false), 2000)
   }
@@ -63,10 +85,10 @@ export default function ConsoleWindow() {
               <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
               <span className="micro-label text-ink">Terminal Native Experience</span>
               <span className="text-xs font-mono text-muted">•</span>
-              <span className="text-xs font-mono text-ink-soft">Real CLI Session Capture</span>
+              <span className="text-xs font-mono text-ink-soft">Substrate-Friction Aesthetic</span>
             </div>
             <h2 className="font-serif-display text-3xl sm:text-4xl text-ink font-normal tracking-tight">
-              What it looks like in your terminal (<code className="text-2xl font-mono">git speak</code>)
+              What it looks like in your terminal (<code className="text-2xl font-mono">ovio</code>)
             </h2>
           </div>
 
@@ -109,83 +131,112 @@ export default function ConsoleWindow() {
               <button
                 onClick={handleCopyCmd}
                 className="px-2 py-0.5 rounded bg-paper-light text-ink hover:bg-paper hairline-border text-[11px] flex items-center gap-1 transition-colors"
-                title="Copy command: git speak"
+                title="Copy command: ovio"
               >
                 {copiedCmd ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-                <span>git speak</span>
+                <span>ovio</span>
               </button>
             </div>
           </div>
 
           {/* Terminal Body */}
-          <div className="p-5 sm:p-7 bg-[#161413] text-[#ecebe4] font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto selection:bg-white/20">
+          <div className="p-5 sm:p-7 bg-[#0f0e0d] text-[#e6e4dc] font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto selection:bg-white/20">
             {/* Command execution prompt */}
-            <div className="text-[#8e8b83] mb-3">
-              <span className="text-emerald-400 font-semibold">$</span> git add . <br />
-              <span className="text-emerald-400 font-semibold">$</span> git speak
+            <div className="text-[#8e8b83] mb-4">
+              <span className="text-emerald-400 font-semibold">$</span> ovio
             </div>
 
-            {/* ANSI Box */}
-            <div className="text-[#c9c8bf] whitespace-pre mb-3 font-normal">
-              ┌─────────────────────────────────────────────────────────────┐<br />
-              │ 🎙️  <span className="text-white font-bold">ovio</span> — Voice Git &amp; Codebase Assistant                   │<br />
-              │ 🌿  Branch: <span className="text-white font-semibold">{session.branch.padEnd(18)}</span> |  📁 {session.filesCount} files staged        │<br />
-              │ 🎯  Biased Keyterms: [<span className="text-white font-semibold">{session.keyterms.join(', ').padEnd(38)}</span>] │<br />
-              └─────────────────────────────────────────────────────────────┘
+            {/* Clean ASCII Banner */}
+            <pre className="text-white font-bold leading-tight select-none mb-3">
+              {ASCII_BANNER}
+            </pre>
+
+            {/* Metadata Section */}
+            <div className="text-[#55524c] select-none text-xs">{RULE}</div>
+            <div className="grid grid-cols-[140px_1fr] gap-y-1 py-1 text-xs sm:text-[13px]">
+              <span className="text-[#8e8b83]">version</span>
+              <span className="text-white">1.0.0</span>
+              <span className="text-[#8e8b83]">model</span>
+              <span className="text-white">Universal-3.5 Pro</span>
+              <span className="text-[#8e8b83]">provider</span>
+              <span className="text-white">AssemblyAI Dictation API</span>
             </div>
 
-            {/* Listening Waveform */}
-            <div className="text-rose-400 font-semibold mb-1 flex items-center gap-2">
-              <span>🔴 Listening...</span>
-              <span className="text-[#8e8b83] font-normal">[Speak your changes, press &lt;ENTER&gt; to stop]</span>
+            <div className="text-[#55524c] select-none text-xs">{RULE}</div>
+            <div className="grid grid-cols-[140px_1fr] gap-y-1 py-1 text-xs sm:text-[13px]">
+              <span className="text-[#8e8b83]">branch</span>
+              <span className="text-cyan-400 font-semibold">{session.branch}</span>
+              <span className="text-[#8e8b83]">staged files</span>
+              <span className="text-white font-semibold">{session.filesCount}</span>
+              <span className="text-[#8e8b83]">symbols biased</span>
+              <span className="text-amber-400 font-semibold">{session.keyterms.length}</span>
             </div>
-            <div className="text-rose-300/80 tracking-widest text-xs mb-4 select-none">
-              &nbsp;&nbsp;&nbsp;∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿
+            <div className="text-[#55524c] select-none text-xs mb-4">{RULE}</div>
+
+            {/* Recording Indicator */}
+            <div className="mb-4 text-xs sm:text-[13px]">
+              <div className="text-[#8e8b83] mb-1">
+                hold <span className="bg-white/20 text-white px-1.5 py-0.5 rounded text-[11px] font-bold">SPACEBAR</span> to dictate — release when done
+              </div>
+              <div className="flex items-center gap-2 font-semibold">
+                <span className="text-red-500">● recording</span>
+                <span className="text-[#FF8C00] tracking-wider">▁▂▃▄▅▄▃▂</span>
+                <span className="text-[#8e8b83] text-xs font-normal">2.8s</span>
+              </div>
             </div>
 
-            {/* Latency Turnaround */}
-            <div className="text-emerald-400 font-bold mb-3 flex items-center gap-1.5">
-              <Zap className="w-4 h-4 fill-emerald-400 text-emerald-400" />
-              <span>Transcribed &amp; Rewritten in {session.latency}ms!</span>
+            {/* Result Header */}
+            <div className="text-xs sm:text-[13px] font-semibold text-white mb-1">
+              transcribed &amp; formatted <span className="text-[#8e8b83] font-normal text-xs">[{session.latency}ms  Universal-3.5 Pro]</span>
+            </div>
+            <div className="text-[#55524c] select-none text-xs">{RULE}</div>
+
+            {/* Verbatim Speech */}
+            <div className="my-2">
+              <div className="text-[#8e8b83] text-xs uppercase tracking-wider mb-1">verbatim</div>
+              <div className="text-[#a8a59c] italic pl-2 border-l-2 border-[#33302a]">
+                "{session.verbatim}"
+              </div>
             </div>
 
-            {/* Verbatim Output */}
-            <div className="text-[#8e8b83] text-xs uppercase tracking-wider mb-1">
-              🗣️ What you said (Verbatim):
-            </div>
-            <div className="text-[#deddd5] bg-white/5 p-3 rounded border border-white/10 mb-4 whitespace-pre-wrap">
-              "{session.verbatim}"
+            {/* Conventional Commit (Amber Highlight) */}
+            <div className="my-3">
+              <div className="text-[#8e8b83] text-xs uppercase tracking-wider mb-1">conventional commit</div>
+              <div className="pl-2 border-l-2 border-[#FF8C00]/40">
+                <div className="text-[#FF8C00] font-bold text-xs sm:text-[13px] mb-1">
+                  {session.commitTitle}
+                </div>
+                {session.commitBullets.map((bullet, i) => (
+                  <div key={i} className="text-[#FF8C00]/90 text-xs sm:text-[13px]">
+                    {bullet}
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Cleaned Conventional Commit Output */}
-            <div className="text-emerald-400 text-xs uppercase tracking-wider mb-1 font-semibold">
-              ✨ Generated Conventional Commit (Cleaned):
-            </div>
-            <div className="text-white bg-emerald-950/40 p-3 rounded border border-emerald-500/30 mb-4 whitespace-pre-wrap font-medium">
-              {session.commit}
-            </div>
+            <div className="text-[#55524c] select-none text-xs mb-3">{RULE}</div>
 
-            {/* Interactive Confirmation Menu */}
-            <div className="text-[#deddd5] bg-white/10 p-3 rounded flex flex-wrap items-center justify-between gap-3 text-xs">
+            {/* Interactive Decision Loop */}
+            <div className="flex flex-wrap items-center justify-between gap-3 text-xs sm:text-[13px]">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="px-2 py-0.5 bg-white/20 rounded text-white font-bold">[Enter]</span>
-                <span>Commit now</span>
-                <span className="text-[#8e8b83] mx-1">•</span>
-                <span className="px-2 py-0.5 bg-white/20 rounded text-white font-bold">[p]</span>
-                <span>Commit &amp; Push</span>
-                <span className="text-[#8e8b83] mx-1">•</span>
-                <span className="px-2 py-0.5 bg-white/20 rounded text-white font-bold">[e]</span>
-                <span>Edit text</span>
-                <span className="text-[#8e8b83] mx-1">•</span>
-                <span className="px-2 py-0.5 bg-white/20 rounded text-white font-bold">[Esc]</span>
-                <span>Cancel</span>
+                <span className="text-white font-bold">[Enter]</span>
+                <span className="text-[#a8a59c]">commit &amp; push</span>
+                <span className="text-[#55524c]">|</span>
+                <span className="text-white font-bold">[c]</span>
+                <span className="text-[#a8a59c]">commit only</span>
+                <span className="text-[#55524c]">|</span>
+                <span className="text-white font-bold">[e]</span>
+                <span className="text-[#a8a59c]">edit</span>
+                <span className="text-[#55524c]">|</span>
+                <span className="text-red-400 font-bold">[q]</span>
+                <span className="text-[#a8a59c]">cancel</span>
               </div>
 
               <button
-                onClick={() => handleCopy(session.commit)}
-                className="px-3 py-1 rounded bg-white text-black font-semibold hover:bg-neutral-200 transition-colors flex items-center gap-1"
+                onClick={() => handleCopy(fullCommitText)}
+                className="px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-white transition-colors flex items-center gap-1.5 text-xs font-mono"
               >
-                {copied ? <Check className="w-3 h-3 text-emerald-700" /> : <Copy className="w-3 h-3 text-black" />}
+                {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3 text-[#a8a59c]" />}
                 <span>{copied ? 'Copied' : 'Copy Commit'}</span>
               </button>
             </div>
@@ -194,8 +245,8 @@ export default function ConsoleWindow() {
 
         {/* Footer info */}
         <div className="mt-4 flex flex-wrap items-center justify-between text-xs font-mono text-muted px-2">
-          <span>Native CLI script located in: <strong className="text-ink">cli/ovio.py</strong></span>
-          <span>Run anywhere via: <code className="px-1.5 py-0.5 bg-paper rounded text-ink font-semibold">git speak</code></span>
+          <span>CLI binary: <strong className="text-ink">ovio</strong> (powered by AssemblyAI Dictation API)</span>
+          <span>Optional Git alias: <code className="px-1.5 py-0.5 bg-paper rounded text-ink font-semibold">ovio --install-alias</code></span>
         </div>
       </div>
     </section>

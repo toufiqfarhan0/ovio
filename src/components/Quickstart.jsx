@@ -17,19 +17,19 @@ export default function Quickstart() {
       cmd: `echo "ASSEMBLYAI_API_KEY=your_key_here" > .env`
     },
     {
-      title: 'Install Python CLI Dependencies',
-      code: `pip install sounddevice scipy requests`,
-      cmd: `pip install sounddevice scipy requests`
+      title: 'Install Package & CLI Command',
+      code: `pip install -e .\n# installs standalone global 'ovio' binary`,
+      cmd: `pip install -e .`
     },
     {
-      title: 'Register Native Git Alias (`git speak`)',
-      code: `git config --global alias.speak "!python ${window?.location ? 'path/to' : 'c:/'}/ovio/cli/ovio.py"`,
-      cmd: `git config --global alias.speak "!python cli/ovio.py"`
+      title: 'Run Voice Dictation Anywhere',
+      code: `ovio\n# or dry-run demo simulation: ovio --demo`,
+      cmd: `ovio`
     },
     {
-      title: 'Stage Code & Speak Your Changes',
-      code: `git add .\ngit speak\n# Hold Spacebar, speak naturally, hit Enter to commit!`,
-      cmd: `git speak`
+      title: 'Optional: Register Native Git Aliases',
+      code: `ovio --install-alias\n# enables 'git speak' and 'git commitspeak'`,
+      cmd: `ovio --install-alias`
     }
   ]
 

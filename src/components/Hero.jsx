@@ -41,7 +41,7 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-base sm:text-lg text-ink-soft max-w-2xl font-normal leading-relaxed mb-8"
         >
-          A pure terminal-native voice assistant (<code className="px-1.5 py-0.5 rounded bg-paper-deep text-xs font-mono text-ink font-semibold">git speak</code>). 
+          A pure terminal-native voice assistant (<code className="px-1.5 py-0.5 rounded bg-paper-deep text-xs font-mono text-ink font-semibold">ovio</code>). 
           Biases your staged <code className="px-1.5 py-0.5 rounded bg-paper-deep text-xs font-mono text-ink font-semibold">git diff</code> AST into AssemblyAI's Dictation API, turning rambling developer mutterings into production-ready Conventional Commits in under 800ms.
         </motion.p>
 
@@ -57,7 +57,7 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
             className="pill-dark"
           >
             <Terminal className="w-4 h-4 text-paper-light" />
-            <span>Install CLI: git speak</span>
+            <span>Install CLI: ovio</span>
             <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-white/20 font-mono">$</kbd>
           </a>
 

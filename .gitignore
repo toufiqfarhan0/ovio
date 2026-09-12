@@ -9,3 +9,4 @@ ovio_input.wav
 ovio_commit.wav
 *.egg-info
 build/
+*.wav

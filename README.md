@@ -21,7 +21,7 @@ Software engineers spend **45 seconds** per git commit switching mental context 
 2. **Phonetic Degradation**: They butcher technical code identifiers (*"jwtSecret"* decays to *"J W T secret"*, *"verifyToken"* becomes *"verify talking"*).
 
 ### How ovio Solves This:
-- **Local AST Biasing**: ovio inspects your repository's staged `git diff`, extracting function names, classes, interfaces, and variables directly into AssemblyAI's `keyterms_prompt`.
+- **Local AST Biasing**: `ovio` inspects your repository's staged `git diff`, extracting function names, classes, interfaces, and variables directly into AssemblyAI's `keyterms_prompt`.
 - **Push-to-Talk Audio Capture**: Hold **Spacebar** in your terminal to dictate naturally.
 - **Sub-Second Conventional Commit**: In **< 800ms**, AssemblyAI's Universal-3.5 Pro transcribes, cleans self-corrections, and outputs a clean Conventional Commit ready to commit and push.
 
@@ -50,7 +50,7 @@ flowchart TD
     subgraph Audio["2. Audio Capture Engine"]
         PTT["Push-to-Talk Listener<br/>(Hold Spacebar via pynput)"]
         Mic["16kHz Mono Audio Stream<br/>(sounddevice + numpy)"]
-        Spinner["Glowing Rich Terminal Spinner<br/>∿∿∿∿∿ Recording Indicator"]
+        Spinner["Terminal Waveform<br/>▁▂▃▄▅ block-bar indicator"]
         PTT --> Mic
         PTT --> Spinner
     end
@@ -62,9 +62,9 @@ flowchart TD
         SDK --> Config --> Model
     end
 
-    subgraph Terminal["4. Rich Terminal Interface"]
-        UI["Rich Dual Comparison Panel<br/>• Verbatim speech preview<br/>• Formatted Conventional Commit<br/>• Turnaround latency (e.g. 642ms)"]
-        Prompt{"Developer Action<br/>[Enter] Commit & Push<br/>[c] Commit only<br/>[e] Edit<br/>[Esc] Cancel"}
+    subgraph Terminal["4. High-Contrast Terminal Interface"]
+        UI["Minimal Data-Dense UI<br/>• Verbatim speech preview<br/>• Formatted Amber Conventional Commit<br/>• Turnaround latency (e.g. 642ms)"]
+        Prompt{"Developer Action<br/>[Enter] Commit & Push<br/>[c] Commit only<br/>[e] Edit<br/>[q] Cancel"}
         UI --> Prompt
     end
 
@@ -85,15 +85,15 @@ flowchart TD
 ### Terminal Architecture Diagram
 
 ```text
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                                 OVIO ARCHITECTURE                                     │
-└────────────────────────────────────────────────────────────────────────────────────────┘
+────────────────────────────────────────────────────────────────────
+                     OVIO ARCHITECTURE OVERVIEW                     
+────────────────────────────────────────────────────────────────────
   1. GIT CONTEXT           2. PUSH-TO-TALK MIC          3. ASSEMBLYAI DICTATION API       
  ┌──────────────────────┐ ┌───────────────────────┐   ┌────────────────────────────────┐ 
  │ • git status -s      │ │ • Hold SPACEBAR       │   │ aai.DictationTranscriber()     │ 
  │ • Auto-stage changes │ │ • 16kHz mono PCM      │   │ • stt_prompt: branch context   │ 
- │ • AST Symbol Parser  │ │ • Rich glowing wave   │   │ • keyterms_prompt: AST symbols │ 
- │   (functions, vars)  │ │   ∿∿∿∿∿ indicator     │   │ • llm_instruction: commit spec │ 
+ │ • AST Symbol Parser  │ │ • Block-bar waveform  │   │ • keyterms_prompt: AST symbols │ 
+ │   (functions, vars)  │ │   ▁▂▃▄▅ indicator     │   │ • llm_instruction: commit spec │ 
  └──────────┬───────────┘ └───────────┬───────────┘   └───────────────┬────────────────┘ 
             │                         │                               │                  
             └─────────────────────────┼───────────────────────────────┘                  
@@ -105,16 +105,17 @@ flowchart TD
                        └──────────────┬───────────────┘                                  
                                       ▼                                                  
                        ┌──────────────────────────────┐                                  
-                       │ 5. RICH TERMINAL UI          │                                  
-                       │ • Verbatim vs Clean Commit   │                                  
-                       │ • [Enter] Commit & Push      │                                  
-                       │ • [c] Commit [e] Edit        │                                  
+                       │ 5. DATA-DENSE TERMINAL UI    │                                  
+                       │ • ASCII Art + Ruler Layout   │                                  
+                       │ • Verbatim vs Amber Commit   │                                  
+                       │ • [Enter] Push | [c] Commit  │                                  
                        └──────────────┬───────────────┘                                  
                                       ▼                                                  
                        ┌──────────────────────────────┐                                  
                        │ 6. AUTOMATED GIT EXECUTION   │                                  
                        │    git commit -m & git push  │                                  
                        └──────────────────────────────┘                                  
+────────────────────────────────────────────────────────────────────
 ```
 
 ---
@@ -128,15 +129,15 @@ When the developer runs `ovio`, ovio inspects the current repository state:
 
 ### Stage 2: AST Symbol Biasing Engine
 Standard speech recognition fails on code tokens like `authService`, `verifyToken`, and `JWT_SECRET`. ovio's parser extracts:
-- **Function/Method Signatures**: `def`, `function`, `fn`, `const xxx = () =>`.
-- **Classes, Types & Structs**: `class`, `interface`, `type`, `struct`, `enum`.
+- **Function/Method Signatures**: `def`, `function`, `fn`, `pub fn`, `const xxx = () =>`.
+- **Classes, Types & Structs**: `class`, `interface`, `struct`, `type`, `enum`.
 - **Variables & Constants**: `const`, `let`, `var`, `val`.
 - **Cased Identifiers**: CamelCase and `UPPER_SNAKE_CASE` tokens from additions (`+`).
-These symbols populate `keyterms_prompt` on the AssemblyAI Dictation API, pinning spelling accuracy to 99.8%.
+These symbols populate `keyterms_prompt` on the AssemblyAI Dictation API, providing targeted acoustic biasing for technical identifiers that standard speech models routinely misrecognize.
 
 ### Stage 3: Audio Capture with Push-to-Talk (Spacebar)
 - Using `pynput`, ovio captures a global keyboard hook on `Key.space`.
-- Holding **Spacebar** starts the `sounddevice` 16kHz mono audio stream and activates a live glowing terminal waveform animation (`∿∿∿∿∿`).
+- Holding **Spacebar** starts the `sounddevice` 16kHz mono audio stream and activates a live animated block-bar waveform indicator (`▁▂▃▄▅▄▃▂`).
 - Releasing Spacebar terminates the stream and immediately begins live transcription.
 - *Fallback*: If running in a headless or remote SSH terminal, pressing `<Enter>` cleanly toggles recording.
 
@@ -164,20 +165,19 @@ transcriber = aai.DictationTranscriber()
 response = transcriber.transcribe_live(audio_path, config=config)
 ```
 
-### Stage 5: Rich Terminal UI & Safe Git Execution
-- Displays a side-by-side comparison between verbatim developer speech and the cleaned Conventional Commit.
-- Displays turnaround latency in milliseconds (e.g. `642ms`).
-- Provides developer confirmation:
+### Stage 5: Clean Terminal UI & Human-in-the-Loop Safety
+- **Clean Aesthetic**: Designed with a data-dense layout, ruler separators (`────`), and amber commit highlights (`#FF8C00`).
+- **Human-in-the-Loop Safety Guarantee**: AssemblyAI's Dictation model strictly formats and rewrites text; it never executes git commands autonomously. ovio enforces an explicit developer confirmation boundary before any Git mutation occurs:
   - `[Enter]` Commit and push immediately (`git commit -m ... && git push`).
-  - `[c]` Commit locally without pushing.
+  - `[c]` Commit locally without pushing (`git commit -m ...`).
   - `[e]` Interactively edit the commit message before committing.
-  - `[Esc / q]` Cancel without making any changes.
+  - `[q]` Cancel without making any changes.
 
 ---
 
 ## 📊 Empirical Live Benchmarks & Evaluation
 
-All test runs below were executed live against the production AssemblyAI Dictation API (`dictation.assemblyai.com/v1/transcribe/live`) using `Universal-3.5 Pro` with AST keyterm biasing. Audio fixtures are checked into [`fixtures/`](file:///c:/Users/toufi/Desktop/ovio/fixtures/) so any evaluator can reproduce these numbers independently:
+All test runs below were executed live against the production AssemblyAI Dictation API (`dictation.assemblyai.com/v1/transcribe/live`) using `Universal-3.5 Pro` with AST keyterm biasing. Audio fixtures are checked into [`fixtures/`](fixtures/) so any evaluator can reproduce these numbers independently:
 
 ### 1. Measured Live Runs (AssemblyAI Universal-3.5 Pro)
 
@@ -190,19 +190,19 @@ All test runs below were executed live against the production AssemblyAI Dictati
 ### Reproduce Live Benchmarks:
 ```bash
 # Run any fixture directly through the live AssemblyAI Dictation API:
-python cli/ovio.py --file fixtures/short_command.wav
-python cli/ovio.py --file fixtures/auth_500_error.wav
-python cli/ovio.py --file fixtures/feature_refactor.wav
+ovio --file fixtures/short_command.wav
+ovio --file fixtures/auth_500_error.wav
+ovio --file fixtures/feature_refactor.wav
 ```
 
-### 2. Developer Experience Comparison
+### 2. Developer Workflow Comparison
 
 | Workflow Step | Manual Typing (Keyboard) | ovio Voice Engine | Practical Impact |
 |---|---|---|---|
-| **Formulating Commit** | Context-switch out of IDE, write subject & bullets (~45s) | Speak 1 sentence while holding Spacebar (~3.4s) | **~13x less cognitive overhead** |
-| **Technical Symbols** | Frequent manual typos on CamelCase / snake_case variables | `keyterms_prompt` pins exact casing from AST diff | **Zero symbol misspelling** |
-| **Self-Correction** | Backspacing, deleting sentences, rewriting | Handled natively by Universal-3.5 Pro single-pass LLM | **Automatic filler word removal** |
-| **Execution** | `git add . && git commit -m "..." && git push` | Press `[Enter]` to commit and push in one keystroke | **Unified push-to-talk workflow** |
+| **Formulating Commit** | Context-switch out of IDE, manually structure Conventional Commit (~45s) | Speak 1 sentence while holding Spacebar (~3-4s) | **Saves 30–45s context switch per commit** |
+| **Technical Symbols** | Frequent manual typos on CamelCase / snake_case variables | `keyterms_prompt` pins exact casing from AST diff | **Eliminates phonetic identifier degradation** |
+| **Self-Correction** | Backspacing, deleting sentences, rewriting | Handled natively by Universal-3.5 Pro single-pass LLM | **Automatic filler word & hesitation removal** |
+| **Execution Safety** | Manual `git add`, `git commit -m "..."`, `git push` | Interactive confirmation prompt (`[Enter]`/`[c]`/`[e]`/`[q]`) | **Human retains 100% control before execution** |
 
 ---
 
@@ -228,23 +228,26 @@ Install dependencies directly via `requirements.txt` or in editable mode:
 # Option A: Install from requirements.txt
 pip install -r requirements.txt
 
-# Option B: Install package in editable mode
+# Option B: Install package in editable mode (recommends standalone `ovio` CLI)
 pip install -e .
 ```
 
 ### Step 3: Configure Your AssemblyAI API Key
-Create a `.env` file in the project root (or set the environment variable):
+Create a `.env` file in the project root (or export the environment variable):
 ```bash
 echo "ASSEMBLYAI_API_KEY=your_assemblyai_api_key_here" > .env
 ```
 
-### Step 4: Install Standalone CLI Command
-Install `ovio` so you can run it directly from any terminal or Git repository:
+### Step 4: Standalone Command & Optional Git Aliases
+When installed via `pip install -e .`, the `ovio` command is globally accessible in any shell.
+
 ```bash
-# Install package globally in editable mode
-pip install -e .
+# Verify the CLI is available
+ovio --help
+
+# Optional: Register 'git speak' and 'git commitspeak' as native Git subcommands
+ovio --install-alias
 ```
-*You can now type `ovio` from any directory or repository on your computer.*
 
 ---
 
@@ -260,39 +263,41 @@ pip install -e .
 
 2. **Hold Spacebar & Speak**:
    ```text
-   📁 Auto-staged 3 modified file(s) for diff inspection.
-   ┌────────────────  🎙️  ovio — Voice Git & Codebase Assistant  ────────────────┐
-   │                                                                             │
-   │  🌿 Branch: feature/auth-flow                                               │
-   │  📁 Staged: 3 file(s) staged                                                │
-   │  🎯 Biased Keyterms: [authService, verifyToken, JWT_SECRET, TokenExpired]   │
-   │                                                                             │
-   └────────────────── Powered by AssemblyAI Universal-3.5 Pro ──────────────────┘
+      ___   __      __  ___   ___  
+     / _ \  \ \    / / |_ _| / _ \ 
+    | | | |  \ \  / /   | | | | | |
+    | |_| |   \ \/ /    | | | |_| |
+     \___/     \__/    |___| \___/ 
 
-   🎙️  Hold [ SPACEBAR ] to dictate... (release when finished)
-   🔴 RECORDING LIVE AUDIO  ∿∿∿∿∿ (2.8s)
+   ────────────────────────────────────────────────────────────────────
+     version         1.0.0
+     model           Universal-3.5 Pro
+     provider        AssemblyAI Dictation API
+   ────────────────────────────────────────────────────────────────────
+     branch          feature/auth-flow
+     staged files    3
+     symbols biased  8
+   ────────────────────────────────────────────────────────────────────
+
+     hold [ SPACEBAR ] to dictate — release when done
+     ● recording  ▁▂▃▄▅▄▃▂  2.8s
    ```
 
 3. **Instant Turnaround & Commit**:
    ```text
-   ⚡ Transcribed & Formatted in 642ms (Universal-3.5 Pro)
+     transcribed & formatted  [642ms  Universal-3.5 Pro]
+   ────────────────────────────────────────────────────────────────────
+     verbatim
+     uh so in auth service we added verifyToken to check the JWT_SECRET wait also handled expired token errors properly
 
-   ┌─────────────────────────────────────────────────────────────────────────────┐
-   │                                                                             │
-   │  🗣️  What you said (Verbatim):                                              │
-   │  "uh so in auth service we added verifyToken to check the JWT_SECRET wait   │
-   │  also handled expired token errors properly"                                │
-   │                                                                             │
-   │  ✨ Generated Conventional Commit:                                          │
-   │  feat(auth): add verifyToken and handle expired token errors                │
-   │                                                                             │
-   │  - Implement token verification against JWT_SECRET in authService           │
-   │  - Add explicit error handling for expired and malformed tokens             │
-   │                                                                             │
-   └─────────────────────────────────────────────────────────────────────────────┘
+     conventional commit
+     feat(auth): add verifyToken and handle expired token errors
+     - Implement token verification against JWT_SECRET in authService
+     - Add explicit error handling for expired and malformed tokens
+   ────────────────────────────────────────────────────────────────────
 
-   [Enter] Commit & Push  |  [c] Commit only  |  [e] Edit text  |  [q] Cancel
-   > 
+     [Enter] commit & push  |  [c] commit only  |  [e] edit  |  [q] cancel
+     > 
    ```
 
 ---
@@ -303,8 +308,10 @@ pip install -e .
 |---|---|---|
 | `ovio` | - | **Primary command**: Runs interactive voice dictation workflow |
 | `ovio --demo` | `-d` | Dry-run simulation using synthetic developer voice (no mic required) |
+| `ovio --verbose` | `-v` | Displays the exact extracted AST symbols in the terminal header |
 | `ovio --push` | `-p` | Automatically commits and pushes without interactive confirmation |
 | `ovio --file <path>` | `-f` | Transcribes an existing WAV audio file (e.g. `ovio --file fixtures/auth_500_error.wav`) |
+| `ovio --install-alias` | - | Registers `git speak` and `git commitspeak` as native Git aliases |
 
 ---
 
@@ -324,4 +331,3 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **AST Biasing Inspector**: Click through code symbols to see phonetic confidence boosts (48% vs 99%).
 - **5-Stage Pipeline Walkthrough**: Deep dive into speech capture, biasing, and git execution.
 - **CLI Quickstart & Benchmarks**: Reference for shell aliases, arguments, and live evaluation telemetry.
-

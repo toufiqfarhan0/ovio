@@ -7,7 +7,10 @@ from pathlib import Path
 cli_dir = Path(__file__).resolve().parent / "cli"
 sys.path.insert(0, str(cli_dir))
 
-from ovio import main
+from ovio import app
+
+def main():
+    app()
 
 if __name__ == "__main__":
     main()
