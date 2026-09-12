@@ -309,22 +309,22 @@ python cli/ovio.py --install-alias
 
 ---
 
-## 🌐 Web Documentation Studio
+## 🌐 Interactive Documentation & Landing Page
 
-ovio includes a technical documentation studio built with React, Vite, and Tailwind CSS featuring a minimal, warm paper editorial design.
+ovio includes a technical landing page and documentation site built with React, Vite, and Tailwind CSS. It allows evaluators and developers to inspect the architecture, explore AST symbol biasing, and test interactive terminal simulations.
 
-### Running the Web App
+### Running the Landing Page Locally
 ```bash
 npm install
 npm run dev
 ```
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-### Interactive Features:
-- **Interactive Terminal Simulator**: Live terminal recreation with waveform oscilloscope.
-- **AST Biasing Inspector**: Click through symbols to see phonetic confidence deltas (48% vs 99%).
-- **Preset Scenarios**: Experience speech cleanup across Authentication, Database Migrations, and UI refactors.
-- **Full Architecture Visualizer**: 5-step breakdown of speech-to-git translation.
+### Key Sections:
+- **Terminal Simulator**: Push-to-talk demo with waveform visualization and sample scenarios.
+- **AST Biasing Inspector**: Click through code symbols to see phonetic confidence boosts (48% vs 99%).
+- **5-Stage Pipeline Walkthrough**: Deep dive into speech capture, biasing, and git execution.
+- **CLI Quickstart & Benchmarks**: Reference for shell aliases, arguments, and live evaluation telemetry.
 
 ---
 
