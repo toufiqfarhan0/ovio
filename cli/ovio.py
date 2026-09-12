@@ -476,10 +476,10 @@ def main(
 
     # 6. Interactive Decision Prompt
     prompt_str = (
-        "[bold green][Enter][/bold green] Commit & Push  │  "
-        "[bold white][c][/bold white] Commit only  │  "
-        "[bold yellow][e][/bold yellow] Edit  │  "
-        "[bold red][Esc/q][/bold red] Cancel"
+        "[bold green][Enter][/bold green] Commit & Push  |  "
+        "[bold cyan]\\[c][/bold cyan] Commit only  |  "
+        "[bold yellow]\\[e][/bold yellow] Edit text  |  "
+        "[bold red]\\[q][/bold red] Cancel"
     )
     console.print(prompt_str)
 
