@@ -318,7 +318,7 @@ def transcribe_with_assemblyai(audio_path: str, context: dict) -> dict:
         return {
             "text": response.text or "",
             "llm_response": response.llm_response or response.text or "",
-            "latency_ms": response.request_time_ms or wall_time_ms
+            "latency_ms": int(round(float(response.request_time_ms or wall_time_ms)))
         }
     except Exception as e:
         # 2. Fallback to direct HTTP multipart live endpoint
@@ -358,7 +358,7 @@ def transcribe_with_assemblyai(audio_path: str, context: dict) -> dict:
         return {
             "text": data.get("text", "").strip(),
             "llm_response": data.get("llm_response") or data.get("text", ""),
-            "latency_ms": data.get("request_time_ms") or wall_time_ms
+            "latency_ms": int(round(float(data.get("request_time_ms") or wall_time_ms)))
         }
 
 def install_git_aliases():
