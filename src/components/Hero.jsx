@@ -31,7 +31,7 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
           className="font-serif-display text-5xl sm:text-6xl lg:text-7xl font-normal tracking-tight leading-[1.05] text-ink mb-6 max-w-4xl"
         >
           Before your tool writes a commit, <br className="hidden sm:inline" />
-          measure what the developer <em className="italic font-normal">meant</em>.
+          listen to what the developer <em className="italic font-normal">meant</em>.
         </motion.h1>
 
         {/* Subtitle */}
@@ -41,8 +41,8 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-base sm:text-lg text-ink-soft max-w-2xl font-normal leading-relaxed mb-8"
         >
-          Spoken thoughts are messy: developers ramble, hesitate, and self-correct mid-sentence.
-          <strong className="text-ink font-medium"> ovio</strong> biases your live AST & <code className="px-1.5 py-0.5 rounded bg-paper-deep text-xs font-mono text-ink">git diff</code> into AssemblyAI's Dictation API, delivering load-bearing Conventional Commits in under 800ms.
+          A pure terminal-native voice assistant (<code className="px-1.5 py-0.5 rounded bg-paper-deep text-xs font-mono text-ink font-semibold">git speak</code>). 
+          Biases your staged <code className="px-1.5 py-0.5 rounded bg-paper-deep text-xs font-mono text-ink font-semibold">git diff</code> AST into AssemblyAI's Dictation API, turning rambling developer mutterings into production-ready Conventional Commits in under 800ms.
         </motion.p>
 
         {/* Action pills */}
@@ -53,24 +53,23 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
           className="flex flex-wrap items-center gap-3 mb-12"
         >
           <a
-            href="#console"
-            onClick={onStartDemo}
+            href="#cli"
             className="pill-dark"
           >
-            <Mic className="w-4 h-4 text-paper-light" />
-            <span>Try Live Console</span>
-            <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-white/20 font-mono">Space</kbd>
+            <Terminal className="w-4 h-4 text-paper-light" />
+            <span>Install CLI: git speak</span>
+            <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-white/20 font-mono">$</kbd>
           </a>
 
-          <a href="#pipeline" className="pill-dashed">
-            <span>The 5-Step Pipeline</span>
+          <a href="#console" className="pill-dashed">
+            <span>Inspect Terminal Session</span>
             <ArrowRight className="w-4 h-4 text-muted" />
           </a>
 
           <div className="flex items-center gap-2 pl-2 text-xs font-mono text-muted">
             <span className="text-emerald-700 font-medium">● 0.6s latency</span>
             <span>·</span>
-            <span>19 languages</span>
+            <span>Zero web-recording bloat</span>
           </div>
         </motion.div>
 

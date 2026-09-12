@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ovio"
+version = "0.1.0"
+description = "Voice Git & Codebase Dictation Engine powered by AssemblyAI Universal-3.5 Pro"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Toufiq Farhan" }]
+dependencies = [
+    "requests>=2.28.0",
+    "sounddevice>=0.4.6",
+    "scipy>=1.10.0",
+    "numpy>=1.24.0"
+]
+
+[project.scripts]
+ovio = "ovio_cli:main"
+git-speak = "ovio_cli:main"
