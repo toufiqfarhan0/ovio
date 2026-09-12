@@ -14,9 +14,14 @@ dependencies = [
     "requests>=2.28.0",
     "sounddevice>=0.4.6",
     "scipy>=1.10.0",
-    "numpy>=1.24.0"
+    "numpy>=1.24.0",
+    "rich>=13.0.0",
+    "typer>=0.9.0",
+    "pynput>=1.7.6",
+    "assemblyai>=1.0.0"
 ]
 
 [project.scripts]
 ovio = "ovio_cli:main"
+commitspeak = "ovio_cli:main"
 git-speak = "ovio_cli:main"

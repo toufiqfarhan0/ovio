@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-ovio — Voice Git & Codebase Dictation Engine
-Powered by AssemblyAI Dictation API (Universal-3.5 Pro)
+ovio / commitspeak — Voice Git & Codebase Dictation Engine
+Powered by AssemblyAI Dictation API (Universal-3.5 Pro) + Rich + Typer + pynput
 """
 
 import os
@@ -11,33 +11,33 @@ import re
 import time
 import threading
 import subprocess
-import argparse
 from pathlib import Path
+from typing import Optional, List
 
-# Force UTF-8 stdout encoding on Windows consoles
+# Force UTF-8 on Windows consoles to prevent encoding errors with ANSI/Unicode
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
-# ANSI colors and styling
-RESET = "\033[0m"
-BOLD = "\033[1m"
-DIM = "\033[2m"
-ITALIC = "\033[3m"
-UNDERLINE = "\033[4m"
+import typer
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.live import Live
+from rich.text import Text
+from rich.prompt import Prompt
 
-# Grayscale / Minimalist tones
-INK = "\033[38;2;22;20;19m"
-INK_SOFT = "\033[38;2;74;70;66m"
-MUTED = "\033[38;2;142;139;131m"
-EMERALD = "\033[38;2;16;120;70m"
-ROSE = "\033[38;2;200;40;40m"
-AMBER = "\033[38;2;190;110;20m"
+# Initialize Typer and Rich Console
+app = typer.Typer(
+    help="ovio — Voice Git & Codebase Dictation Engine powered by AssemblyAI",
+    add_completion=False,
+    invoke_without_command=True
+)
+console = Console()
 
 # Load .env file
 def load_env():
-    # Look in current directory and script's parent directories
     candidates = [
         Path.cwd() / ".env",
         Path(__file__).resolve().parent.parent / ".env",
@@ -59,8 +59,11 @@ def load_env():
 load_env()
 API_KEY = os.environ.get("ASSEMBLYAI_API_KEY")
 
-def get_git_context():
-    """Inspects git status and diff, extracting changed files and AST symbols for keyterms_prompt."""
+def get_git_context(auto_stage: bool = True):
+    """
+    Inspects git status, automatically stages unstaged modified files if needed,
+    and extracts AST symbols from the staged diff to bias AssemblyAI's Dictation model.
+    """
     # 1. Current branch
     try:
         branch = subprocess.check_output(
@@ -71,22 +74,37 @@ def get_git_context():
     except Exception:
         branch = "main"
 
-    # 2. Staged and modified files
+    # 2. Check staged vs unstaged files
     staged_files = []
+    unstaged_files = []
     try:
         status_out = subprocess.check_output(
-            ["git", "status", "-s"], 
+            ["git", "status", "--porcelain"], 
             text=True, 
             stderr=subprocess.DEVNULL
         )
         for line in status_out.splitlines():
-            line = line.strip()
-            if line:
-                parts = line.split()
-                if len(parts) >= 2:
-                    staged_files.append(parts[-1])
+            if len(line) >= 3:
+                x, y = line[0], line[1]
+                filepath = line[3:].strip()
+                if x in ("M", "A", "D", "R"):
+                    staged_files.append(filepath)
+                if y in ("M", "D", "?") or line.startswith("??"):
+                    unstaged_files.append(filepath)
     except Exception:
         pass
+
+    # Auto-stage tracked changes if nothing is staged yet
+    if auto_stage and unstaged_files and not staged_files:
+        try:
+            subprocess.run(["git", "add", "-u"], check=True, stderr=subprocess.DEVNULL)
+            # Re-read status
+            status_out = subprocess.check_output(["git", "status", "--porcelain"], text=True)
+            staged_files = [line[3:].strip() for line in status_out.splitlines() if len(line) >= 3 and line[0] in ("M", "A", "D", "R")]
+            if staged_files:
+                console.print(f"[dim]📁 Auto-staged {len(staged_files)} modified file(s) for diff inspection.[/dim]")
+        except Exception:
+            pass
 
     # 3. Code diff
     diff_out = ""
@@ -114,17 +132,20 @@ def get_git_context():
         class_matches = re.findall(r'(?:class|interface|struct|type|enum)\s+([a-zA-Z0-9_]+)', diff_out)
         # Variables & Constants
         var_matches = re.findall(r'(?:const|let|var|val)\s+([a-zA-Z0-9_]+)', diff_out)
-        # CamelCase and UPPER_CASE tokens from added lines
+        # CamelCase and UPPER_CASE identifiers from additions
         code_tokens = re.findall(r'\+\s*.*?\b([a-zA-Z][a-zA-Z0-9]*(?:[A-Z][a-z0-9]+)+|[A-Z_]{3,})\b', diff_out)
         
         symbols = fn_matches + class_matches + var_matches + code_tokens
 
     # File names without directories
-    file_basenames = [Path(f).name for f in staged_files]
-    file_stems = [Path(f).stem for f in staged_files]
+    file_basenames = [Path(f).name for f in staged_files or unstaged_files]
+    file_stems = [Path(f).stem for f in staged_files or unstaged_files]
 
-    # Combine, deduplicate, filter out trivial tokens
-    blacklist = {"const", "let", "var", "function", "class", "async", "await", "return", "true", "false", "null", "self", "this"}
+    # Combine, deduplicate, filter out trivial keywords
+    blacklist = {
+        "const", "let", "var", "function", "class", "async", "await", "return", 
+        "true", "false", "null", "self", "this", "import", "export", "default", "from"
+    }
     all_terms = []
     seen = set()
     for term in file_basenames + file_stems + symbols:
@@ -133,281 +154,358 @@ def get_git_context():
             seen.add(term)
             all_terms.append(term)
 
-    # Fallback sensible defaults if working tree has no active staged changes
+    # Fallback sensible defaults if working tree has no active changes
     if not all_terms:
         all_terms = ["authService", "verifyToken", "jwtSecret", "TokenExpiredError"]
 
     return {
         "branch": branch or "main",
-        "staged_files": staged_files,
+        "staged_files": staged_files or unstaged_files or ["src/index.js"],
         "keyterms": all_terms[:25],
         "stt_prompt": f"A developer dictating git commits for branch '{branch}'. Files: {', '.join(file_basenames[:5])}."
     }
 
-class WaveformVisualizer:
-    """Renders a smooth animated terminal waveform during recording."""
-    def __init__(self):
-        self.running = False
-        self.thread = None
-        self.frames = [
-            " ∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿∿",
-            " ∿∿∿∿~∿∿∿∿~∿∿∿∿~∿∿∿∿~∿∿∿∿~∿∿∿∿~∿∿∿∿~∿∿∿∿~∿∿∿∿~∿∿∿∿~∿∿∿∿~",
-            " ~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿",
-            " ∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿",
-            " ∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~∿∿~~"
-        ]
-
-    def start(self):
-        self.running = True
-        self.thread = threading.Thread(target=self._animate, daemon=True)
-        self.thread.start()
-
-    def _animate(self):
-        idx = 0
-        while self.running:
-            frame = self.frames[idx % len(self.frames)]
-            sys.stdout.write(f"\r{MUTED}{frame}{RESET}")
-            sys.stdout.flush()
-            idx += 1
-            time.sleep(0.12)
-
-    def stop(self):
-        self.running = False
-        if self.thread:
-            self.thread.join(timeout=0.5)
-        sys.stdout.write("\r" + " " * 60 + "\r")
-        sys.stdout.flush()
-
-def record_audio(output_wav="ovio_commit.wav", max_seconds=45):
-    """Records 16kHz mono audio from microphone with an animated waveform."""
+def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45) -> str:
+    """
+    Records 16kHz audio from microphone using push-to-talk (hold SPACEBAR).
+    Displays a glowing pulsing spinner while recording.
+    Falls back to <Enter> toggle if pynput listener is unavailable.
+    """
     try:
         import sounddevice as sd
         import numpy as np
         import scipy.io.wavfile as wav
     except ImportError:
-        print(f"\n{ROSE}[!] Audio dependencies missing. Run:{RESET} pip install sounddevice scipy")
+        console.print("[bold red][!] Audio dependencies missing.[/bold red] Run: [cyan]pip install sounddevice scipy numpy[/cyan]")
         sys.exit(1)
 
     fs = 16000
     recorded_chunks = []
-    stop_event = threading.Event()
+    recording_active = threading.Event()
+    stop_session = threading.Event()
 
-    def callback(indata, frames, time_info, status):
-        if status:
-            pass
-        recorded_chunks.append(indata.copy())
+    def audio_callback(indata, frames, time_info, status):
+        if recording_active.is_set():
+            recorded_chunks.append(indata.copy())
 
-    stream = sd.InputStream(samplerate=fs, channels=1, dtype='int16', callback=callback)
-    visualizer = WaveformVisualizer()
+    # Try setting up pynput push-to-talk listener
+    use_pynput = False
+    try:
+        from pynput import keyboard
 
-    print(f"\n{ROSE}🔴 Listening...{RESET} {DIM}[Speak your changes, press <ENTER> to stop]{RESET}")
-    visualizer.start()
+        def on_press(key):
+            if key == keyboard.Key.space:
+                if not recording_active.is_set():
+                    recording_active.set()
+
+        def on_release(key):
+            if key == keyboard.Key.space:
+                if recording_active.is_set():
+                    recording_active.clear()
+                    stop_session.set()
+                    return False  # Stop listener
+
+        listener = keyboard.Listener(on_press=on_press, on_release=on_release)
+        listener.start()
+        use_pynput = True
+    except Exception:
+        use_pynput = False
+
+    stream = sd.InputStream(samplerate=fs, channels=1, dtype='int16', callback=audio_callback)
+
+    if use_pynput:
+        console.print("[bold white]🎙️  Hold [black on white] SPACEBAR [/black on white] to dictate...[/bold white] [dim](release when finished)[/dim]")
+    else:
+        console.print("[bold white]🎙️  Press [black on white] ENTER [/black on white] to start dictating...[/bold white]")
+
+    # Glowing terminal spinner animation loop
+    spinner_frames = ["∿∿∿∿∿", "∿~∿~∿", "~~∿~~", "~∿~∿~", "∿∿~~∿"]
+    frame_idx = 0
 
     with stream:
-        def wait_for_enter():
+        if not use_pynput:
+            # Fallback: Enter to start, Enter to stop
             try:
                 input()
             except Exception:
                 pass
-            stop_event.set()
+            recording_active.set()
+            console.print("[bold red]🔴 RECORDING...[/bold red] [dim](press <ENTER> when done)[/dim]")
+            
+            def wait_for_stop():
+                try:
+                    input()
+                except Exception:
+                    pass
+                recording_active.clear()
+                stop_session.set()
 
-        input_thread = threading.Thread(target=wait_for_enter, daemon=True)
-        input_thread.start()
+            t = threading.Thread(target=wait_for_stop, daemon=True)
+            t.start()
 
-        start_time = time.time()
-        while not stop_event.is_set():
-            time.sleep(0.05)
-            if time.time() - start_time > max_seconds:
-                break
+        start_time = None
+        while not stop_session.is_set():
+            if recording_active.is_set():
+                if start_time is None:
+                    start_time = time.time()
+                elapsed = time.time() - start_time
+                frame = spinner_frames[frame_idx % len(spinner_frames)]
+                frame_idx += 1
+                sys.stdout.write(f"\r\033[38;2;255;87;26m🔴 RECORDING LIVE AUDIO\033[0m  \033[38;2;16;120;70m{frame}\033[0m \033[2m({elapsed:.1f}s)\033[0m   ")
+                sys.stdout.flush()
+            else:
+                if start_time is not None:
+                    break
+            time.sleep(0.08)
 
-    visualizer.stop()
+        sys.stdout.write("\r" + " " * 70 + "\r")
+        sys.stdout.flush()
 
     if not recorded_chunks:
-        print(f"{ROSE}[!] No audio captured.{RESET}")
-        sys.exit(1)
+        console.print("[yellow][!] No audio recorded. Falling back to synthetic demonstration clip...[/yellow]")
+        return synthesize_demo_wav(output_wav)
 
     full_audio = np.concatenate(recorded_chunks, axis=0)
     wav.write(output_wav, fs, full_audio)
     return output_wav
 
-def synthesize_demo_wav(output_wav="ovio_commit.wav", duration=3.2, sample_rate=16000):
-    """Creates a clean synthetic test audio clip when mic is not accessible."""
+def synthesize_demo_wav(output_wav="ovio_commit.wav", duration=3.2, sample_rate=16000) -> str:
+    """Creates a clean synthetic test audio clip when mic is unavailable or in demo mode."""
     import numpy as np
     import scipy.io.wavfile as wav
 
     total_samples = int(sample_rate * duration)
     t = np.linspace(0, duration, total_samples, endpoint=False)
-    # Speech-like frequencies around 150Hz and formants
     signal = 0.4 * np.sin(2 * np.pi * 150 * t) + 0.3 * np.sin(2 * np.pi * 320 * t) + 0.15 * np.sin(2 * np.pi * 750 * t)
     envelope = np.sin(np.pi * t / duration) ** 2
     audio = (signal * envelope * 24000).astype(np.int16)
     wav.write(output_wav, sample_rate, audio)
     return output_wav
 
-def call_assemblyai_dictation(audio_path, context):
-    """Submits the recorded audio to the AssemblyAI Dictation API Beta (Universal-3.5 Pro)."""
-    import requests
-
+def transcribe_with_assemblyai(audio_path: str, context: dict) -> dict:
+    """
+    Submits audio to AssemblyAI Dictation API Beta (Universal-3.5 Pro)
+    using the official assemblyai SDK (DictationTranscriber, DictationConfig).
+    """
     if not API_KEY:
-        print(f"\n{ROSE}[!] Missing ASSEMBLYAI_API_KEY in environment or .env file.{RESET}")
-        print(f"{MUTED}Add it via:{RESET} echo \"ASSEMBLYAI_API_KEY=your_key_here\" > .env\n")
+        console.print("\n[bold red][!] Missing ASSEMBLYAI_API_KEY in environment or .env file.[/bold red]")
+        console.print("[dim]Add it via:[/dim] echo \"ASSEMBLYAI_API_KEY=your_key_here\" > .env\n")
         sys.exit(1)
 
-    config = {
-        "sample_rate": 16000,
-        "channels": 1,
-        "stt_prompt": context["stt_prompt"],
-        "keyterms_prompt": context["keyterms"],
-        "llm_instruction": (
-            "Remove filler words, false starts, and hesitation. "
-            "Rewrite into a crisp Conventional Commit in the exact format: "
-            "'<type>(<scope>): <subject>' followed by concise bullet points. "
-            "Keep technical variable names, functions, and symbols verbatim."
+    # 1. Try official AssemblyAI Python SDK
+    start_time = time.time()
+    try:
+        import assemblyai as aai
+        aai.settings.api_key = API_KEY
+
+        config = aai.DictationConfig(
+            sample_rate=16000,
+            channels=1,
+            stt_prompt=context["stt_prompt"],
+            keyterms_prompt=context["keyterms"],
+            llm_instruction=(
+                "Remove filler words, false starts, and hesitation. "
+                "Rewrite into a crisp Conventional Commit in the exact format: "
+                "'<type>(<scope>): <subject>' followed by concise bullet points. "
+                "Keep technical variable names, functions, and symbols verbatim."
+            )
         )
-    }
 
-    url = "https://dictation.assemblyai.com/v1/transcribe/live"
-    headers = {"Authorization": API_KEY}
+        transcriber = aai.DictationTranscriber()
+        response = transcriber.transcribe_live(audio_path, config=config)
+        wall_time_ms = int((time.time() - start_time) * 1000)
 
-    with open(audio_path, "rb") as f:
-        audio_bytes = f.read()
-
-    files = {
-        "config": (None, json.dumps(config), "application/json"),
-        "audio": (Path(audio_path).name, audio_bytes, "audio/wav")
-    }
-
-    start_call = time.time()
-    try:
-        response = requests.post(url, headers=headers, files=files, timeout=45)
+        return {
+            "text": response.text or "",
+            "llm_response": response.llm_response or response.text or "",
+            "latency_ms": response.request_time_ms or wall_time_ms
+        }
     except Exception as e:
-        print(f"{ROSE}[!] Network error calling Dictation API: {e}{RESET}")
-        sys.exit(1)
+        # 2. Fallback to direct HTTP multipart live endpoint
+        import requests
+        url = "https://dictation.assemblyai.com/v1/transcribe/live"
+        headers = {"Authorization": API_KEY}
 
-    wall_time_ms = int((time.time() - start_call) * 1000)
+        config_data = {
+            "sample_rate": 16000,
+            "channels": 1,
+            "stt_prompt": context["stt_prompt"],
+            "keyterms_prompt": context["keyterms"],
+            "llm_instruction": (
+                "Remove filler words, false starts, and hesitation. "
+                "Rewrite into a crisp Conventional Commit in the exact format: "
+                "'<type>(<scope>): <subject>' followed by concise bullet points. "
+                "Keep technical variable names, functions, and symbols verbatim."
+            )
+        }
 
-    if not response.ok:
-        print(f"{ROSE}[!] Dictation API Error ({response.status_code}): {response.text}{RESET}")
-        sys.exit(1)
+        with open(audio_path, "rb") as f:
+            audio_bytes = f.read()
 
-    data = response.json()
-    data["wall_time_ms"] = wall_time_ms
-    return data
+        files = {
+            "config": (None, json.dumps(config_data), "application/json"),
+            "audio": (Path(audio_path).name, audio_bytes, "audio/wav")
+        }
 
-def install_git_alias():
-    """Configures 'git speak' as a global git alias pointing to this script."""
+        resp = requests.post(url, headers=headers, files=files, timeout=45)
+        wall_time_ms = int((time.time() - start_time) * 1000)
+
+        if not resp.ok:
+            console.print(f"[bold red][!] Dictation API Error ({resp.status_code}): {resp.text}[/bold red]")
+            sys.exit(1)
+
+        data = resp.json()
+        return {
+            "text": data.get("text", "").strip(),
+            "llm_response": data.get("llm_response") or data.get("text", ""),
+            "latency_ms": data.get("request_time_ms") or wall_time_ms
+        }
+
+def install_git_aliases():
+    """Configures both 'git speak' and 'commitspeak' global git aliases."""
     script_path = Path(__file__).resolve()
-    cmd = f'git config --global alias.speak "!python \\"{script_path}\\""'
+    cmd1 = f'git config --global alias.speak "!python \\"{script_path}\\""'
+    cmd2 = f'git config --global alias.commitspeak "!python \\"{script_path}\\""'
     try:
-        subprocess.run(cmd, shell=True, check=True)
-        print(f"\n{EMERALD}✅ Git alias registered successfully!{RESET}")
-        print(f"{INK_SOFT}You can now type {BOLD}git speak{RESET}{INK_SOFT} in any git repository on your computer.{RESET}\n")
+        subprocess.run(cmd1, shell=True, check=True)
+        subprocess.run(cmd2, shell=True, check=True)
+        console.print(Panel.fit(
+            "[bold green]✅ Git Aliases Registered Successfully![/bold green]\n\n"
+            "You can now run either command from any git repository on your system:\n"
+            "  • [bold cyan]git speak[/bold cyan]\n"
+            "  • [bold cyan]git commitspeak[/bold cyan]",
+            title="ovio / commitspeak",
+            border_style="green"
+        ))
     except Exception as e:
-        print(f"{ROSE}[!] Failed to register git alias: {e}{RESET}")
+        console.print(f"[bold red][!] Failed to register git aliases: {e}[/bold red]")
 
-def print_banner(branch, file_count, keyterms):
-    """Renders the exact ANSI box UI requested by the developer."""
-    terms_str = ", ".join(keyterms[:5])
-    if len(keyterms) > 5:
-        terms_str += f", +{len(keyterms)-5} more"
-
-    print(f"{INK}┌─────────────────────────────────────────────────────────────┐{RESET}")
-    print(f"{INK}│ 🎙️  {BOLD}CommitSpeak{RESET}{INK} — Voice Git Assistant                      │{RESET}")
-    print(f"{INK}│ 🌿  Branch: {BOLD}{branch:<18}{RESET}{INK} |  📁 {file_count} files staged        │{RESET}")
-    print(f"{INK}│ 🎯  Biased Keyterms: [{BOLD}{terms_str:<38}{RESET}{INK}] │{RESET}")
-    print(f"{INK}└─────────────────────────────────────────────────────────────┘{RESET}")
-
-def main():
-    parser = argparse.ArgumentParser(description="ovio / CommitSpeak — Voice Git & Codebase Dictation Engine")
-    parser.add_argument("--file", "-f", help="Path to existing WAV audio file")
-    parser.add_argument("--demo", action="store_true", help="Run with synthetic audio for dry-run verification")
-    parser.add_argument("--install-alias", action="store_true", help="Register 'git speak' as a global git alias")
-    parser.add_argument("--yes", "-y", action="store_true", help="Auto-commit without prompting")
-    args = parser.parse_args()
-
-    if args.install_alias:
-        install_git_alias()
+@app.callback(invoke_without_command=True)
+def main(
+    ctx: typer.Context,
+    demo: bool = typer.Option(False, "--demo", "-d", help="Run with synthetic audio for dry-run verification"),
+    push: bool = typer.Option(False, "--push", "-p", help="Automatically commit and push without confirmation"),
+    file: Optional[str] = typer.Option(None, "--file", "-f", help="Path to existing WAV audio file"),
+    install_alias: bool = typer.Option(False, "--install-alias", help="Register 'git speak' and 'commitspeak' aliases")
+):
+    """
+    ovio / commitspeak — Voice Git & Codebase Dictation Engine
+    """
+    if install_alias:
+        install_git_aliases()
         return
 
-    context = get_git_context()
-    file_count = len(context["staged_files"]) if context["staged_files"] else 1
-    print_banner(context["branch"], file_count, context["keyterms"])
+    # 1. Gather git context and AST symbols
+    context = get_git_context(auto_stage=True)
+    staged_count = len(context["staged_files"])
+    keyterms_preview = ", ".join(context["keyterms"][:6])
+    if len(context["keyterms"]) > 6:
+        keyterms_preview += f", +{len(context['keyterms'])-6} more"
 
-    # Determine audio source
-    is_demo_mode = args.demo
-    if args.file:
-        audio_file = args.file
+    # 2. Render Rich Banner
+    banner_text = Text()
+    banner_text.append(f"🌿 Branch: ", style="bold white")
+    banner_text.append(f"{context['branch']}\n", style="bold cyan")
+    banner_text.append(f"📁 Staged: ", style="bold white")
+    banner_text.append(f"{staged_count} file(s) staged\n", style="bold green")
+    banner_text.append(f"🎯 Biased Keyterms: ", style="bold white")
+    banner_text.append(f"[{keyterms_preview}]", style="bold yellow")
+
+    console.print(Panel(
+        banner_text,
+        title="[bold white on #161413] 🎙️  ovio — Voice Git & Codebase Assistant [/bold white on #161413]",
+        subtitle="[dim]Powered by AssemblyAI Universal-3.5 Pro[/dim]",
+        border_style="bright_black",
+        padding=(1, 2)
+    ))
+
+    # 3. Audio Recording / Sourcing
+    is_demo_mode = demo
+    if file:
+        audio_path = file
     elif is_demo_mode:
-        print(f"\n{MUTED}[Running in demo simulation mode with sample developer utterance]{RESET}")
-        audio_file = synthesize_demo_wav()
+        console.print("[dim][Running in demo simulation mode with synthetic developer utterance][/dim]")
+        audio_path = synthesize_demo_wav()
     else:
         try:
-            audio_file = record_audio()
+            audio_path = record_audio_push_to_talk()
         except Exception as e:
-            print(f"{AMBER}[!] Microphone unavailable ({e}). Falling back to demo mode...{RESET}")
+            console.print(f"[yellow][!] Microphone unavailable ({e}). Falling back to demo mode...[/yellow]")
             is_demo_mode = True
-            audio_file = synthesize_demo_wav()
+            audio_path = synthesize_demo_wav()
 
+    # 4. Transcribe & Format
     if is_demo_mode:
-        # Realistic simulation of speech with stutters & self-correction
         verbatim = "uh so in auth service we added verifyToken to check the JWT_SECRET wait also handled expired token errors properly"
         clean_commit = "feat(auth): add verifyToken and handle expired token errors\n\n- Implement token verification against JWT_SECRET in authService\n- Add explicit error handling for expired and malformed tokens"
         latency = 642
     else:
-        # Call AssemblyAI Dictation API
-        result = call_assemblyai_dictation(audio_file, context)
-        verbatim = result.get("text", "").strip()
-        clean_commit = result.get("llm_response") or verbatim
-        latency = int(result.get("request_time_ms") or result.get("wall_time_ms") or 640)
+        with console.status("[bold green]⚡ Streaming to AssemblyAI Dictation API...[/bold green]", spinner="dots"):
+            res = transcribe_with_assemblyai(audio_path, context)
+            verbatim = res["text"]
+            clean_commit = res["llm_response"]
+            latency = res["latency_ms"]
 
-    # Clean up temporary recording
-    if not args.file and Path(audio_file).exists():
+    # Cleanup temporary wav
+    if not file and Path(audio_path).exists():
         try:
-            os.remove(audio_file)
+            os.remove(audio_path)
         except Exception:
             pass
 
-    # Print results matching the prompt's exact formatting
-    print(f"\n{EMERALD}{BOLD}⚡ Transcribed & Rewritten in {latency}ms!{RESET}\n")
+    # 5. Output Result Panel
+    console.print(f"\n[bold green]⚡ Transcribed & Formatted in {latency}ms (Universal-3.5 Pro)[/bold green]\n")
 
-    print(f"{BOLD}🗣️  What you said (Verbatim):{RESET}")
-    print(f'{INK_SOFT}"{verbatim}"{RESET}\n')
+    result_text = Text()
+    result_text.append("🗣️  What you said (Verbatim):\n", style="bold white")
+    result_text.append(f'"{verbatim}"\n\n', style="italic dim white")
+    result_text.append("✨ Generated Conventional Commit:\n", style="bold white")
+    result_text.append(f"{clean_commit}", style="bold green")
 
-    print(f"{BOLD}✨ Generated Conventional Commit (Cleaned):{RESET}")
-    print(f"{EMERALD}{clean_commit}{RESET}\n")
+    console.print(Panel(
+        result_text,
+        border_style="green",
+        padding=(1, 2)
+    ))
 
-    if args.yes:
-        subprocess.run(["git", "commit", "-m", clean_commit])
-        print(f"{EMERALD}✅ Committed successfully!{RESET}")
+    if push:
+        subprocess.run(["git", "commit", "-m", clean_commit], check=True)
+        subprocess.run(["git", "push"], check=True)
+        console.print("[bold green]✅ Committed and pushed successfully![/bold green]")
         return
 
-    # Interactive confirmation prompt
-    prompt = f"{BOLD}[Enter]{RESET} Commit now   {BOLD}[p]{RESET} Commit & Push   {BOLD}[e]{RESET} Edit text   {BOLD}[Esc/n]{RESET} Cancel: "
-    try:
-        choice = input(prompt).strip().lower()
-    except (KeyboardInterrupt, EOFError):
-        choice = "n"
+    # 6. Interactive Decision Prompt
+    prompt_str = (
+        "[bold green][Enter][/bold green] Commit & Push  │  "
+        "[bold white][c][/bold white] Commit only  │  "
+        "[bold yellow][e][/bold yellow] Edit  │  "
+        "[bold red][Esc/q][/bold red] Cancel"
+    )
+    console.print(prompt_str)
 
-    if choice in ["", "y"]:
+    try:
+        user_choice = Prompt.ask("[bold cyan]>[/bold cyan]", default="").strip().lower()
+    except (KeyboardInterrupt, EOFError):
+        user_choice = "q"
+
+    if user_choice in ("", "y", "p"):
         res = subprocess.run(["git", "commit", "-m", clean_commit])
         if res.returncode == 0:
-            print(f"\n{EMERALD}✅ Committed successfully!{RESET}")
-        else:
-            print(f"\n{ROSE}[!] git commit exited with code {res.returncode}{RESET}")
-    elif choice == "p":
-        res = subprocess.run(["git", "commit", "-m", clean_commit])
-        if res.returncode == 0:
-            print(f"{EMERALD}✅ Committed! Pushing to remote...{RESET}")
+            console.print("[bold green]✅ Committed successfully! Pushing to remote...[/bold green]")
             subprocess.run(["git", "push"])
         else:
-            print(f"{ROSE}[!] Commit failed; push aborted.{RESET}")
-    elif choice == "e":
-        edited = input(f"\n{BOLD}Edit commit message:{RESET}\n> ").strip()
+            console.print(f"[bold red][!] git commit exited with code {res.returncode}[/bold red]")
+    elif user_choice == "c":
+        res = subprocess.run(["git", "commit", "-m", clean_commit])
+        if res.returncode == 0:
+            console.print("[bold green]✅ Committed locally![/bold green]")
+    elif user_choice == "e":
+        edited = Prompt.ask("\n[bold yellow]Edit commit message[/bold yellow]").strip()
         if edited:
             subprocess.run(["git", "commit", "-m", edited])
-            print(f"\n{EMERALD}✅ Committed with edited message!{RESET}")
+            console.print("[bold green]✅ Committed with edited message![/bold green]")
     else:
-        print(f"\n{MUTED}❌ Commit cancelled.{RESET}")
+        console.print("[dim]❌ Commit cancelled.[/dim]")
 
 if __name__ == "__main__":
-    main()
+    app()

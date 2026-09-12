@@ -128,7 +128,7 @@ export default function ConsoleWindow() {
             {/* ANSI Box */}
             <div className="text-[#c9c8bf] whitespace-pre mb-3 font-normal">
               ┌─────────────────────────────────────────────────────────────┐<br />
-              │ 🎙️  <span className="text-white font-bold">CommitSpeak</span> — Voice Git Assistant                      │<br />
+              │ 🎙️  <span className="text-white font-bold">ovio</span> — Voice Git &amp; Codebase Assistant                   │<br />
               │ 🌿  Branch: <span className="text-white font-semibold">{session.branch.padEnd(18)}</span> |  📁 {session.filesCount} files staged        │<br />
               │ 🎯  Biased Keyterms: [<span className="text-white font-semibold">{session.keyterms.join(', ').padEnd(38)}</span>] │<br />
               └─────────────────────────────────────────────────────────────┘

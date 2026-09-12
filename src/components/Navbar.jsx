@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Terminal, Command, GitBranch, Mic, ArrowUpRight } from 'lucide-react'
+import { Terminal, Command, GitBranch, ArrowUpRight } from 'lucide-react'
 
-export default function Navbar({ onOpenCommandMenu, activeSection }) {
+export default function Navbar({ onOpenCommandMenu }) {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -13,79 +13,53 @@ export default function Navbar({ onOpenCommandMenu, activeSection }) {
   }, [])
 
   return (
-    <header className={`sticky top-0 z-40 w-full transition-all duration-300 ${
-      scrolled ? 'bg-paper/90 backdrop-blur-md shadow-sm hairline-border-b' : 'bg-transparent'
+    <header className={`sticky top-0 z-40 w-full transition-all duration-200 ${
+      scrolled ? 'bg-paper/95 backdrop-blur-md shadow-xs hairline-border-b' : 'bg-paper/80 backdrop-blur-xs hairline-border-b'
     }`}>
-      {/* Top telemetry ticker */}
-      <div className="w-full bg-paper-deep/70 hairline-border-b py-1.5 px-4 text-xs">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3 micro-label text-[10px]">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-              Universal-3.5 Pro · Live
-            </span>
-            <span className="text-muted/60">•</span>
-            <span>API: POST dictation.assemblyai.com/v1/transcribe/live</span>
-          </div>
-          <div className="hidden sm:flex items-center gap-4 micro-label text-[10px]">
-            <span>Latency SLA: &lt;1.0s</span>
-            <span className="text-muted/60">•</span>
-            <span>Voice-to-Git Engine</span>
-          </div>
-        </div>
-      </div>
 
       {/* Main navigation */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-        {/* Logo / Brand */}
-        <div className="flex items-center gap-4">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-4">
+        {/* Left: Brand */}
+        <div className="flex items-center gap-3 shrink-0">
           <a href="#" className="flex items-center gap-2 group">
             <span className="font-serif-display text-2xl tracking-tight text-ink font-semibold group-hover:opacity-80 transition-opacity">
               ovio
             </span>
             <span className="text-muted font-mono text-xs">/</span>
-            <span className="micro-label text-[10.5px] text-ink-soft hidden sm:inline">
+            <span className="micro-label text-[10.5px] text-ink-soft whitespace-nowrap">
               voice-to-git
             </span>
           </a>
-
-          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-paper-light hairline-border text-[11px] font-mono text-ink-soft">
-            <GitBranch className="w-3 h-3 text-muted" />
-            <span>git speak</span>
-          </div>
         </div>
 
-        {/* Center navigation links */}
-        <nav className="hidden lg:flex items-center gap-7 text-[13.5px] font-medium text-ink-soft">
-          <a href="#pipeline" className="hover:text-ink transition-colors">Pipeline</a>
-          <a href="#console" className="hover:text-ink transition-colors flex items-center gap-1.5">
-            <span>Live Console</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-accent"></span>
+        {/* Center: Navigation Links */}
+        <nav className="hidden md:flex items-center gap-5 lg:gap-7 text-[13px] font-medium text-ink-soft">
+          <a href="#pipeline" className="hover:text-ink transition-colors whitespace-nowrap">
+            Pipeline
           </a>
-          <a href="#biasing" className="hover:text-ink transition-colors">AST Biasing</a>
-          <a href="#cli" className="hover:text-ink transition-colors">CLI Reference</a>
-          <a href="#research" className="hover:text-ink transition-colors">Research Log</a>
+          <a href="#console" className="hover:text-ink transition-colors whitespace-nowrap flex items-center gap-1.5">
+            <span>Terminal</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+          </a>
+          <a href="#biasing" className="hover:text-ink transition-colors whitespace-nowrap">
+            AST Biasing
+          </a>
+          <a href="#cli" className="hover:text-ink transition-colors whitespace-nowrap">
+            CLI Reference
+          </a>
+          <a href="#research" className="hover:text-ink transition-colors whitespace-nowrap">
+            Research
+          </a>
         </nav>
 
-        {/* Right action buttons */}
-        <div className="flex items-center gap-3">
-          {/* Quick command search */}
-          <button
-            onClick={onOpenCommandMenu}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-paper-light hairline-border hover:border-ink/40 transition-colors text-xs text-ink-soft font-mono"
-            title="Press ⌘K or Ctrl+K to open"
-          >
-            <Command className="w-3.5 h-3.5 text-muted" />
-            <span className="hidden sm:inline">Commands</span>
-            <kbd className="px-1.5 py-0.5 text-[10px] rounded bg-paper-deep text-ink-soft">⌘K</kbd>
-          </button>
-
+        {/* Right: Actions */}
+        <div className="flex items-center gap-3 shrink-0">
           {/* GitHub link */}
           <a
             href="https://github.com/toufiqfarhan0/ovio"
             target="_blank"
             rel="noreferrer"
-            className="p-2 rounded-md hover:bg-paper-deep/60 transition-colors text-ink-soft hover:text-ink"
+            className="p-2 rounded-md hover:bg-paper-deep/60 transition-colors text-ink-soft hover:text-ink shrink-0"
             aria-label="View on GitHub"
           >
             <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -93,13 +67,13 @@ export default function Navbar({ onOpenCommandMenu, activeSection }) {
             </svg>
           </a>
 
-          {/* Try Live CTA */}
+          {/* Install CLI CTA Pill */}
           <a
-            href="#console"
-            className="pill-dark text-xs py-1.5 px-3.5 hidden sm:inline-flex"
+            href="#cli"
+            className="pill-dark text-xs py-1.5 px-3.5 whitespace-nowrap"
           >
-            <Mic className="w-3.5 h-3.5" />
-            <span>Dictate Now</span>
+            <Terminal className="w-3.5 h-3.5 shrink-0" />
+            <span>git speak</span>
           </a>
         </div>
       </div>

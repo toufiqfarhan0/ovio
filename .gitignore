@@ -6,3 +6,6 @@ dist
 *.pyc
 __pycache__
 ovio_input.wav
+ovio_commit.wav
+*.egg-info
+build/
