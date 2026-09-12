@@ -122,7 +122,7 @@ flowchart TD
 ## 🔬 Deep Dive: The 5-Stage Pipeline
 
 ### Stage 1: Git Context Extraction & Auto-Staging
-When the developer runs `git speak` or `commitspeak`, ovio inspects the current repository state:
+When the developer runs `ovio`, ovio inspects the current repository state:
 - Identifies active branch (`git branch --show-current`).
 - Inspects `git status --porcelain`. If modified files are not yet staged, ovio auto-stages them (`git add -u`) so diff analysis is instant.
 
@@ -238,12 +238,13 @@ Create a `.env` file in the project root (or set the environment variable):
 echo "ASSEMBLYAI_API_KEY=your_assemblyai_api_key_here" > .env
 ```
 
-### Step 4: Register Native Git Aliases
-Run the built-in alias installer once to register `git speak` and `git commitspeak` globally:
+### Step 4: Install Standalone CLI Command
+Install `ovio` so you can run it directly from any terminal or Git repository:
 ```bash
-python cli/ovio.py --install-alias
+# Install package globally in editable mode
+pip install -e .
 ```
-*This configures `git config --global alias.speak` and `git config --global alias.commitspeak` to point to ovio.*
+*You can now type `ovio` from any directory or repository on your computer.*
 
 ---
 
@@ -253,8 +254,8 @@ python cli/ovio.py --install-alias
 
 1. **Stage or modify code in any repo**:
    ```bash
-   # Make code edits, then run:
-   git speak
+   # Make code edits, then simply run:
+   ovio
    ```
 
 2. **Hold Spacebar & Speak**:
@@ -290,7 +291,7 @@ python cli/ovio.py --install-alias
    │                                                                             │
    └─────────────────────────────────────────────────────────────────────────────┘
 
-   [Enter] Commit & Push  │  [c] Commit only  │  [e] Edit  │  [Esc/q] Cancel
+   [Enter] Commit & Push  |  [c] Commit only  |  [e] Edit text  |  [q] Cancel
    > 
    ```
 
@@ -300,12 +301,10 @@ python cli/ovio.py --install-alias
 
 | Command / Flag | Short | Description |
 |---|---|---|
-| `git speak` | - | Runs full interactive voice dictation workflow |
-| `git commitspeak` | - | Canonical alternative command name |
-| `python cli/ovio.py --demo` | `-d` | Dry-run simulation using synthetic developer voice (no mic required) |
-| `python cli/ovio.py --push` | `-p` | Automatically commits and pushes without interactive confirmation |
-| `python cli/ovio.py --file <path>` | `-f` | Transcribes an existing WAV audio file |
-| `python cli/ovio.py --install-alias` | - | Registers global git aliases for all repositories |
+| `ovio` | - | **Primary command**: Runs interactive voice dictation workflow |
+| `ovio --demo` | `-d` | Dry-run simulation using synthetic developer voice (no mic required) |
+| `ovio --push` | `-p` | Automatically commits and pushes without interactive confirmation |
+| `ovio --file <path>` | `-f` | Transcribes an existing WAV audio file (e.g. `ovio --file fixtures/auth_500_error.wav`) |
 
 ---
 
