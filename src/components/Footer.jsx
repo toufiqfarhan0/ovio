@@ -159,7 +159,7 @@ export default function Footer({ onNavigate }) {
                 </a>
               </li>
               <li className="text-muted text-[12px] pt-1">
-                AssemblyAI Hackathon &apos;26
+                Acoustic Keyterm Biasing
               </li>
             </ul>
           </div>
@@ -168,7 +168,7 @@ export default function Footer({ onNavigate }) {
         {/* Bottom Colophon Bar */}
         <div className="mt-12 pt-6 border-t border-line/70 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11.5px] font-mono text-muted">
           <div>
-            Built for <span className="text-ink font-medium">AssemblyAI Voice Hackathon: Hack into Dictation</span> (Sept 2026)
+            Production voice interface for <span className="text-ink font-medium">Git &amp; codebase dictation</span>
           </div>
           <div className="flex items-center gap-2">
             <span>1.0s–1.5s SLA</span>

@@ -1,9 +1,13 @@
+<a id="top"></a>
 # ovio — Voice Git & Codebase Dictation Engine
 
 > **"Speech is messy. Git commits must be load-bearing."**  
-> Built for the **AssemblyAI Voice Hackathon Week: Hack into Dictation** (Sept 2026).  
+> **Production developer voice interface for Git, diff symbol biasing, and codebase dictation.**  
 > Powered by **AssemblyAI Universal-3.5 Pro** via the official `assemblyai` Python SDK Dictation API.
 
+[![Demo Video](https://img.shields.io/badge/Demo%20Video-Google%20Drive-4285F4?logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1wsPWnnoFInNALscRP8VpbJMZYfrlCnr5?usp=sharing)
+[![Interactive Docs & Simulator](https://img.shields.io/badge/Web%20Docs%20%26%20Simulator-ovio--wine.vercel.app-7928CA?logo=vercel&logoColor=white)](https://ovio-wine.vercel.app/)
+[![Live GitHub Execution Proof](https://img.shields.io/badge/Live%20Tests%20(5%20Langs)-ovio--live--test-2ea44f?logo=github&logoColor=white)](https://github.com/toufiqfarhan0/ovio-live-test)
 [![AssemblyAI SDK](https://img.shields.io/badge/AssemblyAI%20SDK-DictationTranscriber-0052FF)](https://www.assemblyai.com/docs/dictation)
 [![Engine](https://img.shields.io/badge/engine-Universal--3.5%20Pro-107846)](https://www.assemblyai.com/docs/dictation)
 [![CLI UI](https://img.shields.io/badge/CLI-Rich%20%2B%20Typer-orange)](https://github.com/Textualize/rich)
@@ -13,13 +17,93 @@
 
 ---
 
+### Quick Links & Project Resources
+
+| Resource | Link | Description |
+| :--- | :--- | :--- |
+| **Live Demo Video Walkthrough** | [**Google Drive Video Folder**](https://drive.google.com/drive/folders/1wsPWnnoFInNALscRP8VpbJMZYfrlCnr5?usp=sharing) | Video walkthrough demonstrating push-to-talk recording, live AssemblyAI Universal-3.5 Pro transcription, diff symbol biasing, and automated git push |
+| **Interactive Documentation & Simulator** | [**ovio-wine.vercel.app**](https://ovio-wine.vercel.app/) | Production landing page featuring interactive terminal audio simulations, diff symbol inspector, and architecture diagrams |
+| **Live Push Target Repository** | [**github.com/toufiqfarhan0/ovio-live-test**](https://github.com/toufiqfarhan0/ovio-live-test) | External target repository containing real verified pushed commits across 5 languages (`en`, `es`, `fr`, `de`, `hi`) |
+| **Core Engine Repository** | [**github.com/toufiqfarhan0/ovio**](https://github.com/toufiqfarhan0/ovio) | Full source code for `ovio` CLI, Diff Symbol Extractor, and AssemblyAI Dictation API integration |
+
+---
+
 <p align="center">
   <img src="public/ovio-terminal.png" alt="ovio Voice Git & Diff Symbol Biasing Engine Terminal Session" width="100%" />
 </p>
 
 ---
 
-## The 60-Second Overview
+## <a id="quick-navigation"></a>Quick Navigation (Table of Contents)
+
+Jump directly to any section without scrolling:
+
+| Section | Key Highlights & Subsections | Quick Jump |
+| :--- | :--- | :--- |
+| **The 60-Second Overview** | Context switching, ASR vs technical code, Diff Symbol Biasing, Acronym Reference | [Jump to Overview](#the-60-second-overview) |
+| **Architecture & Pipeline** | Mermaid dataflow diagram, high-contrast terminal architecture | [Jump to Architecture](#architecture--pipeline) |
+| **Deep Dive: 5-Stage Pipeline** | Auto-staging, Diff Symbol Extractor (Regex vs AST), PTT & RMS silence guidance, SDK integration, UI safety | [Jump to 5-Stage Pipeline](#deep-dive-the-5-stage-pipeline) |
+| **Live Benchmarks & Evaluation** | Measured latency table (1,003ms–1,512ms), CLI reproduction commands, manual vs ovio comparison | [Jump to Benchmarks](#empirical-live-benchmarks--evaluation) |
+| **Installation & Quickstart** | macOS (Homebrew + PortAudio), Windows, Linux, AssemblyAI API key setup, CLI verification | [Jump to Installation](#step-by-step-installation--quickstart) |
+| **How to Use the CLI** | Push-to-talk workflow, Command Matrix (`ovio`, `gate`, `verify`, `--demo`, `--file`, `--lang`, `--push`) | [Jump to CLI Usage](#how-to-use-the-cli) |
+| **Real-World Telemetry (GitHub)** | 6 verified live pushed commits on `ovio-live-test`, step-by-step terminal outputs, Clinical vs Codebase comparison | [Jump to Telemetry](#real-world-execution-telemetry) |
+| **Multilingual Support (19 Langs)** | 19 language codes matrix, CLI usage examples, live multilingual test runs | [Jump to Multilingual](#multilingual-support-19-languages) |
+| **Bundled Audio Fixtures** | Reproducible WAV test files in `fixtures/` with scenario descriptions and CLI commands | [Jump to Fixtures](#bundled-audio-fixtures-directory-fixtures) |
+| **Interactive Documentation Site** | Local setup (`localhost:3000`), terminal simulator, diff symbol inspector | [Jump to Web Docs](#interactive-documentation--landing-page) |
+
+<details>
+<summary><strong>Click here to expand complete detailed outline</strong></summary>
+
+- [The 60-Second Overview](#the-60-second-overview)
+  - [How ovio Solves This](#how-ovio-solves-this)
+  - [Core Terminology & Acronym Reference (ASR, Diff Symbols, RMS, STT, PTT)](#core-terminology--acronym-reference)
+- [Architecture & Pipeline](#architecture--pipeline)
+  - [End-to-End System Flow (Mermaid Flowchart)](#end-to-end-system-flow)
+  - [Terminal Architecture Diagram](#terminal-architecture-diagram)
+- [Deep Dive: The 5-Stage Pipeline](#deep-dive-the-5-stage-pipeline)
+  - [Stage 1: Git Context Extraction & Auto-Staging](#stage-1-git-context-extraction--auto-staging)
+  - [Stage 2: Diff Symbol Biasing Engine (Why Regex beats AST)](#stage-2-diff-symbol-biasing-engine)
+  - [Stage 3: Audio Capture with Push-to-Talk & Real-Time Silence Guidance](#stage-3-audio-capture-with-push-to-talk--real-time-silence-guidance)
+  - [Stage 4: Official AssemblyAI Python SDK Integration](#stage-4-official-assemblyai-python-sdk-integration)
+  - [Stage 5: Clean Terminal UI & Human-in-the-Loop Safety Guarantee](#stage-5-clean-terminal-ui--human-in-the-loop-safety)
+  - [Official AssemblyAI API Reference & Documentation](#official-assemblyai-api-reference--documentation)
+- [Empirical Live Benchmarks & Evaluation](#empirical-live-benchmarks--evaluation)
+  - [1. Measured Live Runs (AssemblyAI Universal-3.5 Pro)](#1-measured-live-runs-assemblyai-universal-35-pro)
+  - [Reproduce Live Benchmarks](#reproduce-live-benchmarks)
+  - [2. Developer Workflow Comparison (Manual vs ovio)](#2-developer-workflow-comparison)
+- [Step-by-Step Installation & Quickstart](#step-by-step-installation--quickstart)
+  - [Prerequisites](#prerequisites)
+  - [macOS Setup (MacBook Pro / Air)](#macos-setup-macbook-pro--air)
+  - [Windows & Linux Setup](#windows--linux-setup)
+  - [Configure Your AssemblyAI API Key](#configure-your-assemblyai-api-key)
+  - [Verify Installation](#verify-installation)
+- [How to Use the CLI](#how-to-use-the-cli)
+  - [Typical Developer Workflow](#typical-developer-workflow)
+  - [Command Matrix & Subcommands](#command-matrix--subcommands)
+- [Real-World Execution Telemetry (Tested on ovio-live-test)](#real-world-execution-telemetry)
+  - [Live Pushed Commits Table](#real-world-execution-telemetry)
+  - [Step 1: Pre-Flight Diagnostics (`ovio verify`)](#step-1-pre-flight-diagnostics-ovio-verify)
+  - [Step 2: Diff Biasing Pre-Flight Audit (`ovio gate`)](#step-2-diff-biasing-pre-flight-audit-ovio-gate)
+  - [Step 3: Dictate, Transcribe & Push Live Commit (English `--lang en`)](#step-3-dictate-transcribe--push-live-commit-english---lang-en)
+  - [Step 4: Multilingual Spanish Dictation & Live Push (`--lang es`)](#step-4-multilingual-spanish-dictation--live-push---lang-es)
+  - [Step 5: Multilingual French Dictation & Live Push (`--lang fr`)](#step-5-multilingual-french-dictation--live-push---lang-fr)
+  - [Step 6: Multilingual German Dictation & Live Push (`--lang de`)](#step-6-multilingual-german-dictation--live-push---lang-de)
+  - [Step 7: Multilingual Hindi Dictation & Live Push (`--lang hi`)](#step-7-multilingual-hindi-dictation--live-push---lang-hi)
+  - [Step 8: Architecture Alignment: Clinical Dictation vs. Codebase Dictation](#step-8-architecture-alignment-clinical-dictation-vs-codebase-dictation)
+  - [Step 9: Synthetic Developer Turnaround (`ovio --demo`)](#step-9-synthetic-developer-turnaround-ovio---demo)
+- [Multilingual Support (19 Languages)](#multilingual-support-19-languages)
+  - [Supported Language Codes](#supported-language-codes)
+  - [CLI Usage](#multilingual-cli-usage)
+  - [Bundled Audio Fixtures Directory (`fixtures/`)](#bundled-audio-fixtures-directory-fixtures)
+- [Interactive Documentation & Landing Page](#interactive-documentation--landing-page)
+  - [Running the Landing Page Locally](#running-the-landing-page-locally)
+  - [Key Sections](#key-sections)
+
+</details>
+
+---
+
+## <a id="the-60-second-overview"></a>The 60-Second Overview
 
 Software engineers spend **45 seconds** per git commit switching mental context between complex code and writing structured [Conventional Commits](https://www.conventionalcommits.org/). Standard speech-to-text engines fail for developer workflows because:
 1. **Verbal Noise**: They transcribe hesitation words (*"uh"*, *"um"*, *"wait actually"*) verbatim into commit logs.
@@ -53,9 +137,11 @@ For developers, evaluators, and judges unfamiliar with speech AI or compiler ter
 | **STT** | **Speech-to-Text** | The broad software category of voice transcription. In ovio, STT is enhanced by injecting codebase diff symbols into AssemblyAI Universal-3.5 Pro. |
 | **PTT** | **Push-to-Talk** | Audio recording mode where the microphone is active only while holding down a specific key (Spacebar). |
 
+[Back to Top](#top) &nbsp;|&nbsp; [Quick Navigation](#quick-navigation)
+
 ---
 
-## Architecture & Pipeline
+## <a id="architecture--pipeline"></a>Architecture & Pipeline
 
 ### End-to-End System Flow
 
@@ -138,9 +224,11 @@ flowchart TD
 ────────────────────────────────────────────────────────────────────
 ```
 
+[Back to Top](#top) &nbsp;|&nbsp; [Quick Navigation](#quick-navigation)
+
 ---
 
-## Deep Dive: The 5-Stage Pipeline
+## <a id="deep-dive-the-5-stage-pipeline"></a>Deep Dive: The 5-Stage Pipeline
 
 ### Stage 1: Git Context Extraction & Auto-Staging
 When the developer runs `ovio`, ovio inspects the current repository state:
@@ -204,15 +292,17 @@ ovio is built natively on AssemblyAI's Dictation API and Universal-3.5 Pro infra
 - **Supported Languages & Dialects Matrix**: [https://www.assemblyai.com/docs/concepts/supported-languages](https://www.assemblyai.com/docs/concepts/supported-languages)
 - **Universal-3.5 Pro Technical Overview**: [https://www.assemblyai.com/blog/universal-3-5-pro-async](https://www.assemblyai.com/blog/universal-3-5-pro-async)
 
+[Back to Top](#top) &nbsp;|&nbsp; [Quick Navigation](#quick-navigation)
+
 ---
 
-## Empirical Live Benchmarks & Evaluation
+## <a id="empirical-live-benchmarks--evaluation"></a>Empirical Live Benchmarks & Evaluation
 
 All test runs below were executed live against the production AssemblyAI Dictation API (`dictation.assemblyai.com/v1/transcribe/live`) using `Universal-3.5 Pro` with diff symbol keyterm biasing. Audio fixtures are checked into [`fixtures/`](fixtures/) so any evaluator or judge can reproduce these exact runs independently:
 
 Measured roundtrip latency ranges from **1,003ms** (short commands) to **1,512ms** (multi-sentence feature descriptions), with synthetic dry-run completing in **642ms**:
 
-### 1. Measured Live Runs (AssemblyAI Universal-3.5 Pro)
+### <a id="measured-live-runs"></a>1. Measured Live Runs (AssemblyAI Universal-3.5 Pro)
 
 | Test Fixture | Audio Duration | Measured Latency | Verbatim Utterance | Generated Conventional Commit |
 |---|---|---|---|---|
@@ -220,7 +310,7 @@ Measured roundtrip latency ranges from **1,003ms** (short commands) to **1,512ms
 | **Auth 500 Bugfix**<br/>`fixtures/auth_500_error.wav` | 8.1s | **1,235 ms** | *"The deployment is delayed because the authentication API is returning 500 errors."* | `fix(auth-api): resolve 500 errors causing deployment delay`<br/>`- Authentication API returning 500 errors`<br/>`- Deployment delayed due to API failures` |
 | **Feature Refactor**<br/>`fixtures/feature_refactor.wav` | 14.2s | **1,512 ms** | *"Please create a new branch named fix-auth-handler and refactor the token validation middleware. Make sure all unit tests pass before submitting the pull request."* | `feat(auth): refactor token validation middleware and create fix-auth-handler branch`<br/>`- Create new branch named fix-auth-handler`<br/>`- Refactor token validation middleware`<br/>`- Ensure all unit tests pass before submitting pull request` |
 
-### Reproduce Live Benchmarks:
+### <a id="reproduce-live-benchmarks"></a>Reproduce Live Benchmarks:
 ```bash
 # Run any fixture directly through the live AssemblyAI Dictation API:
 ovio --file fixtures/short_command.wav
@@ -237,9 +327,11 @@ ovio --file fixtures/feature_refactor.wav
 | **Self-Correction** | Backspacing, deleting sentences, rewriting | Handled natively by Universal-3.5 Pro single-pass LLM | **Automatic filler word & hesitation removal** |
 | **Execution Safety** | Manual `git add`, `git commit -m "..."`, `git push` | Interactive confirmation prompt (`[Enter]`/`[c]`/`[e]`/`[q]`) | **Human retains 100% control before execution** |
 
+[Back to Top](#top) &nbsp;|&nbsp; [Quick Navigation](#quick-navigation)
+
 ---
 
-## Step-by-Step Installation & Quickstart
+## <a id="step-by-step-installation--quickstart"></a>Step-by-Step Installation & Quickstart
 
 ### Prerequisites
 - Python **3.10+**
@@ -296,9 +388,11 @@ When installed via `pip install -e .`, the `ovio` command is globally accessible
 ovio --help
 ```
 
+[Back to Top](#top) &nbsp;|&nbsp; [Quick Navigation](#quick-navigation)
+
 ---
 
-## How to Use the CLI
+## <a id="how-to-use-the-cli"></a>How to Use the CLI
 
 ### Typical Developer Workflow
 
@@ -369,9 +463,11 @@ ovio --help
 | `ovio --push` | `-p` | **Automated Push**: Directly commits and pushes upon confirmation without secondary prompt |
 | `ovio --lang <code>` | `-l` | **Multilingual Dictation**: Sets input language for voice recognition. Verbatim is kept in the source language; the Conventional Commit output is always generated in English. Defaults to `en`. |
 
+[Back to Top](#top) &nbsp;|&nbsp; [Quick Navigation](#quick-navigation)
+
 ---
 
-### Real-World Execution Telemetry (Tested on [`ovio-live-test`](https://github.com/toufiqfarhan0/ovio-live-test))
+## <a id="real-world-execution-telemetry"></a>Real-World Execution Telemetry (Tested on [`ovio-live-test`](https://github.com/toufiqfarhan0/ovio-live-test))
 
 All commands and workflows were executed and verified live end-to-end on the live demo target repository [**github.com/toufiqfarhan0/ovio-live-test**](https://github.com/toufiqfarhan0/ovio-live-test) (where the live demo video recording commit [`56b316a`](https://github.com/toufiqfarhan0/ovio-live-test/commit/56b316ad24f8b00ebe1df153bb47f224e508acb9) was made).
 
@@ -379,7 +475,7 @@ Every single test below generated real production code changes that were staged,
 
 | Target Repo | Live Commit Hash | Mode / Language | Live Commit Link & Conventional Commit Subject |
 |---|---|---|---|
-| [`ovio-live-test`](https://github.com/toufiqfarhan0/ovio-live-test) | [`56b316a`](https://github.com/toufiqfarhan0/ovio-live-test/commit/56b316ad24f8b00ebe1df153bb47f224e508acb9) | **Demo Recording** | [`feat(session): Added sessionBlacklist and validateSessionToken with MAX_RETRY_ATTEMPTS`](https://github.com/toufiqfarhan0/ovio-live-test/commit/56b316ad24f8b00ebe1df153bb47f224e508acb9) |
+| [`ovio-live-test`](https://github.com/toufiqfarhan0/ovio-live-test) | [`56b316a`](https://github.com/toufiqfarhan0/ovio-live-test/commit/56b316ad24f8b00ebe1df153bb47f224e508acb9) | **Demo Recording** ([Google Drive Video](https://drive.google.com/drive/folders/1wsPWnnoFInNALscRP8VpbJMZYfrlCnr5?usp=sharing)) | [`feat(session): Added sessionBlacklist and validateSessionToken with MAX_RETRY_ATTEMPTS`](https://github.com/toufiqfarhan0/ovio-live-test/commit/56b316ad24f8b00ebe1df153bb47f224e508acb9) |
 | [`ovio-live-test`](https://github.com/toufiqfarhan0/ovio-live-test) | [`b5ceac1`](https://github.com/toufiqfarhan0/ovio-live-test/commit/b5ceac1) | **English (`en`)** | [`feat(authRoutes): implemented refreshToken endpoint and tokenBlacklist for session logout`](https://github.com/toufiqfarhan0/ovio-live-test/commit/b5ceac1) |
 | [`ovio-live-test`](https://github.com/toufiqfarhan0/ovio-live-test) | [`9d3588f`](https://github.com/toufiqfarhan0/ovio-live-test/commit/9d3588f) | **Spanish (`es`)** | [`feat(webhooks): add signature verification using stripeWebhookSecret for enhanced security`](https://github.com/toufiqfarhan0/ovio-live-test/commit/9d3588f) |
 | [`ovio-live-test`](https://github.com/toufiqfarhan0/ovio-live-test) | [`820727e`](https://github.com/toufiqfarhan0/ovio-live-test/commit/820727e) | **French (`fr`)** | [`feat(payment): added idempotency key and payment validation in payment routes`](https://github.com/toufiqfarhan0/ovio-live-test/commit/820727e) |
@@ -471,7 +567,7 @@ measure what the developer meant
 VERIFY OK: committed to local branch main; pushed to origin/main
 ────────────────────────────────────────────────────────────────────
 ```
-👉 **Live GitHub Commit**: [https://github.com/toufiqfarhan0/ovio-live-test/commit/b5ceac1](https://github.com/toufiqfarhan0/ovio-live-test/commit/b5ceac1)
+**Live GitHub Commit**: [https://github.com/toufiqfarhan0/ovio-live-test/commit/b5ceac1](https://github.com/toufiqfarhan0/ovio-live-test/commit/b5ceac1)
 
 #### Step 4: Multilingual Spanish Dictation & Live Push (`--lang es`)
 Developer dictates in Spanish: *"En las rutas de webhooks agregamos la verificación de firma con stripeWebhookSecret para mayor seguridad."*
@@ -510,7 +606,7 @@ measure what the developer meant
 VERIFY OK: committed to local branch main; pushed to origin/main
 ────────────────────────────────────────────────────────────────────
 ```
-👉 **Live GitHub Commit**: [https://github.com/toufiqfarhan0/ovio-live-test/commit/9d3588f](https://github.com/toufiqfarhan0/ovio-live-test/commit/9d3588f)
+**Live GitHub Commit**: [https://github.com/toufiqfarhan0/ovio-live-test/commit/9d3588f](https://github.com/toufiqfarhan0/ovio-live-test/commit/9d3588f)
 
 #### Step 5: Multilingual French Dictation & Live Push (`--lang fr`)
 Developer dictates in French: *"Nous avons ajouté la clé d'idempotence et la validation des paiements dans les routes de paiement."*
@@ -552,7 +648,7 @@ measure what the developer meant
 VERIFY OK: committed to local branch main; pushed to origin/main
 ────────────────────────────────────────────────────────────────────
 ```
-👉 **Live GitHub Commit**: [https://github.com/toufiqfarhan0/ovio-live-test/commit/820727e](https://github.com/toufiqfarhan0/ovio-live-test/commit/820727e)
+**Live GitHub Commit**: [https://github.com/toufiqfarhan0/ovio-live-test/commit/820727e](https://github.com/toufiqfarhan0/ovio-live-test/commit/820727e)
 
 #### Step 6: Multilingual German Dictation & Live Push (`--lang de`)
 Developer dictates in German: *"Die Bereitstellung ist verzögert, weil die Authentifizierungs-API 500 Fehler zurückgibt."*
@@ -587,7 +683,7 @@ PS C:\Users\toufi\Desktop\ovio-live-test> ovio --file fixtures/auth_500_error_de
 VERIFY OK: committed to local branch main; pushed to origin/main
 ────────────────────────────────────────────────────────────────────
 ```
-👉 **Live GitHub Commit**: [https://github.com/toufiqfarhan0/ovio-live-test/commit/c154398](https://github.com/toufiqfarhan0/ovio-live-test/commit/c154398)
+**Live GitHub Commit**: [https://github.com/toufiqfarhan0/ovio-live-test/commit/c154398](https://github.com/toufiqfarhan0/ovio-live-test/commit/c154398)
 
 #### Step 7: Multilingual Hindi Dictation & Live Push (`--lang hi`)
 Developer dictates in Hindi: *"डिप्लॉयमेंट में देर हो रही है क्योंकि ऑथेंटिकेशन अभी 500 एरर्स दे रही है।"*
@@ -621,7 +717,7 @@ PS C:\Users\toufi\Desktop\ovio-live-test> ovio --file fixtures/auth_500_error_hi
 VERIFY OK: committed to local branch main; pushed to origin/main
 ────────────────────────────────────────────────────────────────────
 ```
-👉 **Live GitHub Commit**: [https://github.com/toufiqfarhan0/ovio-live-test/commit/6cd957c](https://github.com/toufiqfarhan0/ovio-live-test/commit/6cd957c)
+**Live GitHub Commit**: [https://github.com/toufiqfarhan0/ovio-live-test/commit/6cd957c](https://github.com/toufiqfarhan0/ovio-live-test/commit/6cd957c)
 
 #### Step 8: Architecture Alignment: Clinical Dictation vs. Codebase Dictation
 In AssemblyAI's [Clinical Dictation Specification](https://www.assemblyai.com/docs/dictation#clinical-dictation), three core levers differentiate Dictation from generic STT:
@@ -676,11 +772,11 @@ measure what the developer meant
   [Enter] commit & push  │  [c] commit only  │  [e] edit  │  [q] cancel
   > [Enter]
 VERIFY OK: committed to local branch main; pushed to origin/main
-```
+[Back to Top](#top) &nbsp;|&nbsp; [Quick Navigation](#quick-navigation)
 
 ---
 
-## Multilingual Support (19 Languages)
+## <a id="multilingual-support-19-languages"></a>Multilingual Support (19 Languages)
 
 ovio supports **19 languages** via the `--lang <code>` flag, powered by the `language_codes` parameter of the AssemblyAI Dictation API. Verbatim output is preserved in the source language; the generated Conventional Commit is always synthesized in standard English for team git workflows.
 
@@ -696,7 +792,7 @@ ovio supports **19 languages** via the `--lang <code>` flag, powered by the `lan
 | `he` | Hebrew | `ja` | Japanese | `ur` | Urdu |
 | `zh` | Chinese | | | | |
 
-### CLI Usage
+### <a id="multilingual-cli-usage"></a>CLI Usage
 ```bash
 # Dictate in French
 ovio --lang fr
@@ -711,7 +807,7 @@ ovio --lang es
 ovio --lang hi
 ```
 
-### Bundled Audio Fixtures Directory (`fixtures/`)
+### <a id="bundled-audio-fixtures-directory-fixtures"></a>Bundled Audio Fixtures Directory (`fixtures/`)
 
 All audio fixtures are tracked directly in [`fixtures/`](fixtures/) so evaluators and judges can reproduce the live benchmark telemetry and multilingual tests immediately without recording audio:
 
@@ -726,12 +822,13 @@ All audio fixtures are tracked directly in [`fixtures/`](fixtures/) so evaluator
 | `fixtures/auth_500_error_de.wav` | German (`de`) | 6.2s | Fix: Authentication API 500 errors causing deployment delay | `ovio --file fixtures/auth_500_error_de.wav --lang de` |
 | `fixtures/auth_500_error_hi.wav` | Hindi (`hi`) | 5.3s | Fix: Hindi dictation for deployment 500 auth errors | `ovio --file fixtures/auth_500_error_hi.wav --lang hi` |
 
+[Back to Top](#top) &nbsp;|&nbsp; [Quick Navigation](#quick-navigation)
+
 ---
 
+## <a id="interactive-documentation--landing-page"></a>Interactive Documentation & Landing Page
 
-## Interactive Documentation & Landing Page
-
-ovio includes a technical landing page and documentation site built with React, Vite, and Tailwind CSS. It allows evaluators and developers to inspect the architecture, explore diff symbol biasing, and test interactive terminal simulations.
+ovio includes a technical landing page and documentation site built with React, Vite, and Tailwind CSS. It is deployed live at [**ovio-wine.vercel.app**](https://ovio-wine.vercel.app/) and allows evaluators and developers to inspect the architecture, explore diff symbol biasing, and test interactive terminal simulations.
 
 ### Running the Landing Page Locally
 ```bash
@@ -745,3 +842,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Diff Biasing Inspector**: Click through code symbols to see how vocabulary biasing pins exact identifier casing vs generic phonetic transcription.
 - **5-Stage Pipeline Walkthrough**: Deep dive into speech capture, biasing, and git execution.
 - **CLI Quickstart & Benchmarks**: Reference for CLI commands, arguments, and live evaluation telemetry.
+
+---
+
+[Back to Top](#top) &nbsp;|&nbsp; [Quick Navigation](#quick-navigation)
