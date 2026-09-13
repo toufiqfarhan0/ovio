@@ -338,82 +338,181 @@ ovio --help
 
 ---
 
-### Real-World Execution Telemetry (Tested on `test-apy-sync`)
+### Real-World Execution Telemetry (Tested on [`test-apy-sync`](https://github.com/toufiqfarhan0/test-apy-sync))
 
-All commands were verified live on an external target repository (`test-apy-sync`):
+All commands and workflows were executed and verified live end-to-end like a new developer on the external target repository [**github.com/toufiqfarhan0/test-apy-sync**](https://github.com/toufiqfarhan0/test-apy-sync). 
 
-#### 1. Pre-Flight Diagnostics (`ovio verify`)
+Every single test below generated real production code changes that were staged, audited for AST diff tokens, transcribed through the production AssemblyAI Universal-3.5 Pro Dictation API, formatted into Conventional Commits, and **committed and pushed live to GitHub**. You can inspect each live commit directly on GitHub:
+
+| Target Repo | Live Commit Hash | Mode / Language | Live Commit Link & Conventional Commit Subject |
+|---|---|---|---|
+| [`test-apy-sync`](https://github.com/toufiqfarhan0/test-apy-sync) | [`43b025a`](https://github.com/toufiqfarhan0/test-apy-sync/commit/43b025a56a6a294386033196a8c2a736ed945812) | **English (`en`)** | [`feat(auth): implement refreshToken endpoint and tokenBlacklist for session logout`](https://github.com/toufiqfarhan0/test-apy-sync/commit/43b025a56a6a294386033196a8c2a736ed945812) |
+| [`test-apy-sync`](https://github.com/toufiqfarhan0/test-apy-sync) | [`2e96736`](https://github.com/toufiqfarhan0/test-apy-sync/commit/2e96736fc20ce4b1bc412bb475653b4737f59d28) | **Spanish (`es`)** | [`feat(webhooks): add signature verification using stripeWebhookSecret for enhanced security`](https://github.com/toufiqfarhan0/test-apy-sync/commit/2e96736fc20ce4b1bc412bb475653b4737f59d28) |
+| [`test-apy-sync`](https://github.com/toufiqfarhan0/test-apy-sync) | [`60847a9`](https://github.com/toufiqfarhan0/test-apy-sync/commit/60847a93556d10fb9d08e563eeadfb35baea70a4) | **French (`fr`)** | [`feat(payment): added idempotency key and payment validation in payment routes`](https://github.com/toufiqfarhan0/test-apy-sync/commit/60847a93556d10fb9d08e563eeadfb35baea70a4) |
+
+---
+
+#### Step 1: Pre-Flight Diagnostics (`ovio verify`)
+A new user verifies local audio capture hardware, Git repository detection, and AssemblyAI API authentication:
 ```text
 PS C:\Users\toufi\Desktop\test-apy-sync> ovio verify
 ────────────────────────────────────────────────────────────────────
  ovio_verify   DIAGNOSTICS — environment audit
 ────────────────────────────────────────────────────────────────────
-git repository  OK (work tree detected)
-audio backend   OK (21 audio device(s) detected)
-api key         OK (49db5e...9ace)
+ git repository  : OK (work tree detected)
+ audio backend   : OK (21 audio device(s) detected)
+ api key         : OK (49db5e...9ace)
 ────────────────────────────────────────────────────────────────────
 VERIFY OK: system fully operational; audio capture, AST biasing, and dictation ready.
 ```
 
-#### 2. AST Biasing Audit (`ovio gate`)
-When changes in `src/index.ts` are staged, `ovio gate` parses AST tokens and registers them for vocabulary injection:
+#### Step 2: AST Biasing Pre-Flight Audit (`ovio gate`)
+The developer adds `refreshToken` and `tokenBlacklist` in `src/routes/auth.ts`. Running `ovio gate` inspects the AST diff and extracts custom symbols to bias Universal-3.5 Pro:
 ```text
 PS C:\Users\toufi\Desktop\test-apy-sync> ovio gate
-  ██████╗ ██╗   ██╗██╗ ██████╗       VOICE GIT ─────────────
- ██╔═══██╗██║   ██║██║██╔═══██╗      assemblyai universal-3.5 pro
- ██║   ██║██║   ██║██║██║   ██║      ast codebase biasing engine
- ██║   ██║╚██╗ ██╔╝██║██║   ██║      ───────────────────────
- ╚██████╔╝ ╚████╔╝ ██║╚██████╔╝      sub-second dictation sla
-  ╚═════╝   ╚═══╝  ╚═╝ ╚═════╝ 
 
-[PASS]  GATE_READY      branch=main  staged=1  symbols=4
+ovio — voice git & codebase dictation engine
+
+measure what the developer meant
+
+[PASS]  GATE_READY      branch=main  staged=1  symbols=5
 
 ────────────────────────────────────────────────────────────────────
  main   INSPECT — AST biasing audit
 ────────────────────────────────────────────────────────────────────
-branch          main
-staged files    1 files (index.ts)
-ast biasing     4 symbol(s) locked into vocabulary
-                   01. index.ts
-                   02. index
-                   03. teamsRouter
-                   04. GET
-engine          Universal-3.5 Pro (sub-second SLA < 800ms)
-stt prompt      A developer dictating git commits for branch 'main'. Files: index.ts.
+ branch          : main
+ staged files    : 1 files (auth.ts)
+ ast biasing     : 5 symbol(s) locked into vocabulary
+                   01. auth.ts
+                   02. auth
+                   03. tokenBlacklist
+                   04. POST
+                   05. refreshToken
+ engine          : Universal-3.5 Pro (sub-second SLA < 800ms)
+ stt prompt      : A developer dictating git commits for branch 'main'. Files: auth.ts.
 ────────────────────────────────────────────────────────────────────
 ```
 
-#### 3. Real Audio Transcription via AssemblyAI Dictation API (`ovio --file`)
-Transcribing `fixtures/auth_500_error.wav` through production AssemblyAI Dictation API Beta:
+#### Step 3: Dictate, Transcribe & Push Live Commit ([`43b025a`](https://github.com/toufiqfarhan0/test-apy-sync/commit/43b025a56a6a294386033196a8c2a736ed945812))
+The developer dictates their commit: *"In auth routes, we implemented refreshToken endpoint and tokenBlacklist for session logout."* `ovio` biases the acoustic engine with the staged symbols, formats into Conventional Commits, and pushes live to GitHub:
 ```text
-PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file C:\Users\toufi\Desktop\ovio\fixtures\auth_500_error.wav
-  ██████╗ ██╗   ██╗██╗ ██████╗       VOICE GIT ─────────────
- ██╔═══██╗██║   ██║██║██╔═══██╗      assemblyai universal-3.5 pro
- ██║   ██║██║   ██║██║██║   ██║      ast codebase biasing engine
- ██║   ██║╚██╗ ██╔╝██║██║   ██║      ───────────────────────
- ╚██████╔╝ ╚████╔╝ ██║╚██████╔╝      sub-second dictation sla
-  ╚═════╝   ╚═══╝  ╚═╝ ╚═════╝ 
+PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/auth_refresh_en.wav --push
+
+ovio — voice git & codebase dictation engine
+
+measure what the developer meant
+
+[LIVE]  DICTATION      model=Universal-3.5 Pro  sla<800ms
 
 ────────────────────────────────────────────────────────────────────
-  version         1.0.0               branch          main
-  model           Universal-3.5 Pro   staged files    0
-  provider        AssemblyAI Dictation symbols biased  0
+ main   LIVE — AssemblyAI Dictation Engine
+────────────────────────────────────────────────────────────────────
+ branch          : main
+ staged files    : 1 files (auth.ts)
+ language        : en  (English)
+ ast biasing     : 5 symbols [auth.ts, auth, tokenBlacklist, POST, refreshToken]
+ engine          : Universal-3.5 Pro (sub-second SLA < 800ms)
+ instruction     : Conventional Commit + AST symbol fidelity
+ BIAS HIT: 5 staged symbol(s) locked into STT vocabulary [auth.ts, auth, tokenBlacklist].
 ────────────────────────────────────────────────────────────────────
 
-  file playback: C:\Users\toufi\Desktop\ovio\fixtures\auth_500_error.wav (4.0s)
-  transcribed & formatted  [2642ms  Universal-3.5 Pro]
-────────────────────────────────────────────────────────────────────
-  verbatim
-  The deployment is delayed because the authentication API is returning 500 errors.
+  ● transcribing (English) with Universal-3.5 Pro...
+  [main 43b025a] feat(auth): implement refreshToken endpoint and tokenBlacklist for session logout
+  1 file changed, 21 insertions(+)
 
-  conventional commit
-  fix(auth-api): resolve 500 errors causing deployment delay
-  * Investigate authentication API 500 errors
-  * Resolve root cause to enable deployment
+────────────────────────────────────────────────────────────────────
+ commit_transcribe   TRANSCRIBED — in 2445 ms (SLA < 800ms)
+────────────────────────────────────────────────────────────────────
+ verbatim        : In auth/routes, we implemented refreshToken endpoint and tokenBlacklist for session logout.
+ conventional    : feat(auth): implement refreshToken endpoint and tokenBlacklist for session logout
+                   - Added refreshToken endpoint in auth/routes
+                   - Implemented tokenBlacklist for session logout
+────────────────────────────────────────────────────────────────────
+VERIFY OK: committed to local branch main; pushed to origin/main
 ────────────────────────────────────────────────────────────────────
 ```
+👉 **Live GitHub Commit**: [https://github.com/toufiqfarhan0/test-apy-sync/commit/43b025a](https://github.com/toufiqfarhan0/test-apy-sync/commit/43b025a56a6a294386033196a8c2a736ed945812)
 
-#### 4. Synthetic Developer Turnaround (`ovio --demo`)
+#### Step 4: Multilingual Spanish Dictation & Live Push ([`2e96736`](https://github.com/toufiqfarhan0/test-apy-sync/commit/2e96736fc20ce4b1bc412bb475653b4737f59d28))
+The developer updates `src/routes/webhooks.ts` with HMAC signature validation (`stripeWebhookSecret`, `verifyStripeSignature`) and dictates in Spanish: *"En las rutas de webhooks agregamos la verificación de firma con stripeWebhookSecret para mayor seguridad."*
+```text
+PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/webhook_security_es.wav --lang es --push
+
+ovio — voice git & codebase dictation engine
+
+measure what the developer meant
+
+[LIVE]  DICTATION      model=Universal-3.5 Pro  sla<800ms
+
+────────────────────────────────────────────────────────────────────
+ main   LIVE — AssemblyAI Dictation Engine
+────────────────────────────────────────────────────────────────────
+ branch          : main
+ staged files    : 1 files (webhooks.ts)
+ language        : es  (Spanish)
+ ast biasing     : 12 symbols [webhooks.ts, webhooks, verifyStripeSignature, router, stripeWebhookSecret]
+ engine          : Universal-3.5 Pro (sub-second SLA < 800ms)
+ instruction     : Conventional Commit + AST symbol fidelity
+ BIAS HIT: 12 staged symbol(s) locked into STT vocabulary [webhooks.ts, webhooks, verifyStripeSignature].
+────────────────────────────────────────────────────────────────────
+
+  ● transcribing (Spanish) with Universal-3.5 Pro...
+  [main 2e96736] feat(webhooks): add signature verification using stripeWebhookSecret for enhanced security
+  1 file changed, 18 insertions(+), 2 deletions(-)
+
+────────────────────────────────────────────────────────────────────
+ commit_transcribe   TRANSCRIBED — in 2544 ms (SLA < 800ms)
+────────────────────────────────────────────────────────────────────
+ verbatim        : En las rutas de webhooks agregamos la verificación de firma con stripeWebhookSecret para mayor seguridad.
+ conventional    : feat(webhooks): add signature verification using stripeWebhookSecret for enhanced security
+────────────────────────────────────────────────────────────────────
+VERIFY OK: committed to local branch main; pushed to origin/main
+────────────────────────────────────────────────────────────────────
+```
+👉 **Live GitHub Commit**: [https://github.com/toufiqfarhan0/test-apy-sync/commit/2e96736](https://github.com/toufiqfarhan0/test-apy-sync/commit/2e96736fc20ce4b1bc412bb475653b4737f59d28)
+
+#### Step 5: Multilingual French Dictation & Live Push ([`60847a9`](https://github.com/toufiqfarhan0/test-apy-sync/commit/60847a93556d10fb9d08e563eeadfb35baea70a4))
+The developer adds idempotency key replay cache in `src/routes/payments.ts` (`idempotencyStore`, `idempotencyKey`) and dictates in French: *"Nous avons ajouté la clé d'idempotence et la validation des paiements dans les routes de paiement."*
+```text
+PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/payments_idempotency_fr.wav --lang fr --push
+
+ovio — voice git & codebase dictation engine
+
+measure what the developer meant
+
+[LIVE]  DICTATION      model=Universal-3.5 Pro  sla<800ms
+
+────────────────────────────────────────────────────────────────────
+ main   LIVE — AssemblyAI Dictation Engine
+────────────────────────────────────────────────────────────────────
+ branch          : main
+ staged files    : 1 files (payments.ts)
+ language        : fr  (French)
+ ast biasing     : 9 symbols [payments.ts, payments, router, idempotencyStore, idempotencyKey]
+ engine          : Universal-3.5 Pro (sub-second SLA < 800ms)
+ instruction     : Conventional Commit + AST symbol fidelity
+ BIAS HIT: 9 staged symbol(s) locked into STT vocabulary [payments.ts, payments, router].
+────────────────────────────────────────────────────────────────────
+
+  ● transcribing (French) with Universal-3.5 Pro...
+  [main 60847a9] feat(payment): added idempotency key and payment validation in payment routes
+  1 file changed, 23 insertions(+), 2 deletions(-)
+
+────────────────────────────────────────────────────────────────────
+ commit_transcribe   TRANSCRIBED — in 1299 ms (SLA < 800ms)
+────────────────────────────────────────────────────────────────────
+ verbatim        : Nous avons ajouté la clé d'idempotence et la validation des paiements dans les routes de paiement.
+ conventional    : feat(payment): added idempotency key and payment validation in payment routes
+                   - Added idempotency key
+                   - Added payment validation
+────────────────────────────────────────────────────────────────────
+VERIFY OK: committed to local branch main; pushed to origin/main
+────────────────────────────────────────────────────────────────────
+```
+👉 **Live GitHub Commit**: [https://github.com/toufiqfarhan0/test-apy-sync/commit/60847a9](https://github.com/toufiqfarhan0/test-apy-sync/commit/60847a93556d10fb9d08e563eeadfb35baea70a4)
+
+#### Step 6: Synthetic Developer Turnaround (`ovio --demo`)
+Zero-latency synthetic dry run for CI/CD environments or developers testing without audio inputs:
 ```text
 PS C:\Users\toufi\Desktop\test-apy-sync> ovio --demo
   ██████╗ ██╗   ██╗██╗ ██████╗       VOICE GIT ─────────────
@@ -475,7 +574,7 @@ ovio --lang es
 ovio --lang hi
 ```
 
-### Live Multilingual Test Results (on `test-apy-sync`)
+### Live Multilingual Test Results (on [`test-apy-sync`](https://github.com/toufiqfarhan0/test-apy-sync))
 
 All four tests were executed live against the production AssemblyAI Dictation API using gTTS-synthesized audio fixtures. Verbatim is in the source language; commit is always English.
 
