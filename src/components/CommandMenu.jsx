@@ -122,8 +122,8 @@ export default function CommandMenu({ isOpen, onClose, onSelectCommand }) {
 
         {/* Footer shortcuts */}
         <div className="px-4 py-2 bg-paper-deep/40 hairline-border-t flex items-center justify-between text-[11px] font-mono text-muted">
-          <span>Navigate: ↑ ↓</span>
-          <span>Select: ↵</span>
+          <span>Navigate: Up / Down</span>
+          <span>Select: Enter</span>
           <span>Close: Esc</span>
         </div>
       </div>

@@ -1,4 +1,4 @@
-# ovio / commitspeak — Voice Git & Codebase Dictation Engine
+# ovio — Voice Git & Codebase Dictation Engine
 # Core Python dependencies
 assemblyai>=1.0.0
 rich>=13.0.0

@@ -5,10 +5,10 @@ export default function Surfaces() {
   const surfaces = [
     {
       title: 'Native Terminal CLI',
-      badge: 'git speak',
+      badge: 'ovio',
       desc: 'Run directly in any git repository. Push-to-talk audio capture, sub-second AssemblyAI turnaround, and one-key commit execution.',
       icon: Terminal,
-      code: '$ git add .\n$ git speak\n[0.6s] Committed: feat(auth): verify JWT expiry'
+      code: '$ git add .\n$ ovio\n[0.6s] Committed: feat(auth): verify JWT expiry'
     },
     {
       title: 'Pre-Commit & CI Gate',
@@ -27,7 +27,7 @@ export default function Surfaces() {
     {
       title: 'VS Code & Cursor Overlay',
       badge: 'Desktop Raycast Style',
-      desc: 'Floating pill widget triggered by a global hotkey (⌘+Shift+C) over your editor without leaving your active file.',
+      desc: 'Floating pill widget triggered by a global hotkey (Cmd+Shift+C) over your editor without leaving your active file.',
       icon: Laptop,
       code: 'Shortcut: Cmd + Shift + C\nScope: Active Editor Diff\nTarget: Staged Git Index'
     }

@@ -246,7 +246,7 @@ export default function ConsoleWindow() {
         {/* Footer info */}
         <div className="mt-4 flex flex-wrap items-center justify-between text-xs font-mono text-muted px-2">
           <span>CLI binary: <strong className="text-ink">ovio</strong> (powered by AssemblyAI Dictation API)</span>
-          <span>Optional Git alias: <code className="px-1.5 py-0.5 bg-paper rounded text-ink font-semibold">ovio --install-alias</code></span>
+          <span>Execution: <code className="px-1.5 py-0.5 bg-paper rounded text-ink font-semibold">ovio</code></span>
         </div>
       </div>
     </section>

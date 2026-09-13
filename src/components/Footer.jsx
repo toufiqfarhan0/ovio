@@ -26,7 +26,7 @@ export default function Footer() {
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-paper-light border border-line text-[11px] font-mono text-ink-soft">
                 <Terminal className="w-3 h-3 text-muted" />
-                <span>git speak</span>
+                <span>ovio</span>
               </span>
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-paper-light border border-line text-[11px] font-mono text-muted">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>

@@ -1,4 +1,4 @@
-# 🎙️ ovio — Voice Git & Codebase Dictation Engine
+# ovio — Voice Git & Codebase Dictation Engine
 
 > **"Speech is messy. Git commits must be load-bearing."**  
 > Built for the **AssemblyAI Voice Hackathon Week: Hack into Dictation** (Sept 2026).  
@@ -14,7 +14,7 @@
 
 ---
 
-## ⚡ The 60-Second Overview
+## The 60-Second Overview
 
 Software engineers spend **45 seconds** per git commit switching mental context between complex code and writing structured [Conventional Commits](https://www.conventionalcommits.org/). Standard speech-to-text engines fail for developer workflows because:
 1. **Verbal Noise**: They transcribe hesitation words (*"uh"*, *"um"*, *"wait actually"*) verbatim into commit logs.
@@ -35,7 +35,7 @@ feat(auth): handle TokenExpiredError in verifyToken
 
 ---
 
-## 🏗️ Architecture & Pipeline
+## Architecture & Pipeline
 
 ### End-to-End System Flow
 
@@ -120,7 +120,7 @@ flowchart TD
 
 ---
 
-## 🔬 Deep Dive: The 5-Stage Pipeline
+## Deep Dive: The 5-Stage Pipeline
 
 ### Stage 1: Git Context Extraction & Auto-Staging
 When the developer runs `ovio`, ovio inspects the current repository state:
@@ -175,7 +175,7 @@ response = transcriber.transcribe_live(audio_path, config=config)
 
 ---
 
-## 📊 Empirical Live Benchmarks & Evaluation
+## Empirical Live Benchmarks & Evaluation
 
 All test runs below were executed live against the production AssemblyAI Dictation API (`dictation.assemblyai.com/v1/transcribe/live`) using `Universal-3.5 Pro` with AST keyterm biasing. Audio fixtures are checked into [`fixtures/`](fixtures/) so any evaluator can reproduce these numbers independently:
 
@@ -206,7 +206,7 @@ ovio --file fixtures/feature_refactor.wav
 
 ---
 
-## 🚀 Step-by-Step Installation & Quickstart
+## Step-by-Step Installation & Quickstart
 
 ### Prerequisites
 - Python **3.10+**
@@ -238,20 +238,17 @@ Create a `.env` file in the project root (or export the environment variable):
 echo "ASSEMBLYAI_API_KEY=your_assemblyai_api_key_here" > .env
 ```
 
-### Step 4: Standalone Command & Optional Git Aliases
+### Step 4: Verify Installation
 When installed via `pip install -e .`, the `ovio` command is globally accessible in any shell.
 
 ```bash
 # Verify the CLI is available
 ovio --help
-
-# Optional: Register 'git speak' and 'git commitspeak' as native Git subcommands
-ovio --install-alias
 ```
 
 ---
 
-## 🎮 How to Use the CLI
+## How to Use the CLI
 
 ### Typical Developer Workflow
 
@@ -311,11 +308,10 @@ ovio --install-alias
 | `ovio --verbose` | `-v` | Displays the exact extracted AST symbols in the terminal header |
 | `ovio --push` | `-p` | Automatically commits and pushes without interactive confirmation |
 | `ovio --file <path>` | `-f` | Transcribes an existing WAV audio file (e.g. `ovio --file fixtures/auth_500_error.wav`) |
-| `ovio --install-alias` | - | Registers `git speak` and `git commitspeak` as native Git aliases |
 
 ---
 
-## 🌐 Interactive Documentation & Landing Page
+## Interactive Documentation & Landing Page
 
 ovio includes a technical landing page and documentation site built with React, Vite, and Tailwind CSS. It allows evaluators and developers to inspect the architecture, explore AST symbol biasing, and test interactive terminal simulations.
 
@@ -330,4 +326,4 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Terminal Simulator**: Push-to-talk demo with waveform visualization and sample scenarios.
 - **AST Biasing Inspector**: Click through code symbols to see phonetic confidence boosts (48% vs 99%).
 - **5-Stage Pipeline Walkthrough**: Deep dive into speech capture, biasing, and git execution.
-- **CLI Quickstart & Benchmarks**: Reference for shell aliases, arguments, and live evaluation telemetry.
+- **CLI Quickstart & Benchmarks**: Reference for CLI commands, arguments, and live evaluation telemetry.

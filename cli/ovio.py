@@ -406,26 +406,6 @@ def transcribe_with_assemblyai(audio_path: str, context: dict) -> dict:
         }
 
 # ─────────────────────────────────────────────────────────────
-# install-alias
-# ─────────────────────────────────────────────────────────────
-
-def install_git_aliases():
-    """Registers 'git speak' as a global git alias pointing to this script."""
-    script_path = Path(__file__).resolve()
-    cmd1 = f'git config --global alias.speak "!python \\"{script_path}\\""'
-    cmd2 = f'git config --global alias.commitspeak "!python \\"{script_path}\\""'
-    try:
-        subprocess.run(cmd1, shell=True, check=True)
-        subprocess.run(cmd2, shell=True, check=True)
-        console.print()
-        print_rule()
-        console.print("  [bold green]ok[/bold green]  git aliases registered")
-        print_rule()
-        console.print()
-    except Exception as e:
-        console.print(f"  [bold red]error:[/bold red] {e}")
-
-# ─────────────────────────────────────────────────────────────
 # rendering
 # ─────────────────────────────────────────────────────────────
 
@@ -502,15 +482,11 @@ def main(
     demo: bool = typer.Option(False, "--demo", "-d", help="Run with synthetic audio for dry-run verification"),
     push: bool = typer.Option(False, "--push", "-p", help="Automatically commit and push without confirmation"),
     file: Optional[str] = typer.Option(None, "--file", "-f", help="Path to existing WAV audio file"),
-    verbose: bool = typer.Option(False, "--verbose", "-v", help="Display extracted AST symbols in header"),
-    install_alias: bool = typer.Option(False, "--install-alias", help="Register 'git speak' and 'commitspeak' aliases")
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Display extracted AST symbols in header")
 ):
     """
     ovio — Voice Git & Codebase Dictation Engine
     """
-    if install_alias:
-        install_git_aliases()
-        return
 
     # 1. Gather git context and AST symbols
     context = get_git_context(auto_stage=True)

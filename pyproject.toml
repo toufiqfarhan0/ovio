@@ -23,5 +23,3 @@ dependencies = [
 
 [project.scripts]
 ovio = "ovio_cli:main"
-commitspeak = "ovio_cli:main"
-git-speak = "ovio_cli:main"

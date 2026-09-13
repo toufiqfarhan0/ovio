@@ -27,9 +27,9 @@ export default function Quickstart() {
       cmd: `ovio`
     },
     {
-      title: 'Optional: Register Native Git Aliases',
-      code: `ovio --install-alias\n# enables 'git speak' and 'git commitspeak'`,
-      cmd: `ovio --install-alias`
+      title: 'Inspect AST Biased Symbols',
+      code: `ovio -v\n# displays extracted codebase symbols in header`,
+      cmd: `ovio -v`
     }
   ]
 
