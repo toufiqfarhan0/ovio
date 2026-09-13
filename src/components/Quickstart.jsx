@@ -26,7 +26,7 @@ export default function Quickstart() {
     },
     {
       title: 'Run Voice Git Anywhere',
-      code: `ovio\n# or dry-run demo simulation: ovio --demo\n# or transcribe file: ovio --file clip.wav`,
+      code: `ovio\n# or in French, Spanish, German, etc: ovio --lang fr\n# or transcribe file: ovio --file clip.wav\n# or dry-run demo: ovio --demo`,
       cmd: `ovio`
     },
     {

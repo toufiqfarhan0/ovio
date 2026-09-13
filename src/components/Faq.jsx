@@ -37,7 +37,7 @@ export default function Faq() {
       a: (
         <div className="space-y-2">
           <p>
-            The Dictation API runs on Universal-3.5 Pro across 19 languages: English, Spanish, French, German, Italian, Portuguese, Arabic, Danish, Dutch, Finnish, Hebrew, Hindi, Japanese, Mandarin (Chinese), Norwegian, Swedish, Turkish, and Vietnamese (plus deep regional dialects). For languages outside this primary set (such as Urdu), automatic fallback to Universal-2 provides support for 99 languages.
+            ovio includes first-class multilingual support via the <code>--lang &lt;code&gt;</code> flag (e.g. <code>ovio --lang fr</code>, <code>ovio --lang es</code>, <code>ovio --lang de</code>, <code>ovio --lang hi</code>). The Dictation API runs on Universal-3.5 Pro across 19 languages: English, Spanish, French, German, Italian, Portuguese, Arabic, Danish, Dutch, Finnish, Hebrew, Hindi, Japanese, Mandarin (Chinese), Norwegian, Swedish, Turkish, and Vietnamese. Spoken speech is preserved verbatim in your native language in session telemetry, while the generated Conventional Commit message is automatically standardized into English.
           </p>
           <div className="pt-1 flex flex-wrap items-center gap-3 text-xs font-mono">
             <a
