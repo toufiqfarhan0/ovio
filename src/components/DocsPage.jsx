@@ -495,6 +495,56 @@ export default function DocsPage({ onBack }) {
                 </p>
               </div>
             </div>
+
+            {/* Architecture Alignment: Clinical Dictation vs Codebase Dictation */}
+            <div className="mt-8 pt-6 border-t border-line space-y-3">
+              <h3 className="font-semibold text-base text-ink flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#ff571a]" />
+                <span>Architectural Alignment: Clinical Dictation vs. Codebase Dictation</span>
+              </h3>
+              <p className="text-ink-soft text-xs leading-relaxed">
+                In AssemblyAI&apos;s official documentation, the flagship example for the Dictation API is <strong>Clinical Dictation</strong> (a doctor dictating patient notes). ovio directly mirrors that exact three-lever paradigm to solve developer workflow challenges:
+              </p>
+              
+              <div className="overflow-x-auto rounded-lg border border-line bg-paper-card">
+                <table className="w-full text-left text-xs font-mono">
+                  <thead>
+                    <tr className="border-b border-line bg-paper-deep/50 text-ink">
+                      <th className="py-2.5 px-3">Dictation Lever</th>
+                      <th className="py-2.5 px-3">AssemblyAI Clinical Dictation</th>
+                      <th className="py-2.5 px-3">ovio Codebase Dictation</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-line text-ink-soft">
+                    <tr>
+                      <td className="py-2 px-3 font-bold text-ink">stt_prompt</td>
+                      <td className="py-2 px-3">&quot;A doctor dictating a patient visit note.&quot;</td>
+                      <td className="py-2 px-3 text-[#ff571a]">&quot;A developer dictating git commits for branch &apos;main&apos;. Files: authRoutes.ts.&quot;</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 px-3 font-bold text-ink">keyterms_prompt</td>
+                      <td className="py-2 px-3">Drug names: [&quot;amoxicillin&quot;, &quot;lisinopril&quot;]</td>
+                      <td className="py-2 px-3 text-[#ff571a]">AST diff identifiers: [&quot;refreshToken&quot;, &quot;tokenBlacklist&quot;]</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 px-3 font-bold text-ink">llm_instruction</td>
+                      <td className="py-2 px-3">&quot;Rewrite as a concise clinical chart note.&quot;</td>
+                      <td className="py-2 px-3 text-[#ff571a]">&quot;Format strictly as Conventional Commit v1.0.0 (type(scope): summary).&quot;</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 px-3 font-bold text-ink">Fallback Safety</td>
+                      <td className="py-2 px-3">rewrite = result[&quot;llm_response&quot;] or transcript</td>
+                      <td className="py-2 px-3 text-[#ff571a]">clean_commit = res[&quot;llm_response&quot;] or verbatim (zero data loss)</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 px-3 font-bold text-ink">Pre-warming</td>
+                      <td className="py-2 px-3">transcriber.warm() (DNS/TCP/TLS setup)</td>
+                      <td className="py-2 px-3 text-[#ff571a]">Pre-flight warm-up on CLI initialization</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </section>
 
           <hr className="border-line" />
@@ -626,13 +676,22 @@ export default function DocsPage({ onBack }) {
                 <tbody className="divide-y divide-line text-ink-soft">
                   <tr><td className="py-2 px-3 font-bold">en</td><td className="py-2 px-3">English</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
                   <tr><td className="py-2 px-3 font-bold">es</td><td className="py-2 px-3">Spanish</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
-                  <tr><td className="py-2 px-3 font-bold">fr</td><td className="py-2 px-3">French</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
                   <tr><td className="py-2 px-3 font-bold">de</td><td className="py-2 px-3">German</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
-                  <tr><td className="py-2 px-3 font-bold">hi</td><td className="py-2 px-3">Hindi</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
+                  <tr><td className="py-2 px-3 font-bold">fr</td><td className="py-2 px-3">French</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
                   <tr><td className="py-2 px-3 font-bold">it</td><td className="py-2 px-3">Italian</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
                   <tr><td className="py-2 px-3 font-bold">pt</td><td className="py-2 px-3">Portuguese</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
+                  <tr><td className="py-2 px-3 font-bold">tr</td><td className="py-2 px-3">Turkish</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
                   <tr><td className="py-2 px-3 font-bold">nl</td><td className="py-2 px-3">Dutch</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
+                  <tr><td className="py-2 px-3 font-bold">sv</td><td className="py-2 px-3">Swedish</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
+                  <tr><td className="py-2 px-3 font-bold">no</td><td className="py-2 px-3">Norwegian</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
+                  <tr><td className="py-2 px-3 font-bold">da</td><td className="py-2 px-3">Danish</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
+                  <tr><td className="py-2 px-3 font-bold">fi</td><td className="py-2 px-3">Finnish</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
+                  <tr><td className="py-2 px-3 font-bold">hi</td><td className="py-2 px-3">Hindi</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
+                  <tr><td className="py-2 px-3 font-bold">vi</td><td className="py-2 px-3">Vietnamese</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
+                  <tr><td className="py-2 px-3 font-bold">ar</td><td className="py-2 px-3">Arabic</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
+                  <tr><td className="py-2 px-3 font-bold">he</td><td className="py-2 px-3">Hebrew</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
                   <tr><td className="py-2 px-3 font-bold">ja</td><td className="py-2 px-3">Japanese</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
+                  <tr><td className="py-2 px-3 font-bold">ur</td><td className="py-2 px-3">Urdu</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
                   <tr><td className="py-2 px-3 font-bold">zh</td><td className="py-2 px-3">Chinese</td><td className="py-2 px-3 font-sans">Conventional Commit (English)</td></tr>
                 </tbody>
               </table>
@@ -691,10 +750,10 @@ export default function DocsPage({ onBack }) {
               <div className="p-4 rounded-lg border border-line bg-paper-card space-y-2">
                 <h4 className="font-semibold text-sm text-ink flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 text-amber-600" />
-                  <span>401 Unauthorized API Error</span>
+                  <span>404 Not Found / Authentication Failure</span>
                 </h4>
                 <p className="text-ink-soft">
-                  Verify that your AssemblyAI API key is valid and has active credits. Run <code className="font-mono">ovio verify</code> to confirm your key is loaded and properly formatted.
+                  Per the AssemblyAI Dictation API specification, an invalid API key returns HTTP <code className="font-mono">404 Not Found</code> with <code className="font-mono">&#123;&quot;detail&quot;: &quot;Invalid API key&quot;&#125;</code> rather than standard 401. Run <code className="font-mono">ovio verify</code> to audit your key formatting and environment loading.
                 </p>
               </div>
 

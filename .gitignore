@@ -10,3 +10,4 @@ ovio_commit.wav
 *.egg-info
 build/
 *.wav
+!fixtures/*.wav

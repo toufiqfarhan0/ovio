@@ -295,7 +295,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                 <span className="w-2.5 h-2.5 rounded-full bg-line-strong"></span>
               </div>
               <Terminal className="w-3.5 h-3.5 text-muted" />
-              <span className="text-xs font-mono text-ink font-semibold">~/test-apy-sync — zsh / pwsh</span>
+              <span className="text-xs font-mono text-ink font-semibold">~/ovio-live-test — zsh / pwsh</span>
               <span className="text-xs font-mono text-muted">•</span>
               <span className="text-[11px] font-mono text-muted">
                 {currentCommandDisplay}
