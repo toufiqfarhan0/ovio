@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Terminal,
   BookOpen,
@@ -102,6 +102,9 @@ function Callout({ type = 'note', title, children }) {
 export default function DocsPage({ onBack }) {
   const [activeSection, setActiveSection] = useState('overview')
   const [searchQuery, setSearchQuery] = useState('')
+  const isClickScrolling = useRef(false)
+  const navButtonRefs = useRef({})
+  const sidebarContainerRef = useRef(null)
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' })
@@ -158,6 +161,51 @@ export default function DocsPage({ onBack }) {
     }
   ]
 
+  // Scrollspy: automatically track visible section as user scrolls
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isClickScrolling.current) return
+
+      const scrollPosition = window.scrollY + 160 // offset for sticky navbar + breathing room
+      let currentSection = docSections[0].id
+
+      for (let i = 0; i < docSections.length; i++) {
+        const id = docSections[i].id
+        const el = document.getElementById(`doc-${id}`)
+        if (el) {
+          const top = el.offsetTop
+          if (scrollPosition >= top) {
+            currentSection = id
+          }
+        }
+      }
+
+      // If scrolled near bottom of page, activate the last section
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60) {
+        currentSection = docSections[docSections.length - 1].id
+      }
+
+      setActiveSection(prev => (prev !== currentSection ? currentSection : prev))
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Auto-scroll sidebar navigation so active section is always visible
+  useEffect(() => {
+    const activeBtn = navButtonRefs.current[activeSection]
+    if (activeBtn) {
+      activeBtn.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'nearest'
+      })
+    }
+  }, [activeSection])
+
   const filteredSections = docSections.filter(s =>
     s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.group.toLowerCase().includes(searchQuery.toLowerCase())
@@ -165,9 +213,15 @@ export default function DocsPage({ onBack }) {
 
   const scrollToDoc = (id) => {
     setActiveSection(id)
+    isClickScrolling.current = true
     const element = document.getElementById(`doc-${id}`)
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setTimeout(() => {
+        isClickScrolling.current = false
+      }, 800)
+    } else {
+      isClickScrolling.current = false
     }
   }
 
@@ -177,7 +231,10 @@ export default function DocsPage({ onBack }) {
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
         {/* Left Sidebar Navigation */}
         <aside className="lg:col-span-3">
-          <div className="sticky top-20 sm:top-24 space-y-6">
+          <div 
+            ref={sidebarContainerRef}
+            className="sticky top-20 sm:top-24 max-h-[calc(100vh-6.5rem)] overflow-y-auto pr-1.5 space-y-6"
+          >
             {/* Search filter */}
             <div className="relative">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
@@ -208,6 +265,7 @@ export default function DocsPage({ onBack }) {
                         return (
                           <button
                             key={item.id}
+                            ref={el => { navButtonRefs.current[item.id] = el }}
                             onClick={() => scrollToDoc(item.id)}
                             className={`w-full text-left flex items-center justify-between px-2.5 py-1.5 rounded-md transition-colors ${
                               isActive
@@ -241,11 +299,11 @@ export default function DocsPage({ onBack }) {
               </div>
               <div className="flex items-center justify-between text-muted">
                 <span>Biasing Slot Limit</span>
-                <span className="text-ink font-semibold">30 Symbols</span>
+                <span className="text-ink font-semibold">25 Symbols</span>
               </div>
               <div className="flex items-center justify-between text-muted">
                 <span>Supported Langs</span>
-                <span className="text-ink font-semibold">10+ Locales</span>
+                <span className="text-ink font-semibold">19 Languages</span>
               </div>
             </div>
           </div>
@@ -289,58 +347,101 @@ export default function DocsPage({ onBack }) {
           <section id="doc-quickstart" className="scroll-mt-32 space-y-4">
             <div className="micro-label text-muted">Quickstart & Installation</div>
             <h2 className="font-serif-display text-3xl text-ink font-semibold">
-              Installation & Initial Setup
+              Installation & System Setup
             </h2>
             <p className="text-ink-soft text-sm">
-              ovio requires Python 3.10+ and an AssemblyAI API key.
+              ovio requires Python 3.10+, Git, and an AssemblyAI API key. It runs natively across Windows, macOS, and Linux.
             </p>
 
-            <h3 className="font-semibold text-base pt-2">1. Install Package</h3>
-            <CodeBlock
-              code={`# On macOS, install portaudio via Homebrew first:\n# brew install portaudio git python\n\npip install -e .`}
-              language="bash"
-              label="Terminal Installation"
-            />
+            <div className="space-y-6 pt-2">
+              {/* Windows & Linux Setup */}
+              <div className="p-4 rounded-lg border border-line bg-paper-card space-y-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-sm text-ink flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-ink-soft" />
+                    <span>Windows &amp; Linux Setup</span>
+                  </h3>
+                  <span className="micro-label text-[10px] text-muted">POWERSHELL / BASH</span>
+                </div>
+                <p className="text-ink-soft text-xs">
+                  Clone the repository, install dependencies, and install the CLI in editable mode so <code className="font-mono">ovio</code> is globally accessible in any shell:
+                </p>
+                <CodeBlock
+                  code={`git clone https://github.com/toufiqfarhan0/ovio.git\ncd ovio\npip install -r requirements.txt\npip install -e .`}
+                  language="bash"
+                  label="Windows & Linux Terminal"
+                />
+              </div>
 
-            <h3 className="font-semibold text-base pt-2">2. Provide AssemblyAI API Key</h3>
-            <p className="text-ink-soft text-xs">
-              ovio resolves your API key from your environment or configuration files:
-            </p>
-            <CodeBlock
-              code={`# Option A: Local project environment (make sure .env is in .gitignore!)\necho "ASSEMBLYAI_API_KEY=your_assemblyai_api_key_here" > .env\n\n# Option B: Global home directory (works across all repositories safely)\necho "ASSEMBLYAI_API_KEY=your_assemblyai_api_key_here" > ~/.ovio.env\n\n# Option C: Direct shell export\nexport ASSEMBLYAI_API_KEY="your_assemblyai_api_key_here"`}
-              language="bash"
-              label="API Key Setup"
-            />
+              {/* macOS Setup */}
+              <div className="p-4 rounded-lg border border-line bg-paper-card space-y-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold text-sm text-ink flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-ink-soft" />
+                    <span>macOS Setup (MacBook Pro / Air — Apple Silicon &amp; Intel)</span>
+                  </h3>
+                  <span className="micro-label text-[10px] text-muted">HOMEBREW &amp; VENV</span>
+                </div>
+                <p className="text-ink-soft text-xs">
+                  Install PortAudio via Homebrew, create an isolated virtual environment, and install dependencies:
+                </p>
+                <CodeBlock
+                  code={`# 1. Install PortAudio and Python via Homebrew\nbrew install portaudio git python\n\n# 2. Clone repository & initialize virtual environment\ngit clone https://github.com/toufiqfarhan0/ovio.git\ncd ovio\npython3 -m venv venv\nsource venv/bin/activate\n\n# 3. Install dependencies & CLI globally in venv\npip install -r requirements.txt\npip install -e .`}
+                  language="bash"
+                  label="macOS Terminal (zsh / bash)"
+                />
 
-            <h3 className="font-semibold text-base pt-2">3. Verify Your Environment</h3>
-            <p className="text-ink-soft text-xs">
-              Run diagnostics to audit audio devices, Git working tree, and AssemblyAI connectivity:
-            </p>
-            <CodeBlock
-              code="ovio verify"
-              language="bash"
-              label="Environment Diagnostics"
-            />
+                <Callout type="tip" title="macOS Permissions & Resilience">
+                  <ul className="list-disc pl-4 space-y-1 text-xs">
+                    <li><strong>Microphone Permission:</strong> When prompted on first launch, click <strong>Allow</strong> for Terminal, iTerm2, or VS Code.</li>
+                    <li><strong>Accessibility Permission (Spacebar Push-to-Talk):</strong> Open <em>System Settings &gt; Privacy &amp; Security &gt; Accessibility</em> and toggle <strong>ON</strong> your terminal application.</li>
+                    <li><strong>Automatic Fallback:</strong> If Accessibility permissions are restricted or locked down, <code>ovio</code> automatically falls back to an <code>&lt;Enter&gt;</code> key start/stop toggle without crashing.</li>
+                  </ul>
+                </Callout>
+              </div>
 
-            <Callout type="tip" title="macOS (MacBook Pro / Air) Setup & Permissions">
-              On macOS, grant <strong>Microphone Access</strong> when prompted. For Spacebar push-to-talk, grant <strong>Accessibility</strong> in <em>System Settings &gt; Privacy &amp; Security &gt; Accessibility</em>. If running without accessibility, ovio automatically switches to the <code>&lt;Enter&gt;</code> toggle fallback.
-            </Callout>
+              {/* API Key Configuration */}
+              <div>
+                <h3 className="font-semibold text-base pt-1">2. Configure AssemblyAI API Key</h3>
+                <p className="text-ink-soft text-xs mt-1">
+                  ovio resolves your API key from local environment files, user profile, or shell environment variables:
+                </p>
+                <CodeBlock
+                  code={`# Option A: Local project environment (make sure .env is in .gitignore!)\necho "ASSEMBLYAI_API_KEY=your_assemblyai_api_key_here" > .env\n\n# Option B: Global home directory (works across all repositories securely)\necho "ASSEMBLYAI_API_KEY=your_assemblyai_api_key_here" > ~/.ovio.env\n\n# Option C: Direct shell export\nexport ASSEMBLYAI_API_KEY="your_assemblyai_api_key_here"`}
+                  language="bash"
+                  label="API Key Resolution Options"
+                />
+              </div>
 
-            <Callout type="tip" title="Zero-Mic Dry Run">
-              Don&apos;t have an active microphone or running in a headless VM? Test ovio instantly with synthetic developer audio using <code className="font-mono">ovio --demo</code> or test live API fixtures with <code className="font-mono">ovio --file fixtures/short_command.wav</code>.
-            </Callout>
+              {/* Verification Diagnostics */}
+              <div>
+                <h3 className="font-semibold text-base pt-1">3. Verify Your Environment</h3>
+                <p className="text-ink-soft text-xs mt-1">
+                  Run diagnostics to audit audio devices, Git working tree, and AssemblyAI API connectivity:
+                </p>
+                <CodeBlock
+                  code="ovio verify"
+                  language="bash"
+                  label="Environment Diagnostics"
+                />
+              </div>
+
+              <Callout type="note" title="Zero-Mic & Headless CI Testing">
+                Don&apos;t have an active microphone or running in a headless VM? Test ovio instantly with synthetic developer audio using <code className="font-mono">ovio --demo</code> or test live API fixtures with <code className="font-mono">ovio --file fixtures/short_command.wav</code>.
+              </Callout>
+            </div>
           </section>
 
           <hr className="border-line" />
 
-          {/* SECTION 3: Sub-800ms Pipeline Architecture */}
+          {/* SECTION 3: 5-Stage Pipeline Architecture */}
           <section id="doc-architecture" className="scroll-mt-32 space-y-4">
             <div className="micro-label text-muted">Core Engine</div>
             <h2 className="font-serif-display text-3xl text-ink font-semibold">
               The 5-Stage Voice-to-Git Pipeline
             </h2>
             <p className="text-ink-soft text-sm">
-              Every voice commit execution traverses five synchronous, fault-tolerant stages designed to hit a strict &lt;800ms SLA:
+              Every voice commit execution traverses five synchronous, fault-tolerant stages delivering rapid ~1s turnaround (1,003ms–1,512ms measured live):
             </p>
 
             <div className="space-y-3 font-mono text-xs">
