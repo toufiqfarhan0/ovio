@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FileCode, GitCommit, Check, X, ArrowRight, Zap, ShieldAlert, Cpu, Sparkles, Layers } from 'lucide-react'
+import TechTooltip from './TechTooltip'
+import { useSectionId } from '../utils/navigation'
 
 export const CODE_SAMPLES = {
   typescript: {
@@ -52,9 +54,10 @@ export default function InteractiveGraph() {
   const [activeLang, setActiveLang] = useState('typescript')
   const [selectedSymbol, setSelectedSymbol] = useState('verifyToken')
   const sample = CODE_SAMPLES[activeLang]
+  const sectionId = useSectionId('biasing')
 
   return (
-    <section id="biasing" className="py-16 hairline-border-b bg-paper">
+    <section id={sectionId} className="py-16 hairline-border-b bg-paper">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
@@ -63,16 +66,18 @@ export default function InteractiveGraph() {
               <span className="w-2 h-2 rounded-full bg-ink"></span>
               <span className="micro-label text-ink">The Decoding Gap</span>
               <span className="text-xs font-mono text-muted">•</span>
-              <span className="text-xs font-mono text-ink-soft">AST Biasing Inspector</span>
+              <span className="text-xs font-mono text-ink-soft">
+                <TechTooltip term="AST" position="bottom" align="left">AST</TechTooltip> Biasing Inspector
+              </span>
             </div>
             <h2 className="font-serif-display text-3xl sm:text-4xl text-ink font-normal tracking-tight">
-              Why raw ASR fails on code — and how ovio fixes it
+              Why raw <TechTooltip term="ASR" position="bottom" align="left">ASR</TechTooltip> fails on code — and how ovio fixes it
             </h2>
           </div>
 
           {/* Language / File Toggle */}
           <div className="flex items-center gap-2 bg-paper-light p-1 rounded-lg hairline-border text-xs font-mono">
-            <span className="text-muted px-2">Sample AST:</span>
+            <span className="text-muted px-2">Sample <TechTooltip term="AST" position="bottom" align="right">AST</TechTooltip>:</span>
             {Object.keys(CODE_SAMPLES).map((langKey) => (
               <button
                 key={langKey}
@@ -126,7 +131,7 @@ export default function InteractiveGraph() {
             </div>
 
             <div className="mt-4 pt-3 hairline-border-t flex items-center justify-between text-xs font-mono text-muted">
-              <span>AST symbols harvested: {sample.symbols.length}</span>
+              <span><TechTooltip term="AST" position="top">AST</TechTooltip> symbols harvested: {sample.symbols.length}</span>
               <span className="text-ink font-semibold">Tree-sitter / Regex Engine</span>
             </div>
           </div>
@@ -192,7 +197,7 @@ export default function InteractiveGraph() {
                       <div className="flex items-center justify-between mb-1.5 text-xs font-mono">
                         <span className="text-rose-900 font-medium flex items-center gap-1">
                           <X className="w-3.5 h-3.5" />
-                          <span>Standard STT (Unbiased)</span>
+                          <span>Standard <TechTooltip term="STT" position="top">STT</TechTooltip> (Unbiased)</span>
                         </span>
                         <span className="text-rose-700 font-bold">
                           {(current.confidenceUnbiased * 100).toFixed(0)}% confidence
@@ -221,7 +226,7 @@ export default function InteractiveGraph() {
                         "{current.biased}"
                       </div>
                       <p className="text-[11px] text-emerald-800/80 mt-1.5 leading-snug">
-                        Exact AST symbol preserved verbatim in commit message bullet points.
+                        Exact <TechTooltip term="AST" position="top">AST</TechTooltip> symbol preserved verbatim in commit message bullet points.
                       </p>
                     </div>
                   </div>

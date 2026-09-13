@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Search, Terminal, Mic, GitCommit, FileCode, ArrowRight, X, ExternalLink } from 'lucide-react'
+import { scrollToSection } from '../utils/navigation'
 
 export default function CommandMenu({ isOpen, onClose, onSelectCommand }) {
   const [query, setQuery] = useState('')
@@ -24,16 +25,16 @@ export default function CommandMenu({ isOpen, onClose, onSelectCommand }) {
     {
       category: 'Interactive Demo',
       items: [
-        { id: 'console', title: 'Open Live Dictation Console', desc: 'Push-to-talk live audio dictation to conventional commit', icon: Mic, action: () => { window.location.hash = '#console'; onClose(false); } },
-        { id: 'sample', title: 'Load Sample Voice Utterance', desc: 'Test speech with hesitation and self-corrections', icon: Terminal, action: () => { window.location.hash = '#console'; onClose(false); } },
+        { id: 'console', title: 'Open Live Dictation Console', desc: 'Push-to-talk live audio dictation to conventional commit', icon: Mic, action: () => { scrollToSection('console'); onClose(false); } },
+        { id: 'sample', title: 'Load Sample Voice Utterance', desc: 'Test speech with hesitation and self-corrections', icon: Terminal, action: () => { scrollToSection('console'); onClose(false); } },
       ]
     },
     {
       category: 'Documentation & Architecture',
       items: [
-        { id: 'pipeline', title: 'The 5-Step Pipeline', desc: 'Speech → AST Biasing → Universal-3.5 Pro → Conventional Commit', icon: GitCommit, action: () => { window.location.hash = '#pipeline'; onClose(false); } },
-        { id: 'biasing', title: 'AST Keyterms Biasing', desc: 'How ovio extracts symbols to eliminate misspellings', icon: FileCode, action: () => { window.location.hash = '#biasing'; onClose(false); } },
-        { id: 'cli', title: 'CLI Quickstart (`ovio`)', desc: 'Install and configure the terminal tool in 30 seconds', icon: Terminal, action: () => { window.location.hash = '#cli'; onClose(false); } },
+        { id: 'pipeline', title: 'The 5-Step Pipeline', desc: 'Speech → AST Biasing → Universal-3.5 Pro → Conventional Commit', icon: GitCommit, action: () => { scrollToSection('pipeline'); onClose(false); } },
+        { id: 'biasing', title: 'AST Keyterms Biasing', desc: 'How ovio extracts symbols to eliminate misspellings', icon: FileCode, action: () => { scrollToSection('biasing'); onClose(false); } },
+        { id: 'cli', title: 'CLI Quickstart (`ovio`)', desc: 'Install and configure the terminal tool in 30 seconds', icon: Terminal, action: () => { scrollToSection('cli'); onClose(false); } },
       ]
     },
     {

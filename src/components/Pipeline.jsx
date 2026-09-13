@@ -1,52 +1,59 @@
 import React from 'react'
 import { GitBranch, FileCode, Mic, Cpu, CheckCircle2, ArrowRight } from 'lucide-react'
+import TechTooltip from './TechTooltip'
+import { useSectionId } from '../utils/navigation'
 
 export default function Pipeline() {
+  const sectionId = useSectionId('pipeline')
   const steps = [
     {
       step: '01',
       title: 'Local Git Context',
-      badge: 'simple-git / CLI',
-      desc: 'Inspects staged changes and modified files via git status -s and git diff --staged before the developer speaks.',
+      badge: 'LOCAL GIT DIFF',
+      desc: 'Inspects staged changes and modified files via git status and git diff before the developer speaks.',
       icon: GitBranch,
-      detail: 'Extracts file paths, modified lines, and current branch name.'
+      detail: 'Extracts file paths, modified lines, and active branch name.'
     },
     {
       step: '02',
-      title: 'AST Symbol Extraction',
-      badge: 'Regex & Tree-sitter',
-      desc: 'Parses function, class, and identifier declarations into keyterms_prompt (up to 30 terms).',
+      title: 'AST Symbol Biasing',
+      badge: 'REGEX & AST PARSER',
+      desc: 'Parses function, class, and identifier declarations into keyterms_prompt for targeted acoustic biasing.',
       icon: FileCode,
-      detail: 'Eliminates ASR phonetic typos like "jwtSecret" vs "JSON secret".'
+      detail: (
+        <>
+          Eliminates phonetic <TechTooltip term="ASR" position="top">ASR</TechTooltip> typos like "jwtSecret" vs "JSON secret".
+        </>
+      )
     },
     {
       step: '03',
-      title: 'Voice Meter & Silence Nudge',
-      badge: 'Live RMS / Push-to-Talk',
-      desc: 'Streams 16kHz mono audio on Spacebar with real-time RMS metering. If silent for >2s, prompts the user to speak.',
+      title: 'Voice & Silence Meter',
+      badge: 'PUSH-TO-TALK / RMS',
+      desc: 'Captures 16kHz audio on Spacebar with real-time RMS metering, prompting user if silent for >2 seconds.',
       icon: Mic,
-      detail: 'Intercepts dead air before API calls, prompting with repo-aware suggestions.'
+      detail: 'Intercepts dead air before API calls with repo-aware suggestions.'
     },
     {
       step: '04',
       title: 'Universal-3.5 Pro',
-      badge: 'AssemblyAI Beta',
-      desc: 'Returns dual output: verbatim spoken words alongside Conventional Commit format in a single HTTP call.',
+      badge: 'ASSEMBLYAI BETA',
+      desc: 'Transcribes verbatim speech and formats Conventional Commits in a single sub-second API round-trip.',
       icon: Cpu,
-      detail: 'llm_instruction reshapes hesitation into feat(scope): subject in <800ms.'
+      detail: 'llm_instruction reshapes hesitation into feat(scope): subject.'
     },
     {
       step: '05',
       title: 'Safe Git Execution',
-      badge: 'Native Commit',
-      desc: 'User reviews and executes git commit -m with one keypress (Enter), or commits and pushes with (p).',
+      badge: 'NATIVE COMMIT',
+      desc: 'User reviews and confirms commit with one keypress (Enter), or commits and pushes directly with (p).',
       icon: CheckCircle2,
       detail: 'Safe, deterministic, developer-verified repository change.'
     }
   ]
 
   return (
-    <section id="pipeline" className="py-16 hairline-border-b bg-paper">
+    <section id={sectionId} className="py-16 hairline-border-b bg-paper">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="max-w-2xl mb-12">
@@ -58,7 +65,7 @@ export default function Pipeline() {
             How ovio turns voice into load-bearing code changes
           </h2>
           <p className="text-ink-soft text-sm sm:text-base leading-relaxed">
-            Conventional speech-to-text operates linearly without codebase awareness. ovio closes the loop by injecting repository AST context into the transcription engine itself.
+            Conventional speech-to-text operates linearly without codebase awareness. ovio closes the loop by injecting repository <TechTooltip term="AST" position="bottom">AST</TechTooltip> context into the transcription engine itself.
           </p>
         </div>
 

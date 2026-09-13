@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navbar from './components/Navbar'
 import CommandMenu from './components/CommandMenu'
 import Hero from './components/Hero'
@@ -12,23 +12,56 @@ import ResearchLog from './components/ResearchLog'
 import Faq from './components/Faq'
 import Footer from './components/Footer'
 
+import { scrollToSection } from './utils/navigation'
+
 export default function App() {
   const [commandMenuOpen, setCommandMenuOpen] = useState(false)
   const [selectedPreset, setSelectedPreset] = useState('auth')
 
+  useEffect(() => {
+    // Force manual scroll restoration
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual'
+    }
+
+    const resetToCleanRoot = () => {
+      if (window.location.hash) {
+        window.history.replaceState(null, '', window.location.pathname + window.location.search)
+      }
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+      const startTime = performance.now()
+      let frameId
+      const enforceTop = (time) => {
+        if (window.scrollY > 0) {
+          window.scrollTo(0, 0)
+        }
+        if (time - startTime < 400) {
+          frameId = requestAnimationFrame(enforceTop)
+        }
+      }
+      frameId = requestAnimationFrame(enforceTop)
+    }
+
+    if (window.location.hash || window.__HAD_INITIAL_HASH__) {
+      resetToCleanRoot()
+    }
+
+    window.addEventListener('hashchange', resetToCleanRoot)
+    window.addEventListener('popstate', resetToCleanRoot)
+
+    return () => {
+      window.removeEventListener('hashchange', resetToCleanRoot)
+      window.removeEventListener('popstate', resetToCleanRoot)
+    }
+  }, [])
+
   const handleSelectPreset = (presetKey) => {
     setSelectedPreset(presetKey)
-    const el = document.getElementById('console')
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' })
-    }
+    scrollToSection('console')
   }
 
   const handleStartDemo = () => {
-    const el = document.getElementById('console')
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' })
-    }
+    scrollToSection('console')
   }
 
   return (

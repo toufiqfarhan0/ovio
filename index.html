@@ -9,6 +9,36 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <script>
+      // Immediately sanitize URL and disable browser scroll restoration
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+
+      function resetHashAndScrollTop() {
+        if (window.location.hash) {
+          window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        }
+        window.scrollTo(0, 0);
+        requestAnimationFrame(function() {
+          window.scrollTo(0, 0);
+        });
+        setTimeout(function() {
+          window.scrollTo(0, 0);
+        }, 50);
+      }
+
+      resetHashAndScrollTop();
+
+      window.addEventListener('hashchange', function(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        resetHashAndScrollTop();
+      });
+      window.addEventListener('popstate', resetHashAndScrollTop);
+      window.addEventListener('DOMContentLoaded', resetHashAndScrollTop);
+      window.addEventListener('load', resetHashAndScrollTop);
+      window.addEventListener('pageshow', resetHashAndScrollTop);
+    </script>
   </head>
   <body class="bg-paper text-ink antialiased selection:bg-ink selection:text-paper-light">
     <div id="root"></div>

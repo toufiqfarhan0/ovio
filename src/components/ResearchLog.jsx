@@ -1,6 +1,9 @@
 import React from 'react'
+import TechTooltip from './TechTooltip'
+import { useSectionId } from '../utils/navigation'
 
 export default function ResearchLog() {
+  const sectionId = useSectionId('research')
   const metrics = [
     {
       metric: 'Formulating Conventional Commit',
@@ -40,7 +43,7 @@ export default function ResearchLog() {
   ]
 
   return (
-    <section id="research" className="py-16 hairline-border-b bg-paper">
+    <section id={sectionId} className="py-16 hairline-border-b bg-paper">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="max-w-2xl mb-10">
           <div className="flex items-center gap-2 mb-2">
@@ -48,7 +51,7 @@ export default function ResearchLog() {
             <span className="micro-label text-ink">Benchmark Measurements</span>
           </div>
           <h2 className="font-serif-display text-3xl sm:text-4xl text-ink font-normal tracking-tight mb-3">
-            Why voice dictation wins when paired with repository AST
+            Why voice dictation wins when paired with repository <TechTooltip term="AST" position="bottom">AST</TechTooltip>
           </h2>
           <p className="text-ink-soft text-sm sm:text-base leading-relaxed">
             We evaluated voice-to-git against traditional keyboard entry across real developer workflows and measured test fixtures.

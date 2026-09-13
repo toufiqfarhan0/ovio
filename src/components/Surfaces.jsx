@@ -1,7 +1,9 @@
 import React from 'react'
 import { Terminal, Shield, Bot, Laptop, ArrowRight } from 'lucide-react'
+import { useSectionId } from '../utils/navigation'
 
 export default function Surfaces() {
+  const sectionId = useSectionId('surfaces')
   const surfaces = [
     {
       title: 'Native Terminal CLI',
@@ -34,7 +36,7 @@ export default function Surfaces() {
   ]
 
   return (
-    <section className="py-16 hairline-border-b bg-paper-light">
+    <section id={sectionId} className="py-16 hairline-border-b bg-paper-light">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="max-w-2xl mb-10">
           <div className="flex items-center gap-2 mb-2">

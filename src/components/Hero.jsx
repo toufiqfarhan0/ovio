@@ -1,6 +1,8 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { Mic, ArrowRight, GitBranch, Sparkles, Terminal, ShieldCheck } from 'lucide-react'
+import TechTooltip from './TechTooltip'
+import { handleNavClick } from '../utils/navigation'
 
 export default function Hero({ onStartDemo, onSelectPreset }) {
   return (
@@ -42,7 +44,7 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
           className="text-base sm:text-lg text-ink-soft max-w-2xl font-normal leading-relaxed mb-8"
         >
           A pure terminal-native voice assistant (<code className="px-1.5 py-0.5 rounded bg-paper-deep text-xs font-mono text-ink font-semibold">ovio</code>). 
-          Biases your staged <code className="px-1.5 py-0.5 rounded bg-paper-deep text-xs font-mono text-ink font-semibold">git diff</code> AST into AssemblyAI's Dictation API, turning rambling developer mutterings into production-ready Conventional Commits in under 800ms.
+          Biases your staged <code className="px-1.5 py-0.5 rounded bg-paper-deep text-xs font-mono text-ink font-semibold">git diff</code> <TechTooltip term="AST" position="bottom">AST</TechTooltip> into AssemblyAI's Dictation API, turning rambling developer mutterings into production-ready Conventional Commits in under 800ms.
         </motion.p>
 
         {/* Action pills */}
@@ -54,6 +56,7 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
         >
           <a
             href="#cli"
+            onClick={(e) => handleNavClick(e, 'cli')}
             className="pill-dark"
           >
             <Terminal className="w-4 h-4 text-paper-light" />
@@ -61,7 +64,11 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
             <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-white/20 font-mono">$</kbd>
           </a>
 
-          <a href="#console" className="pill-dashed">
+          <a 
+            href="#console" 
+            onClick={(e) => handleNavClick(e, 'console')}
+            className="pill-dashed"
+          >
             <span>Inspect Terminal Session</span>
             <ArrowRight className="w-4 h-4 text-muted" />
           </a>
@@ -111,7 +118,7 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
           <div className="flex items-center gap-3 text-muted">
             <span>Zero filler words</span>
             <span>•</span>
-            <span>AST symbol extraction</span>
+            <span><TechTooltip term="AST" position="top">AST</TechTooltip> symbol extraction</span>
             <span>•</span>
             <span>Silence detection</span>
           </div>

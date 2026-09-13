@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Terminal, Copy, Check, Zap } from 'lucide-react'
+import { useSectionId } from '../utils/navigation'
 
 export const TERMINAL_SESSIONS = {
   auth: {
@@ -98,8 +99,10 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
     setTimeout(() => setCopiedCmd(false), 2000)
   }
 
+  const sectionId = useSectionId('console')
+
   return (
-    <section id="console" className="py-16 hairline-border-b bg-paper-light">
+    <section id={sectionId} className="py-16 hairline-border-b bg-paper-light">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">

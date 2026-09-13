@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Terminal, Command, GitBranch, ArrowUpRight } from 'lucide-react'
+import { handleNavClick } from '../utils/navigation'
 
 export default function Navbar({ onOpenCommandMenu }) {
   const [scrolled, setScrolled] = useState(false)
@@ -21,7 +22,11 @@ export default function Navbar({ onOpenCommandMenu }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-4">
         {/* Left: Brand */}
         <div className="flex items-center gap-3 shrink-0">
-          <a href="#" className="flex items-center gap-2 group">
+          <a 
+            href="#" 
+            onClick={(e) => handleNavClick(e, 'top')}
+            className="flex items-center gap-2 group"
+          >
             <span className="font-serif-display text-2xl tracking-tight text-ink font-semibold group-hover:opacity-80 transition-opacity">
               ovio
             </span>
@@ -34,20 +39,40 @@ export default function Navbar({ onOpenCommandMenu }) {
 
         {/* Center: Navigation Links */}
         <nav className="hidden md:flex items-center gap-5 lg:gap-7 text-[13px] font-medium text-ink-soft">
-          <a href="#pipeline" className="hover:text-ink transition-colors whitespace-nowrap">
+          <a 
+            href="#pipeline" 
+            onClick={(e) => handleNavClick(e, 'pipeline')}
+            className="hover:text-ink transition-colors whitespace-nowrap"
+          >
             Pipeline
           </a>
-          <a href="#console" className="hover:text-ink transition-colors whitespace-nowrap flex items-center gap-1.5">
+          <a 
+            href="#console" 
+            onClick={(e) => handleNavClick(e, 'console')}
+            className="hover:text-ink transition-colors whitespace-nowrap flex items-center gap-1.5"
+          >
             <span>Terminal</span>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
           </a>
-          <a href="#biasing" className="hover:text-ink transition-colors whitespace-nowrap">
+          <a 
+            href="#biasing" 
+            onClick={(e) => handleNavClick(e, 'biasing')}
+            className="hover:text-ink transition-colors whitespace-nowrap"
+          >
             AST Biasing
           </a>
-          <a href="#cli" className="hover:text-ink transition-colors whitespace-nowrap">
+          <a 
+            href="#cli" 
+            onClick={(e) => handleNavClick(e, 'cli')}
+            className="hover:text-ink transition-colors whitespace-nowrap"
+          >
             CLI Reference
           </a>
-          <a href="#research" className="hover:text-ink transition-colors whitespace-nowrap">
+          <a 
+            href="#research" 
+            onClick={(e) => handleNavClick(e, 'research')}
+            className="hover:text-ink transition-colors whitespace-nowrap"
+          >
             Research
           </a>
         </nav>
@@ -70,6 +95,7 @@ export default function Navbar({ onOpenCommandMenu }) {
           {/* Install CLI CTA Pill */}
           <a
             href="#cli"
+            onClick={(e) => handleNavClick(e, 'cli')}
             className="pill-dark text-xs py-1.5 px-3.5 whitespace-nowrap"
           >
             <Terminal className="w-3.5 h-3.5 shrink-0" />

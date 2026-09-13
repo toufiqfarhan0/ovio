@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import { Terminal, Copy, Check, GitBranch, ArrowRight } from 'lucide-react'
+import TechTooltip from './TechTooltip'
+import { useSectionId } from '../utils/navigation'
 
 export default function Quickstart() {
   const [copiedIndex, setCopiedIndex] = useState(null)
+  const sectionId = useSectionId('cli')
 
   const copyToClipboard = (text, index) => {
     navigator.clipboard.writeText(text)
@@ -27,14 +30,14 @@ export default function Quickstart() {
       cmd: `ovio`
     },
     {
-      title: 'Inspect AST Biased Symbols',
+      title: <>Inspect <TechTooltip term="AST" position="top">AST</TechTooltip> Biased Symbols</>,
       code: `ovio -v\n# displays extracted codebase symbols in header`,
       cmd: `ovio -v`
     }
   ]
 
   return (
-    <section id="cli" className="py-16 hairline-border-b bg-paper-light">
+    <section id={sectionId} className="py-16 hairline-border-b bg-paper-light">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
           <div>

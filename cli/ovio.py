@@ -365,8 +365,9 @@ def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45, cont
         sys.stdout.flush()
 
     if not recorded_chunks:
-        console.print("  [dim]no audio captured — falling back to synthetic clip[/dim]")
-        return synthesize_demo_wav(output_wav), False
+        empty_audio = np.zeros(int(fs * 0.1), dtype=np.int16)
+        wav.write(output_wav, fs, empty_audio)
+        return output_wav, False
 
     full_audio = np.concatenate(recorded_chunks, axis=0)
     overall_rms = float(np.sqrt(np.mean(full_audio.astype(np.float32) ** 2)))
@@ -623,10 +624,9 @@ def main(
             try:
                 audio_path, has_speech = record_audio_push_to_talk(context=context)
             except Exception as e:
-                console.print(f"  [dim]microphone unavailable ({e}) — switching to demo mode[/dim]")
-                is_demo_mode = True
-                audio_path = synthesize_demo_wav()
-                break
+                console.print(f"  [bold red]microphone error:[/bold red] {e}")
+                console.print("  [dim]please check your microphone connection and permissions.[/dim]")
+                sys.exit(1)
 
             if has_speech:
                 break
@@ -641,15 +641,11 @@ def main(
             console.print()
 
             action = Prompt.ask(
-                "  [bold white][r][/bold white] retry dictation  |  [bold white][d][/bold white] test with demo audio  |  [bold white][q][/bold white] quit",
+                "  [bold white][r][/bold white] retry dictation  |  [bold white][q][/bold white] quit",
                 default="r"
             ).strip().lower()
 
-            if action == "d":
-                is_demo_mode = True
-                audio_path = synthesize_demo_wav()
-                break
-            elif action == "q":
+            if action == "q":
                 console.print("  [dim]cancelled[/dim]")
                 sys.exit(0)
             # action == "r" repeats recording loop

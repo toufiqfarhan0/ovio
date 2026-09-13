@@ -18,12 +18,12 @@
 
 Software engineers spend **45 seconds** per git commit switching mental context between complex code and writing structured [Conventional Commits](https://www.conventionalcommits.org/). Standard speech-to-text engines fail for developer workflows because:
 1. **Verbal Noise**: They transcribe hesitation words (*"uh"*, *"um"*, *"wait actually"*) verbatim into commit logs.
-2. **Phonetic Degradation**: They butcher technical code identifiers (*"jwtSecret"* decays to *"J W T secret"*, *"verifyToken"* becomes *"verify talking"*).
+2. **Phonetic Degradation**: Standard **ASR** (**Automatic Speech Recognition**) butchers technical code identifiers (*"jwtSecret"* decays to *"J W T secret"*, *"verifyToken"* becomes *"verify talking"*).
 
 ### How ovio Solves This:
-- **Local AST Biasing**: `ovio` inspects your repository's staged `git diff`, extracting function names, classes, interfaces, and variables directly into AssemblyAI's `keyterms_prompt`.
-- **Push-to-Talk Audio Capture**: Hold **Spacebar** in your terminal to dictate naturally.
-- **Real-Time Silence Guidance**: Live RMS audio metering tracks vocal energy. If silent for >2s, ovio prompts `(listening... please speak more)` and intercepts dead air before wasting API calls.
+- **Local AST (Abstract Syntax Tree) Biasing**: `ovio` inspects your repository's staged `git diff`, extracting function names, classes, interfaces, and variables directly into AssemblyAI's `keyterms_prompt`.
+- **Push-to-Talk (PTT) Audio Capture**: Hold **Spacebar** in your terminal to dictate naturally.
+- **Real-Time Silence Guidance**: Live **RMS (Root Mean Square)** audio metering tracks vocal energy. If silent for >2s, ovio prompts `(listening... please speak more)` and intercepts dead air before wasting API calls.
 - **Sub-Second Conventional Commit**: In **< 800ms**, AssemblyAI's Universal-3.5 Pro transcribes, cleans self-corrections, and outputs a clean Conventional Commit ready to commit and push.
 
 ```git
@@ -33,6 +33,20 @@ feat(auth): handle TokenExpiredError in verifyToken
 - Explicitly catch TokenExpiredError and return HTTP 401 instead of 500
 - Add regression test cases in tests/auth.test.ts
 ```
+
+---
+
+### Core Terminology & Acronym Reference
+
+For developers, evaluators, and judges unfamiliar with speech AI or compiler terminology:
+
+| Term | Full Form | What It Means in ovio |
+| :--- | :--- | :--- |
+| **ASR** | **Automatic Speech Recognition** | The machine-learning process that translates spoken acoustic audio into text strings. Generic ASR models fail on camelCase and snake_case code symbols; ovio eliminates these misspellings via targeted vocabulary biasing. |
+| **AST** | **Abstract Syntax Tree** | A hierarchical tree structure representing source code syntax. ovio parses AST nodes (functions, classes, variables) from your staged git diff before you speak. |
+| **RMS** | **Root Mean Square (Audio Level)** | A real-time measurement of microphone signal energy and vocal loudness. ovio uses RMS to detect voice onset, visualize terminal waveforms, and nudge silent users. |
+| **STT** | **Speech-to-Text** | The broad software category of voice transcription. In ovio, STT is enhanced by injecting codebase AST context into AssemblyAI Universal-3.5 Pro. |
+| **PTT** | **Push-to-Talk** | Audio recording mode where the microphone is active only while holding down a specific key (Spacebar). |
 
 ---
 
@@ -175,6 +189,15 @@ response = transcriber.transcribe_live(audio_path, config=config)
   - `[c]` Commit locally without pushing (`git commit -m ...`).
   - `[e]` Interactively edit the commit message before committing.
   - `[q]` Cancel without making any changes.
+
+### Official AssemblyAI API Reference & Documentation
+
+ovio is built natively on AssemblyAI's Dictation API and Universal-3.5 Pro infrastructure:
+
+- **AssemblyAI Dictation API Documentation**: [https://www.assemblyai.com/docs/dictation](https://www.assemblyai.com/docs/dictation)
+- **Domain & Keyterms Biasing Specification**: [https://www.assemblyai.com/docs/dictation#clinical-dictation](https://www.assemblyai.com/docs/dictation#clinical-dictation)
+- **Supported Languages & Dialects Matrix**: [https://www.assemblyai.com/docs/concepts/supported-languages](https://www.assemblyai.com/docs/concepts/supported-languages)
+- **Universal-3.5 Pro Technical Overview**: [https://www.assemblyai.com/blog/universal-3-5-pro-async](https://www.assemblyai.com/blog/universal-3-5-pro-async)
 
 ---
 

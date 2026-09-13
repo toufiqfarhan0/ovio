@@ -1,5 +1,7 @@
 import React from 'react'
 import { Terminal, GitBranch, ExternalLink, ShieldCheck } from 'lucide-react'
+import TechTooltip from './TechTooltip'
+import { handleNavClick } from '../utils/navigation'
 
 export default function Footer() {
   return (
@@ -20,12 +22,12 @@ export default function Footer() {
             </div>
 
             <p className="text-[13px] text-ink-soft leading-relaxed max-w-sm">
-              Voice Git & codebase dictation engine. Extracts local repository AST symbols to bias AssemblyAI&apos;s streaming Dictation API for zero-hallucination conventional commits in under 800ms.
+              Voice Git & codebase dictation engine. Extracts local repository <TechTooltip term="AST" position="top">AST</TechTooltip> symbols to bias AssemblyAI&apos;s streaming Dictation API for zero-hallucination conventional commits in under 800ms.
             </p>
 
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-paper-light border border-line text-[11px] font-mono text-ink-soft">
-                <Terminal className="w-3 h-3 text-muted" />
+            <div className="flex items-center gap-3 pt-2">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-paper-light border border-line text-[11px] font-mono text-muted">
+                <Terminal className="w-3 h-3 text-ink-soft" />
                 <span>ovio</span>
               </span>
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-paper-light border border-line text-[11px] font-mono text-muted">
@@ -42,22 +44,38 @@ export default function Footer() {
             </div>
             <ul className="space-y-2 text-[13px] text-ink-soft font-normal">
               <li>
-                <a href="#pipeline" className="hover:text-ink transition-colors">
+                <a 
+                  href="#pipeline" 
+                  onClick={(e) => handleNavClick(e, 'pipeline')}
+                  className="hover:text-ink transition-colors"
+                >
                   5-Stage Pipeline
                 </a>
               </li>
               <li>
-                <a href="#biasing" className="hover:text-ink transition-colors">
+                <a 
+                  href="#biasing" 
+                  onClick={(e) => handleNavClick(e, 'biasing')}
+                  className="hover:text-ink transition-colors"
+                >
                   AST Biasing Engine
                 </a>
               </li>
               <li>
-                <a href="#console" className="hover:text-ink transition-colors">
+                <a 
+                  href="#console" 
+                  onClick={(e) => handleNavClick(e, 'console')}
+                  className="hover:text-ink transition-colors"
+                >
                   Interactive Terminal
                 </a>
               </li>
               <li>
-                <a href="#research" className="hover:text-ink transition-colors">
+                <a 
+                  href="#research" 
+                  onClick={(e) => handleNavClick(e, 'research')}
+                  className="hover:text-ink transition-colors"
+                >
                   Benchmark & Latency SLA
                 </a>
               </li>
@@ -71,22 +89,20 @@ export default function Footer() {
             </div>
             <ul className="space-y-2 text-[13px] text-ink-soft font-normal">
               <li>
-                <a href="#cli" className="hover:text-ink transition-colors">
+                <a 
+                  href="#cli" 
+                  onClick={(e) => handleNavClick(e, 'cli')}
+                  className="hover:text-ink transition-colors"
+                >
                   CLI Reference
                 </a>
               </li>
               <li>
-                <a href="#cli" className="hover:text-ink transition-colors">
-                  Shell Aliases
-                </a>
-              </li>
-              <li>
-                <a href="#surfaces" className="hover:text-ink transition-colors">
-                  Integration Surfaces
-                </a>
-              </li>
-              <li>
-                <a href="#faq" className="hover:text-ink transition-colors">
+                <a 
+                  href="#faq" 
+                  onClick={(e) => handleNavClick(e, 'faq')}
+                  className="hover:text-ink transition-colors"
+                >
                   Technical FAQ
                 </a>
               </li>
@@ -149,7 +165,7 @@ export default function Footer() {
             <span>•</span>
             <span>Zero Hallucination</span>
             <span>•</span>
-            <span className="text-ink-soft">Local AST Inference</span>
+            <span className="text-ink-soft">Local <TechTooltip term="AST" position="top" align="right">AST</TechTooltip> Inference</span>
           </div>
         </div>
       </div>
