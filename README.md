@@ -328,12 +328,13 @@ ovio --help
 
 | Command | Arguments / Flags | Description |
 |---|---|---|
-| `ovio` | `--demo` (`-d`), `--file <path>` (`-f`), `--push` (`-p`), `--verbose` (`-v`) | **Primary workflow**: Push-to-talk voice recording, AST biasing, and commit generation |
+| `ovio` | `--demo` (`-d`), `--file <path>` (`-f`), `--push` (`-p`), `--verbose` (`-v`), `--lang <code>` (`-l`) | **Primary workflow**: Push-to-talk voice recording, AST biasing, and commit generation |
 | `ovio gate` | `--verbose` (`-v`) | **AST Biasing Audit**: Pre-flight inspection of staged changes, AST diff tokens, and vocabulary biasing readiness |
 | `ovio verify` | None | **Diagnostics**: Verifies Git work tree, audio input devices (sounddevice/numpy), and AssemblyAI API key authentication |
 | `ovio --demo` | `-d` | **Dry-Run Simulation**: Runs instant turnaround test with synthetic developer audio (no mic required) |
 | `ovio --file <path>` | `-f` | **Audio Playback**: Transcribes an existing WAV fixture directly through AssemblyAI Dictation API |
 | `ovio --push` | `-p` | **Automated Push**: Directly commits and pushes upon confirmation without secondary prompt |
+| `ovio --lang <code>` | `-l` | **Multilingual Dictation**: Sets input language for voice recognition. Verbatim is kept in the source language; the Conventional Commit output is always generated in English. Defaults to `en`. |
 
 ---
 
@@ -438,6 +439,101 @@ PS C:\Users\toufi\Desktop\test-apy-sync> ovio --demo
   feat(auth): add verifyToken and handle expired token errors
   - Implement token verification against JWT_SECRET in authService
   - Add explicit error handling for expired and malformed tokens
+────────────────────────────────────────────────────────────────────
+```
+
+---
+
+## Multilingual Support (19 Languages)
+
+ovio supports **19 languages** via the `--lang <code>` flag, powered by the `language_codes` parameter of the AssemblyAI Dictation API. Verbatim output is preserved in the source language; the generated Conventional Commit is always output in English.
+
+### Supported Language Codes
+
+| Code | Language | Code | Language | Code | Language |
+|---|---|---|---|---|---|
+| `en` | English | `fr` | French | `de` | German |
+| `es` | Spanish | `it` | Italian | `pt` | Portuguese |
+| `tr` | Turkish | `nl` | Dutch | `sv` | Swedish |
+| `no` | Norwegian | `da` | Danish | `fi` | Finnish |
+| `hi` | Hindi | `vi` | Vietnamese | `ar` | Arabic |
+| `he` | Hebrew | `ja` | Japanese | `ur` | Urdu |
+| `zh` | Chinese | | | | |
+
+### Usage
+```bash
+# Dictate in French
+ovio --lang fr
+
+# Dictate in German using an audio file
+ovio --file clip_german.wav --lang de
+
+# Dictate in Spanish with push-to-talk
+ovio --lang es
+
+# Dictate in Hindi
+ovio --lang hi
+```
+
+### Live Multilingual Test Results (on `test-apy-sync`)
+
+All four tests were executed live against the production AssemblyAI Dictation API using gTTS-synthesized audio fixtures. Verbatim is in the source language; commit is always English.
+
+#### French (`--lang fr`)  — 2515 ms
+```text
+PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/auth_500_error_fr.wav --lang fr
+────────────────────────────────────────────────────────────────────
+ main   LIVE — AssemblyAI Dictation Engine
+────────────────────────────────────────────────────────────────────
+ language        : fr  (French)
+────────────────────────────────────────────────────────────────────
+
+  ● transcribing (French) with Universal-3.5 Pro...
+────────────────────────────────────────────────────────────────────
+ commit_transcribe   TRANSCRIBED — in 2515 ms (SLA < 800ms)
+────────────────────────────────────────────────────────────────────
+ verbatim        : Le déploiement est bloqué parce que l'API d'authentification retourne des erreurs 500.
+ conventional    : fix(auth): deployment blocked by 500 errors from authentication API
+                   - Deployment is blocked due to 500 errors returned by the authentication API.
+────────────────────────────────────────────────────────────────────
+```
+
+#### Spanish (`--lang es`) — 1328 ms
+```text
+PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/auth_500_error_es.wav --lang es
+────────────────────────────────────────────────────────────────────
+ commit_transcribe   TRANSCRIBED — in 1328 ms (SLA < 800ms)
+────────────────────────────────────────────────────────────────────
+ verbatim        : El despliegue está retrasado porque la API de autenticación está devolviendo errores de servidor.
+ conventional    : fix(auth): authentication API returning server errors
+                   - Deployment delayed due to authentication API errors
+                   - Server errors returned by the authentication API
+────────────────────────────────────────────────────────────────────
+```
+
+#### German (`--lang de`) — 1280 ms
+```text
+PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/auth_500_error_de.wav --lang de
+────────────────────────────────────────────────────────────────────
+ commit_transcribe   TRANSCRIBED — in 1280 ms (SLA < 800ms)
+────────────────────────────────────────────────────────────────────
+ verbatim        : Die Bereitstellung ist verzögert, weil die Authentifizierungs-API 500 Fehler zurückgibt.
+ conventional    : fix(auth): authentication API returns 500 error
+                   - Authentication API is returning 500 errors
+                   - Service deployment is delayed due to this issue
+────────────────────────────────────────────────────────────────────
+```
+
+#### Hindi (`--lang hi`) — 2682 ms
+```text
+PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/auth_500_error_hi.wav --lang hi
+────────────────────────────────────────────────────────────────────
+ commit_transcribe   TRANSCRIBED — in 2682 ms (SLA < 800ms)
+────────────────────────────────────────────────────────────────────
+ verbatim        : डिप्लॉयमेंट में देर हो रही है क्योंकि ऑथेंटिकेशन अभी 500 एरर्स दे रही है।
+ conventional    : fix(deployment): resolve 500 authentication errors
+                   - Authentication service returning 500 errors during deployment
+                   - Deployment process delayed due to authentication failures
 ────────────────────────────────────────────────────────────────────
 ```
 

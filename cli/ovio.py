@@ -471,10 +471,37 @@ def synthesize_demo_wav(output_wav="ovio_commit.wav", duration=3.2, sample_rate=
 # AssemblyAI transcription
 # ─────────────────────────────────────────────────────────────
 
-def transcribe_with_assemblyai(audio_path: str, context: dict) -> dict:
+# ─────────────────────────────────────────────────────────────
+# supported language codes (AssemblyAI Dictation API)
+# ─────────────────────────────────────────────────────────────
+
+SUPPORTED_LANGS = {
+    "en": "English",
+    "es": "Spanish",
+    "de": "German",
+    "fr": "French",
+    "it": "Italian",
+    "pt": "Portuguese",
+    "tr": "Turkish",
+    "nl": "Dutch",
+    "sv": "Swedish",
+    "no": "Norwegian",
+    "da": "Danish",
+    "fi": "Finnish",
+    "hi": "Hindi",
+    "vi": "Vietnamese",
+    "ar": "Arabic",
+    "he": "Hebrew",
+    "ja": "Japanese",
+    "ur": "Urdu",
+    "zh": "Chinese",
+}
+
+def transcribe_with_assemblyai(audio_path: str, context: dict, lang: str = "en") -> dict:
     """
     Submits audio to AssemblyAI Dictation API Beta (Universal-3.5 Pro)
     using the official assemblyai SDK or HTTP live fallback.
+    Pass lang as a BCP-47 language code (e.g. 'en', 'fr', 'de', 'es', 'hi').
     """
     if not API_KEY:
         print()
@@ -484,6 +511,16 @@ def transcribe_with_assemblyai(audio_path: str, context: dict) -> dict:
         print(rule())
         sys.exit(1)
 
+    # Build per-language LLM instruction (Conventional Commit for all languages)
+    lang_name = SUPPORTED_LANGS.get(lang, lang.upper())
+    llm_instruction = (
+        "Remove filler words, false starts, and hesitation. "
+        "Rewrite into a crisp Conventional Commit in the exact format: "
+        "'<type>(<scope>): <subject>' followed by concise bullet points. "
+        "Keep technical variable names, functions, and symbols verbatim. "
+        f"The speaker dictated in {lang_name}; output the commit in English."
+    )
+
     start_time = time.time()
     try:
         import assemblyai as aai
@@ -492,14 +529,10 @@ def transcribe_with_assemblyai(audio_path: str, context: dict) -> dict:
         config = aai.DictationConfig(
             sample_rate=16000,
             channels=1,
+            language_codes=[lang],
             stt_prompt=context["stt_prompt"],
             keyterms_prompt=context["keyterms"],
-            llm_instruction=(
-                "Remove filler words, false starts, and hesitation. "
-                "Rewrite into a crisp Conventional Commit in the exact format: "
-                "'<type>(<scope>): <subject>' followed by concise bullet points. "
-                "Keep technical variable names, functions, and symbols verbatim."
-            )
+            llm_instruction=llm_instruction
         )
 
         transcriber = aai.DictationTranscriber()
@@ -519,14 +552,10 @@ def transcribe_with_assemblyai(audio_path: str, context: dict) -> dict:
         config_data = {
             "sample_rate": 16000,
             "channels": 1,
+            "language_codes": [lang],
             "stt_prompt": context["stt_prompt"],
             "keyterms_prompt": context["keyterms"],
-            "llm_instruction": (
-                "Remove filler words, false starts, and hesitation. "
-                "Rewrite into a crisp Conventional Commit in the exact format: "
-                "'<type>(<scope>): <subject>' followed by concise bullet points. "
-                "Keep technical variable names, functions, and symbols verbatim."
-            )
+            "llm_instruction": llm_instruction
         }
 
         with open(audio_path, "rb") as f:
@@ -555,12 +584,13 @@ def transcribe_with_assemblyai(audio_path: str, context: dict) -> dict:
 # rendering
 # ─────────────────────────────────────────────────────────────
 
-def render_header(context: dict, mode: str = "live", verbose: bool = False):
+def render_header(context: dict, mode: str = "live", verbose: bool = False, lang: str = "en"):
     """Print the startup header with wordmark and telemetry."""
     branch = context["branch"]
     staged_files = context["staged_files"]
     staged = len(staged_files)
     keyterms = context["keyterms"]
+    lang_name = SUPPORTED_LANGS.get(lang, lang.upper())
 
     print(banner())
     if mode == "demo":
@@ -579,6 +609,8 @@ def render_header(context: dict, mode: str = "live", verbose: bool = False):
         print(kv("staged files", f"{staged} files ({file_preview}{extra})"))
     else:
         print(kv("staged files", "0 (clean working tree)"))
+
+    print(kv("language", f"{lang}  ({lang_name})"))
 
     if keyterms:
         preview_terms = ", ".join(keyterms[:5])
@@ -733,8 +765,18 @@ def verify_cmd():
 # main dictation flow
 # ─────────────────────────────────────────────────────────────
 
-def run_dictation_flow(demo: bool = False, push: bool = False, file: Optional[str] = None, verbose: bool = False):
+def run_dictation_flow(demo: bool = False, push: bool = False, file: Optional[str] = None, verbose: bool = False, lang: str = "en"):
     """Core interactive dictation execution."""
+    # Validate language code
+    if lang not in SUPPORTED_LANGS:
+        supported_list = ", ".join(sorted(SUPPORTED_LANGS.keys()))
+        print()
+        print(rule())
+        print(f" {paint('error:', ACCENT, BOLD)} unsupported language code '{lang}'")
+        print(f" {paint('supported:', FAINT)} {supported_list}")
+        print(rule())
+        sys.exit(1)
+
     if not is_git_repository() and not demo:
         print()
         print(banner())
@@ -758,7 +800,7 @@ def run_dictation_flow(demo: bool = False, push: bool = False, file: Optional[st
 
     # 2. Render header
     mode = "demo" if demo else ("file" if file else "live")
-    render_header(context, mode=mode, verbose=verbose)
+    render_header(context, mode=mode, verbose=verbose, lang=lang)
 
     # 3. Audio Recording / Sourcing
     is_demo_mode = demo
@@ -798,9 +840,10 @@ def run_dictation_flow(demo: bool = False, push: bool = False, file: Optional[st
         clean_commit = "feat(auth): add verifyToken and handle expired token errors\n\n- Implement token verification against JWT_SECRET in authService\n- Add explicit error handling for expired and malformed tokens"
         latency      = 642
     else:
-        sys.stdout.write(f"  {paint('●', ACCENT, BOLD)} {paint('transcribing with Universal-3.5 Pro...', FAINT)}\r")
+        lang_name = SUPPORTED_LANGS.get(lang, lang.upper())
+        sys.stdout.write(f"  {paint('●', ACCENT, BOLD)} {paint(f'transcribing ({lang_name}) with Universal-3.5 Pro...', FAINT)}\r")
         sys.stdout.flush()
-        res          = transcribe_with_assemblyai(audio_path, context)
+        res          = transcribe_with_assemblyai(audio_path, context, lang=lang)
         sys.stdout.write("\r" + " " * 60 + "\r")
         sys.stdout.flush()
         verbatim     = res["text"]
@@ -887,7 +930,8 @@ def main(
     push: bool = typer.Option(False, "--push", "-p", help="Automatically commit and push without confirmation"),
     file: Optional[str] = typer.Option(None, "--file", "-f", help="Path to existing WAV audio file"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Display extracted AST symbols in header"),
-    gate: bool = typer.Option(False, "--gate", "-g", help="Audit git branch, diff, and AST biasing without dictating")
+    gate: bool = typer.Option(False, "--gate", "-g", help="Audit git branch, diff, and AST biasing without dictating"),
+    lang: str = typer.Option("en", "--lang", "-l", help="BCP-47 language code for dictation (en, fr, de, es, hi, ja, zh, ...)"),
 ):
     """
     ovio — Voice Git & Codebase Dictation Engine
@@ -896,7 +940,7 @@ def main(
         if gate:
             gate_cmd(verbose=verbose)
         else:
-            run_dictation_flow(demo=demo, push=push, file=file, verbose=verbose)
+            run_dictation_flow(demo=demo, push=push, file=file, verbose=verbose, lang=lang)
 
 if __name__ == "__main__":
     app()
