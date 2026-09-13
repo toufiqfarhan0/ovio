@@ -332,7 +332,7 @@ ovio --help
 | `ovio gate` | `--verbose` (`-v`) | **AST Biasing Audit**: Pre-flight inspection of staged changes, AST diff tokens, and vocabulary biasing readiness |
 | `ovio verify` | None | **Diagnostics**: Verifies Git work tree, audio input devices (sounddevice/numpy), and AssemblyAI API key authentication |
 | `ovio --demo` | `-d` | **Dry-Run Simulation**: Runs instant turnaround test with synthetic developer audio (no mic required) |
-| `ovio --file <path>` | `-f` | **Audio Playback**: Transcribes an existing WAV fixture directly through AssemblyAI Dictation API |
+| `ovio --file <path>` | `-f` | **Testing & Headless CI**: Transcribes an existing WAV fixture directly through AssemblyAI Dictation API (ideal for automated testing, benchmarks, or headless environments without an active mic) |
 | `ovio --push` | `-p` | **Automated Push**: Directly commits and pushes upon confirmation without secondary prompt |
 | `ovio --lang <code>` | `-l` | **Multilingual Dictation**: Sets input language for voice recognition. Verbatim is kept in the source language; the Conventional Commit output is always generated in English. Defaults to `en`. |
 

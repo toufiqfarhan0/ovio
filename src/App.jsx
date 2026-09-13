@@ -6,7 +6,6 @@ import ConsoleWindow from './components/ConsoleWindow'
 import Quote from './components/Quote'
 import Pipeline from './components/Pipeline'
 import InteractiveGraph from './components/InteractiveGraph'
-import Surfaces from './components/Surfaces'
 import Quickstart from './components/Quickstart'
 import ResearchLog from './components/ResearchLog'
 import Faq from './components/Faq'
@@ -93,10 +92,7 @@ export default function App() {
         {/* 5. AST Symbol Extraction & Decoding Gap Inspector (Step 3) */}
         <InteractiveGraph />
 
-        {/* 6. Integration Surfaces */}
-        <Surfaces />
-
-        {/* 7. CLI Quickstart Guide */}
+        {/* 6. CLI Quickstart Guide */}
         <Quickstart />
 
         {/* 8. Benchmark Research Log */}
