@@ -21,7 +21,7 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
           <span className="text-xs font-mono text-muted">•</span>
           <span className="text-xs font-mono text-ink-soft flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-            Sub-second SLA (&lt;1.0s)
+            Measured 1.0s–1.5s SLA
           </span>
         </motion.div>
 

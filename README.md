@@ -48,7 +48,7 @@ For developers, evaluators, and judges unfamiliar with speech AI or compiler ter
 | Term | Full Form | What It Means in ovio |
 | :--- | :--- | :--- |
 | **ASR** | **Automatic Speech Recognition** | The machine-learning process that translates spoken acoustic audio into text strings. Generic ASR models fail on camelCase and snake_case code symbols; ovio eliminates these misspellings via targeted vocabulary biasing. |
-| **AST / Diff Symbols** | **Diff Symbol Extractor** | Source syntax representation. Rather than running brittle AST compilers on partial diff hunks, ovio uses fast language-agnostic regex to extract function, class, and variable names from staged diffs into AssemblyAI keyterms. |
+| **Diff Symbols (vs AST)** | **Diff Symbol Extractor** | Source syntax representation. Rather than running brittle AST compilers on partial diff hunks, ovio uses fast language-agnostic regex to extract function, class, and variable names from staged diffs into AssemblyAI keyterms. |
 | **RMS** | **Root Mean Square (Audio Level)** | A real-time measurement of microphone signal energy and vocal loudness. ovio uses RMS to detect voice onset, visualize terminal waveforms, and nudge silent users. |
 | **STT** | **Speech-to-Text** | The broad software category of voice transcription. In ovio, STT is enhanced by injecting codebase diff symbols into AssemblyAI Universal-3.5 Pro. |
 | **PTT** | **Push-to-Talk** | Audio recording mode where the microphone is active only while holding down a specific key (Spacebar). |
@@ -63,8 +63,8 @@ For developers, evaluators, and judges unfamiliar with speech AI or compiler ter
 flowchart TD
     subgraph Local["1. Local Git Repository"]
         Diff["git diff --staged / git status"]
-        AST["Diff Symbol Extractor<br/>(functions, classes, variables, identifiers)"]
-        Diff --> AST
+        SymbolExtractor["Diff Symbol Extractor<br/>(functions, classes, variables, identifiers)"]
+        Diff --> SymbolExtractor
     end
 
     subgraph Audio["2. Audio Capture Engine"]
@@ -147,8 +147,8 @@ When the developer runs `ovio`, ovio inspects the current repository state:
 - Identifies active branch (`git branch --show-current`).
 - Inspects `git status --porcelain`. If modified files are not yet staged, ovio auto-stages them (`git add -u`) so diff analysis is instant.
 
-### Stage 2: AST Symbol Biasing Engine
-Standard speech recognition fails on code tokens like `authService`, `verifyToken`, and `JWT_SECRET`. ovio's parser extracts:
+### Stage 2: Diff Symbol Biasing Engine
+Standard speech recognition fails on code tokens like `authService`, `verifyToken`, and `JWT_SECRET`. ovio's diff symbol extractor identifies:
 - **Function/Method Signatures**: `def`, `function`, `fn`, `pub fn`, `const xxx = () =>`.
 - **Classes, Types & Structs**: `class`, `interface`, `struct`, `type`, `enum`.
 - **Variables & Constants**: `const`, `let`, `var`, `val`.
@@ -174,7 +174,7 @@ config = aai.DictationConfig(
     sample_rate=16000,
     channels=1,
     stt_prompt=f"A developer dictating git commits for branch '{branch}'. Files: {', '.join(file_basenames[:5])}.",
-    keyterms_prompt=keyterms,  # Extracted AST symbols
+    keyterms_prompt=keyterms,  # Extracted staged diff symbols
     llm_instruction=(
         "Remove filler words, false starts, and hesitation. "
         "Rewrite into a crisp Conventional Commit in the exact format: "
@@ -361,8 +361,8 @@ ovio --help
 
 | Command | Arguments / Flags | Description |
 |---|---|---|
-| `ovio` | `--demo` (`-d`), `--file <path>` (`-f`), `--push` (`-p`), `--verbose` (`-v`), `--lang <code>` (`-l`) | **Primary workflow**: Push-to-talk voice recording, AST biasing, and commit generation |
-| `ovio gate` | `--verbose` (`-v`) | **AST Biasing Audit**: Pre-flight inspection of staged changes, AST diff tokens, and vocabulary biasing readiness |
+| `ovio` | `--demo` (`-d`), `--file <path>` (`-f`), `--push` (`-p`), `--verbose` (`-v`), `--lang <code>` (`-l`) | **Primary workflow**: Push-to-talk voice recording, diff symbol biasing, and commit generation |
+| `ovio gate` | `--verbose` (`-v`) | **Diff Biasing Audit**: Pre-flight inspection of staged changes, diff symbols, and vocabulary biasing readiness |
 | `ovio verify` | None | **Diagnostics**: Verifies Git work tree, audio input devices (sounddevice/numpy), and AssemblyAI API key authentication |
 | `ovio --demo` | `-d` | **Dry-Run Simulation**: Runs instant turnaround test with synthetic developer audio (no mic required) |
 | `ovio --file <path>` | `-f` | **Testing & Headless CI**: Transcribes an existing WAV fixture directly through AssemblyAI Dictation API (ideal for automated testing, benchmarks, or headless environments without an active mic) |
@@ -375,7 +375,7 @@ ovio --help
 
 All commands and workflows were executed and verified live end-to-end like a new developer on the external target repository [**github.com/toufiqfarhan0/test-apy-sync**](https://github.com/toufiqfarhan0/test-apy-sync). 
 
-Every single test below generated real production code changes that were staged, audited for AST diff tokens, transcribed through the production AssemblyAI Universal-3.5 Pro Dictation API, formatted into Conventional Commits, and **committed and pushed live to GitHub**. You can inspect each live commit directly on GitHub:
+Every single test below generated real production code changes that were staged, audited for staged diff symbols, transcribed through the production AssemblyAI Universal-3.5 Pro Dictation API, formatted into Conventional Commits, and **committed and pushed live to GitHub**. You can inspect each live commit directly on GitHub:
 
 | Target Repo | Live Commit Hash | Mode / Language | Live Commit Link & Conventional Commit Subject |
 |---|---|---|---|
@@ -396,7 +396,7 @@ PS C:\Users\toufi\Desktop\test-apy-sync> ovio verify
  audio backend   : OK (21 audio device(s) detected)
  api key         : OK (49db5e...9ace)
 ────────────────────────────────────────────────────────────────────
-VERIFY OK: system fully operational; audio capture, AST biasing, and dictation ready.
+VERIFY OK: system fully operational; audio capture, diff symbol biasing, and dictation ready.
 ```
 
 #### Step 2: Diff Biasing Pre-Flight Audit (`ovio gate`)

@@ -29,7 +29,7 @@ export const GLOSSARY = {
     fullName: 'Speech-to-Text',
     category: 'VOICE TRANSCRIPTION',
     summary: 'The general category of software systems that convert spoken human voice into computer-readable text strings.',
-    ovioRole: 'ovio pairs code-aware STT with AssemblyAI Universal-3.5 Pro to format speech into Conventional Commits in <800ms.'
+    ovioRole: 'ovio pairs code-aware STT with AssemblyAI Universal-3.5 Pro to format speech into Conventional Commits with rapid ~1.0s turnaround.'
   },
   PTT: {
     term: 'PTT',

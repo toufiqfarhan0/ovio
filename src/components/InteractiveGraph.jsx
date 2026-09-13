@@ -67,7 +67,7 @@ export default function InteractiveGraph() {
               <span className="micro-label text-ink">The Decoding Gap</span>
               <span className="text-xs font-mono text-muted">•</span>
               <span className="text-xs font-mono text-ink-soft">
-                <TechTooltip term="AST" position="bottom" align="left">AST</TechTooltip> Biasing Inspector
+                <TechTooltip term="AST" position="bottom" align="left">Diff Symbol</TechTooltip> Biasing Inspector
               </span>
             </div>
             <h2 className="font-serif-display text-3xl sm:text-4xl text-ink font-normal tracking-tight">
@@ -77,7 +77,7 @@ export default function InteractiveGraph() {
 
           {/* Language / File Toggle */}
           <div className="flex items-center gap-2 bg-paper-light p-1 rounded-lg hairline-border text-xs font-mono">
-            <span className="text-muted px-2">Sample <TechTooltip term="AST" position="bottom" align="right">AST</TechTooltip>:</span>
+            <span className="text-muted px-2">Sample <TechTooltip term="AST" position="bottom" align="right">Diff</TechTooltip>:</span>
             {Object.keys(CODE_SAMPLES).map((langKey) => (
               <button
                 key={langKey}
@@ -131,8 +131,8 @@ export default function InteractiveGraph() {
             </div>
 
             <div className="mt-4 pt-3 hairline-border-t flex items-center justify-between text-xs font-mono text-muted">
-              <span><TechTooltip term="AST" position="top">AST</TechTooltip> symbols harvested: {sample.symbols.length}</span>
-              <span className="text-ink font-semibold">Tree-sitter / Regex Engine</span>
+              <span><TechTooltip term="AST" position="top">Diff</TechTooltip> symbols harvested: {sample.symbols.length}</span>
+              <span className="text-ink font-semibold">Diff Regex Extractor</span>
             </div>
           </div>
 

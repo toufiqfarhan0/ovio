@@ -38,7 +38,7 @@ export default function Pipeline() {
       step: '04',
       title: 'Universal-3.5 Pro',
       badge: 'ASSEMBLYAI BETA',
-      desc: 'Transcribes verbatim speech and formats Conventional Commits in a single sub-second API round-trip.',
+      desc: 'Transcribes verbatim speech and formats Conventional Commits in a single rapid ~1.0s API round-trip (1,003ms–1,512ms measured).',
       icon: Cpu,
       detail: 'llm_instruction reshapes hesitation into feat(scope): subject.'
     },
@@ -65,7 +65,7 @@ export default function Pipeline() {
             How ovio turns voice into load-bearing code changes
           </h2>
           <p className="text-ink-soft text-sm sm:text-base leading-relaxed">
-            Conventional speech-to-text operates linearly without codebase awareness. ovio closes the loop by injecting repository <TechTooltip term="AST" position="bottom">AST</TechTooltip> context into the transcription engine itself.
+            Conventional speech-to-text operates linearly without codebase awareness. ovio closes the loop by injecting repository <TechTooltip term="AST" position="bottom">diff symbol</TechTooltip> context into the transcription engine itself.
           </p>
         </div>
 

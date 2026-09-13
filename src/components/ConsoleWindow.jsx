@@ -257,7 +257,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                 </button>
               ))}
             </div>
-            <span className="hidden sm:inline text-[11px] text-muted">Universal-3.5 Pro · Sub-second SLA &lt;800ms</span>
+            <span className="hidden sm:inline text-[11px] text-muted">Universal-3.5 Pro · Rapid Turnaround (1,003ms)</span>
           </div>
         )}
 
@@ -492,7 +492,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                     <span className="text-white font-bold">: {selectedLang}  ({currentLang.label})</span>
 
                     <span className="text-[#a0a0a0]">engine</span>
-                    <span className="text-white font-bold">: Universal-3.5 Pro (sub-second SLA &lt; 800ms)</span>
+                    <span className="text-white font-bold">: Universal-3.5 Pro (rapid turnaround ~1s)</span>
 
                     <span className="text-[#a0a0a0]">instruction</span>
                     <span className="text-white font-bold">: Native speech audio → English Conventional Commit standard</span>

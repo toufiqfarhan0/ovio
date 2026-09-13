@@ -16,7 +16,7 @@ export default function Faq() {
       a: (
         <div className="space-y-2">
           <p>
-            Standard speech-to-text transcribes filler words (&quot;ums&quot;, &quot;ahs&quot;) and retracted speech verbatim. The Dictation API applies an integrated LLM rewrite in the same sub-second call. You get both the verbatim transcript (<code>text</code>) and the send-ready artifact (<code>llm_response</code>) with zero external LLM roundtrip.
+            Standard speech-to-text transcribes filler words (&quot;ums&quot;, &quot;ahs&quot;) and retracted speech verbatim. The Dictation API applies an integrated LLM rewrite in the same single API call (measured ~1.0s). You get both the verbatim transcript (<code>text</code>) and the send-ready artifact (<code>llm_response</code>) with zero external LLM roundtrip.
           </p>
           <div className="pt-1">
             <a
@@ -83,7 +83,7 @@ export default function Faq() {
               <strong className="text-ink">ASR (Automatic Speech Recognition)</strong>: The AI model that decodes acoustic speech audio into text strings.
             </li>
             <li>
-              <strong className="text-ink">AST / Diff Symbols</strong>: Source syntax representation. Rather than running brittle AST compilers on partial diff hunks, ovio uses fast language-agnostic regex to extract function, class, and variable names from staged diffs into AssemblyAI keyterms.
+              <strong className="text-ink">Diff Symbols (vs AST)</strong>: Code identifier extraction. Rather than running brittle AST compilers on partial diff hunks, ovio uses fast language-agnostic regex to extract function, class, and variable names from staged diffs into AssemblyAI keyterms.
             </li>
             <li>
               <strong className="text-ink">RMS (Root Mean Square)</strong>: Live microphone energy calculation used for real-time silence detection and waveform visualization.

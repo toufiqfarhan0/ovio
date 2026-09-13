@@ -123,13 +123,13 @@ export default function DocsPage({ onBack }) {
     {
       id: 'architecture',
       group: 'Architecture',
-      title: 'Sub-800ms Pipeline',
+      title: '5-Stage Pipeline',
       icon: Layers
     },
     {
-      id: 'ast-biasing',
+      id: 'diff-biasing',
       group: 'Architecture',
-      title: 'AST Biasing Mechanics',
+      title: 'Diff Biasing Mechanics',
       icon: Cpu
     },
     {
@@ -357,7 +357,7 @@ export default function DocsPage({ onBack }) {
               <div className="p-3.5 rounded-lg border border-line bg-paper-card">
                 <div className="flex items-center gap-2 font-bold text-ink mb-1">
                   <span className="w-5 h-5 rounded-full bg-ink text-paper-light flex items-center justify-center text-[10px]">2</span>
-                  <span>Git Diff AST Extraction</span>
+                  <span>Git Diff Symbol Extraction</span>
                 </div>
                 <p className="text-ink-soft pl-7 font-sans">
                   Inspects staged index (<code className="font-mono text-[11px]">git diff --staged</code>). Regex and language heuristics extract modified identifiers, exported classes, and functions across Python, TypeScript, Go, Rust, and JavaScript.
@@ -370,7 +370,7 @@ export default function DocsPage({ onBack }) {
                   <span>AssemblyAI Dictation API Ingestion</span>
                 </div>
                 <p className="text-ink-soft pl-7 font-sans">
-                  Dispatches audio payload to AssemblyAI Universal-3.5 Pro with <code className="font-mono text-[11px]">keyterms_prompt</code> containing extracted AST tokens and <code className="font-mono text-[11px]">stt_prompt</code> with staged file paths.
+                  Dispatches audio payload to AssemblyAI Universal-3.5 Pro with <code className="font-mono text-[11px]">keyterms_prompt</code> containing extracted diff symbols and <code className="font-mono text-[11px]">stt_prompt</code> with staged file paths.
                 </p>
               </div>
 
@@ -398,11 +398,11 @@ export default function DocsPage({ onBack }) {
 
           <hr className="border-line" />
 
-          {/* SECTION 4: AST Biasing Mechanics */}
-          <section id="doc-ast-biasing" className="scroll-mt-32 space-y-4">
-            <div className="micro-label text-muted">AST Biasing Deep Dive</div>
+          {/* SECTION 4: Diff Biasing Mechanics */}
+          <section id="doc-diff-biasing" className="scroll-mt-32 space-y-4">
+            <div className="micro-label text-muted">Diff Biasing Deep Dive</div>
             <h2 className="font-serif-display text-3xl text-ink font-semibold">
-              AST Vocabulary Biasing Mechanics
+              Diff Vocabulary Biasing Mechanics
             </h2>
             <p className="text-ink-soft text-sm">
               How ovio guarantees 100% spelling fidelity for symbols in your codebase:
@@ -458,12 +458,12 @@ export default function DocsPage({ onBack }) {
                   <tr>
                     <td className="py-2.5 px-3 font-bold text-ink">ovio</td>
                     <td className="py-2.5 px-3 text-muted">—</td>
-                    <td className="py-2.5 px-3 font-sans">Runs interactive voice commit. Push-to-talk with Spacebar, biased by staged AST symbols.</td>
+                    <td className="py-2.5 px-3 font-sans">Runs interactive voice commit. Push-to-talk with Spacebar, biased by staged diff symbols.</td>
                   </tr>
                   <tr>
                     <td className="py-2.5 px-3 font-bold text-ink">ovio gate</td>
                     <td className="py-2.5 px-3 text-muted">-v / --verbose</td>
-                    <td className="py-2.5 px-3 font-sans">AST Biasing Audit. Displays staged files, extracted tokens, and vocabulary readiness.</td>
+                    <td className="py-2.5 px-3 font-sans">Diff Biasing Audit. Displays staged files, extracted symbols, and vocabulary readiness.</td>
                   </tr>
                   <tr>
                     <td className="py-2.5 px-3 font-bold text-ink">ovio verify</td>

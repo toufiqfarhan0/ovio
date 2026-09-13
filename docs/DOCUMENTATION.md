@@ -1,6 +1,6 @@
 # ovio Technical Documentation & System Reference
 
-**ovio** is a Voice Git & Codebase Dictation Engine powered by AssemblyAI's streaming Dictation API (Universal-3.5 Pro) with real-time local Abstract Syntax Tree (AST) vocabulary biasing.
+**ovio** is a Voice Git & Codebase Dictation Engine powered by AssemblyAI's streaming Dictation API (Universal-3.5 Pro) with real-time local diff symbol vocabulary biasing.
 
 ---
 
@@ -8,7 +8,7 @@
 1. [Overview & Problem Statement](#1-overview--problem-statement)
 2. [Quickstart & Installation](#2-quickstart--installation)
 3. [Architecture & The 5-Stage Pipeline](#3-architecture--the-5-stage-pipeline)
-4. [AST Vocabulary Biasing Engine](#4-ast-vocabulary-biasing-engine)
+4. [Diff Vocabulary Biasing Engine](#4-diff-vocabulary-biasing-engine)
 5. [CLI Command Matrix & Flags](#5-cli-command-matrix--flags)
 6. [Multilingual Voice Dictation](#6-multilingual-voice-dictation)
 7. [Configuration & Environment Security](#7-configuration--environment-security)
@@ -64,7 +64,7 @@ Expected diagnostic output:
  audio backend   : OK (audio device(s) detected)
  api key         : OK (49db5e...9ace)
 ────────────────────────────────────────────────────────────────────
-VERIFY OK: system fully operational; audio capture, AST biasing, and dictation ready.
+VERIFY OK: system fully operational; audio capture, diff symbol biasing, and dictation ready.
 ```
 
 ---
@@ -77,7 +77,7 @@ VERIFY OK: system fully operational; audio capture, AST biasing, and dictation r
          ▼
  1. Audio Capture (16kHz PCM WAV via sounddevice)
          │
- 2. Local Git Diff AST Parser (Extracts modified symbols & identifiers)
+ 2. Local Git Diff Symbol Parser (Extracts modified symbols & identifiers)
          │
          ▼
  3. AssemblyAI Dictation API (Universal-3.5 Pro + keyterms_prompt biasing)
@@ -122,8 +122,8 @@ ovio gate --verbose
 
 | Command | Flags / Alias | Purpose |
 | :--- | :--- | :--- |
-| `ovio` | None | **Voice Commit**: Interactive push-to-talk dictation with AST vocabulary biasing |
-| `ovio gate` | `--verbose` (`-v`) | **AST Biasing Audit**: Pre-flight inspection of staged changes & extracted symbols |
+| `ovio` | None | **Voice Commit**: Interactive push-to-talk dictation with diff symbol vocabulary biasing |
+| `ovio gate` | `--verbose` (`-v`) | **Diff Biasing Audit**: Pre-flight inspection of staged changes & extracted symbols |
 | `ovio verify` | None | **Diagnostics**: Verifies Git work tree, audio input devices, and API credentials |
 | `ovio --demo` | `-d` | **Dry-Run Simulation**: Instant turnaround test with synthetic developer audio |
 | `ovio --lang <code>` | `-l` | **Multilingual Dictation**: Dictate in native language, generate English Conventional Commit |

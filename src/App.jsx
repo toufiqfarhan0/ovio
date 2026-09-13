@@ -131,7 +131,7 @@ export default function App() {
           {/* 4. 5-Step Architecture Pipeline */}
           <Pipeline />
 
-          {/* 5. AST Symbol Extraction & Decoding Gap Inspector (Step 3) */}
+          {/* 5. Diff Symbol Extraction & Decoding Gap Inspector (Step 3) */}
           <InteractiveGraph />
 
           {/* 6. CLI Quickstart Guide */}

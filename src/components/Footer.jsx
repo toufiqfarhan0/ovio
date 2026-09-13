@@ -171,11 +171,11 @@ export default function Footer({ onNavigate }) {
             Built for <span className="text-ink font-medium">AssemblyAI Voice Hackathon: Hack into Dictation</span> (Sept 2026)
           </div>
           <div className="flex items-center gap-2">
-            <span>&lt;800ms SLA</span>
+            <span>1.0s–1.5s SLA</span>
             <span>•</span>
             <span>Zero Hallucination</span>
             <span>•</span>
-            <span className="text-ink-soft">Local <TechTooltip term="AST" position="top" align="right">AST</TechTooltip> Inference</span>
+            <span className="text-ink-soft">Local <TechTooltip term="AST" position="top" align="right">Diff Symbol</TechTooltip> Biasing</span>
           </div>
         </div>
       </div>
