@@ -16,23 +16,19 @@ export default function Quickstart() {
   const steps = [
     {
       title: 'Clone & Configure Environment',
-      code: `git clone https://github.com/toufiqfarhan0/ovio.git\ncd ovio\necho "ASSEMBLYAI_API_KEY=your_key_here" > .env`,
-      cmd: `echo "ASSEMBLYAI_API_KEY=your_key_here" > .env`
+      code: `git clone https://github.com/toufiqfarhan0/ovio.git\ncd ovio\necho "ASSEMBLYAI_API_KEY=your_key_here" > .env`
     },
     {
       title: 'Install Package & CLI Command',
-      code: `pip install -e .\n# installs standalone global 'ovio' binary`,
-      cmd: `pip install -e .`
+      code: `pip install -e .\n# installs standalone global 'ovio' binary`
     },
     {
       title: 'Run Voice Git Anywhere',
-      code: `ovio\n# or specify language: ovio --lang en\n# or transcribe file: ovio --file clip.wav\n# or dry-run demo: ovio --demo`,
-      cmd: `ovio`
+      code: `ovio\n# or specify language: ovio --lang en\n# or transcribe file: ovio --file clip.wav\n# or dry-run demo: ovio --demo`
     },
     {
       title: <>Audit <TechTooltip term="AST" position="top">AST</TechTooltip> Biasing & Diagnostics</>,
-      code: `ovio gate     # inspects staged AST symbols\novio verify   # tests mic and API connectivity`,
-      cmd: `ovio gate`
+      code: `ovio gate     # inspects staged AST symbols\novio verify   # tests mic and API connectivity`
     }
   ]
 
@@ -67,7 +63,7 @@ export default function Quickstart() {
                 <div className="flex items-center justify-between mb-2">
                   <span className="micro-label text-muted">STEP {idx + 1}</span>
                   <button
-                    onClick={() => copyToClipboard(item.cmd, idx)}
+                    onClick={() => copyToClipboard(item.code, idx)}
                     className="flex items-center gap-1 text-xs font-mono text-muted hover:text-ink transition-colors"
                   >
                     {copiedIndex === idx ? (
