@@ -524,7 +524,7 @@ export default function DocsPage({ onBack }) {
                     <tr>
                       <td className="py-2 px-3 font-bold text-ink">keyterms_prompt</td>
                       <td className="py-2 px-3">Drug names: [&quot;amoxicillin&quot;, &quot;lisinopril&quot;]</td>
-                      <td className="py-2 px-3 text-[#ff571a]">AST diff identifiers: [&quot;refreshToken&quot;, &quot;tokenBlacklist&quot;]</td>
+                      <td className="py-2 px-3 text-[#ff571a]">Staged diff identifiers: [&quot;refreshToken&quot;, &quot;tokenBlacklist&quot;]</td>
                     </tr>
                     <tr>
                       <td className="py-2 px-3 font-bold text-ink">llm_instruction</td>

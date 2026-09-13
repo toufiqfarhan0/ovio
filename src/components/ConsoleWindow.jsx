@@ -341,7 +341,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                 <div className="mb-4 text-xs sm:text-[13px]">
                   <span className="text-emerald-400 font-bold">[LIVE]</span>{' '}
                   <span className="text-white font-bold">DICTATION</span>{' '}
-                  <span className="text-[#8e8b83]">model=Universal-3.5-Pro  sla&lt;800ms</span>
+                  <span className="text-[#8e8b83]">model=Universal-3.5 Pro  streaming=True</span>
                 </div>
 
                 {/* Framed Telemetry Block */}

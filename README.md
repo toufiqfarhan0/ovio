@@ -633,7 +633,7 @@ In AssemblyAI's [Clinical Dictation Specification](https://www.assemblyai.com/do
 |---|---|---|
 | **Domain** | Healthcare & Medicine | Software Engineering & Version Control |
 | **`stt_prompt`** | `"A doctor dictating a patient visit note."` | `"A developer dictating git commits for branch 'main'. Files: authRoutes.ts, webhook.ts."` |
-| **`keyterms_prompt`** | `["amoxicillin", "lisinopril", "metoprolol"]` | `["refreshToken", "stripeWebhookSecret", "idempotencyKey"]` (Harvested directly from staged diffs via AST parser) |
+| **`keyterms_prompt`** | `["amoxicillin", "lisinopril", "metoprolol"]` | `["refreshToken", "stripeWebhookSecret", "idempotencyKey"]` (Harvested directly from staged diffs via regex symbol extractor) |
 | **`llm_instruction`** | `"Remove filler words and rewrite as a concise clinical chart note."` | `"Remove filler words, keep staged code symbols verbatim, and format as a Conventional Commit v1.0.0 (type(scope): summary)."` |
 | **Fallback Rule** | `rewrite = result["llm_response"] or transcript` | `clean_commit = res["llm_response"] or res["text"]` (Best-effort rewrite fallback ensuring zero data loss) |
 | **Authentication Handling** | Returns `404 Not Found` with `{"detail": "Invalid API key"}` (not `401`) | `ovio verify` & CLI explicitly maps `404` as an API auth failure |
