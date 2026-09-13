@@ -45,13 +45,13 @@ RULE_STR = "─" * WIDTH
 
 _TRUECOLOR = os.environ.get("COLORTERM", "") in ("truecolor", "24bit") or sys.platform == "win32"
 
-_ACCENT_256 = "38;5;208"
+_ACCENT_256 = "38;5;226"
 _SIGNAL_256 = "38;5;220"
 _DIM_256 = "38;5;240"
 _FAINT_256 = "38;5;245"
 
 if _TRUECOLOR:
-    ACCENT = "38;2;255;87;26"       # brand orange (#ff571a)
+    ACCENT = "38;2;245;238;39"       # cyber yellow (#F5EE27)
     SIGNAL = "38;2;249;196;37"      # yellow (#f9c425)
     DIM = "38;2;110;110;110"        # line ramp (#6e6e6e)
     FAINT = "38;2;160;160;160"      # muted text (#a0a0a0)

@@ -4,7 +4,7 @@ import TechTooltip from './TechTooltip'
 import { handleNavClick } from '../utils/navigation'
 import Logo from './Logo'
 
-export default function Footer() {
+export default function Footer({ onNavigate }) {
   return (
     <footer className="w-full bg-paper-deep/30 border-t border-line py-14 px-4 sm:px-6 font-sans">
       <div className="max-w-6xl mx-auto">
@@ -90,6 +90,14 @@ export default function Footer() {
               Tooling
             </div>
             <ul className="space-y-2 text-[13px] text-ink-soft font-normal">
+              <li>
+                <button 
+                  onClick={() => onNavigate && onNavigate('docs')}
+                  className="hover:text-ink transition-colors text-left"
+                >
+                  Documentation
+                </button>
+              </li>
               <li>
                 <a 
                   href="#cli" 

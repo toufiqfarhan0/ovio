@@ -326,7 +326,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
               <>
                 {/* Dual-Tone ANSI Shadow Banner */}
                 <div className="select-none mb-3">
-                  <pre className="text-[#ff571a] font-bold leading-none tracking-normal">
+                  <pre className="text-[#F5EE27] font-bold leading-none tracking-normal">
                     {BANNER_TOP}
                   </pre>
                   <pre className="text-white font-bold leading-none tracking-normal mt-2">
@@ -347,7 +347,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                 {/* Framed Telemetry Block */}
                 <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
                 <div className="py-0.5 text-xs sm:text-[13px] flex items-center gap-3">
-                  <span className="text-[#ff571a] font-bold">{session.branch}</span>
+                  <span className="text-[#F5EE27] font-bold">{session.branch}</span>
                   <span className="text-white font-bold">LIVE — AssemblyAI Dictation Engine</span>
                 </div>
                 <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
@@ -372,7 +372,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                   <span className="text-white font-bold">: Conventional Commit + AST symbol fidelity</span>
                 </div>
 
-                <div className="text-[#ff571a] font-bold text-xs py-1">
+                <div className="text-[#F5EE27] font-bold text-xs py-1">
                   BIAS HIT: {session.keyterms.length} staged symbol(s) locked into STT vocabulary [{session.keyterms.slice(0, 3).join(', ')}].
                 </div>
                 <div className="text-[#3a3834] select-none text-xs mb-4">{RULE}</div>
@@ -384,7 +384,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                   </div>
                   <div className="flex flex-wrap items-center gap-2 font-semibold">
                     <span className="text-red-500">● recording</span>
-                    <span className="text-[#ff571a] tracking-wider">{session.statusNote ? '·······' : '▁▂▃▄▅▄▃▂'}</span>
+                    <span className="text-[#F5EE27] tracking-wider">{session.statusNote ? '·······' : '▁▂▃▄▅▄▃▂'}</span>
                     <span className="text-[#8e8b83] text-xs font-normal">2.4s</span>
                     {session.statusNote ? (
                       <span className="text-amber-400 text-xs font-mono font-normal">({session.statusNote})</span>
@@ -397,7 +397,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                 {/* Result Card with Framed Header */}
                 <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
                 <div className="py-0.5 text-xs sm:text-[13px] flex items-center gap-3">
-                  <span className="text-[#ff571a] font-bold">commit_transcribe</span>
+                  <span className="text-[#F5EE27] font-bold">commit_transcribe</span>
                   <span className="text-white font-bold">TRANSCRIBED — in {session.latency} ms (SLA &lt; 800ms)</span>
                 </div>
                 <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
@@ -432,7 +432,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                     <span className="text-white font-bold">[e]</span>
                     <span className="text-[#a8a59c]">edit</span>
                     <span className="text-[#55524c]">│</span>
-                    <span className="text-[#ff571a] font-bold">[q]</span>
+                    <span className="text-[#F5EE27] font-bold">[q]</span>
                     <span className="text-[#a8a59c]">cancel</span>
                   </div>
 
@@ -445,7 +445,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                   </button>
                 </div>
 
-                <div className="mt-3 text-xs font-bold text-[#ff571a]">
+                <div className="mt-3 text-xs font-bold text-[#F5EE27]">
                   VERIFY OK: committed to local branch {session.branch}; pushed to origin/{session.branch}
                 </div>
               </>
@@ -457,7 +457,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
               return (
                 <>
                   <div className="select-none mb-3">
-                    <pre className="text-[#ff571a] font-bold leading-none tracking-normal">
+                    <pre className="text-[#F5EE27] font-bold leading-none tracking-normal">
                       {BANNER_TOP}
                     </pre>
                     <pre className="text-white font-bold leading-none tracking-normal mt-2">
@@ -476,7 +476,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
 
                   <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
                   <div className="py-0.5 text-xs sm:text-[13px] flex items-center gap-3">
-                    <span className="text-[#ff571a] font-bold">main</span>
+                    <span className="text-[#F5EE27] font-bold">main</span>
                     <span className="text-white font-bold">LIVE — AssemblyAI Universal-3.5 Pro Multilingual Engine</span>
                   </div>
                   <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
@@ -498,7 +498,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                     <span className="text-white font-bold">: Native speech audio → English Conventional Commit standard</span>
                   </div>
 
-                  <div className="text-[#ff571a] font-bold text-xs py-1">
+                  <div className="text-[#F5EE27] font-bold text-xs py-1">
                     LANGUAGE ACTIVE: Universal-3.5 Pro configured for &apos;{selectedLang}&apos;. Spoken verbatim is captured in native tongue; commit is output in English.
                   </div>
                   <div className="text-[#3a3834] select-none text-xs mb-4">{RULE}</div>
@@ -510,7 +510,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                     </div>
                     <div className="flex flex-wrap items-center gap-2 font-semibold">
                       <span className="text-red-500">● recording</span>
-                      <span className="text-[#ff571a] tracking-wider">▁▂▃▄▅▄▃▂</span>
+                      <span className="text-[#F5EE27] tracking-wider">▁▂▃▄▅▄▃▂</span>
                       <span className="text-[#8e8b83] text-xs font-normal">2.4s</span>
                       <span className="text-emerald-400 text-xs font-mono font-normal">(voice active · {currentLang.label})</span>
                     </div>
@@ -519,7 +519,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                   {/* Result Card */}
                   <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
                   <div className="py-0.5 text-xs sm:text-[13px] flex items-center gap-3">
-                    <span className="text-[#ff571a] font-bold">commit_transcribe</span>
+                    <span className="text-[#F5EE27] font-bold">commit_transcribe</span>
                     <span className="text-white font-bold">TRANSCRIBED — in {currentLang.latency} ms</span>
                   </div>
                   <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
@@ -554,7 +554,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                       <span className="text-white font-bold">[e]</span>
                       <span className="text-[#a8a59c]">edit</span>
                       <span className="text-[#55524c]">│</span>
-                      <span className="text-[#ff571a] font-bold">[q]</span>
+                      <span className="text-[#F5EE27] font-bold">[q]</span>
                       <span className="text-[#a8a59c]">cancel</span>
                     </div>
 
@@ -567,7 +567,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                     </button>
                   </div>
 
-                  <div className="mt-3 text-xs font-bold text-[#ff571a]">
+                  <div className="mt-3 text-xs font-bold text-[#F5EE27]">
                     VERIFY OK: committed to local branch main; pushed to origin/main
                   </div>
                 </>
@@ -577,7 +577,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
             {activeCommand === 'gate' && (
               <>
                 <div className="select-none mb-3">
-                  <pre className="text-[#ff571a] font-bold leading-none tracking-normal">
+                  <pre className="text-[#F5EE27] font-bold leading-none tracking-normal">
                     {BANNER_TOP}
                   </pre>
                   <pre className="text-white font-bold leading-none tracking-normal mt-2">
@@ -596,7 +596,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
 
                 <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
                 <div className="py-0.5 text-xs sm:text-[13px] flex items-center gap-3">
-                  <span className="text-[#ff571a] font-bold">main</span>
+                  <span className="text-[#F5EE27] font-bold">main</span>
                   <span className="text-white font-bold">INSPECT — AST biasing audit</span>
                 </div>
                 <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
@@ -633,7 +633,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
               <>
                 <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
                 <div className="py-0.5 text-xs sm:text-[13px] flex items-center gap-3">
-                  <span className="text-[#ff571a] font-bold">ovio_verify</span>
+                  <span className="text-[#F5EE27] font-bold">ovio_verify</span>
                   <span className="text-white font-bold">DIAGNOSTICS — environment audit</span>
                 </div>
                 <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
@@ -650,7 +650,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                 </div>
                 <div className="text-[#3a3834] select-none text-xs mb-3">{RULE}</div>
 
-                <div className="text-xs font-bold text-[#ff571a]">
+                <div className="text-xs font-bold text-[#F5EE27]">
                   VERIFY OK: system fully operational; audio capture, AST biasing, and dictation ready.
                 </div>
               </>

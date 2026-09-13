@@ -3,7 +3,7 @@ import { Terminal, Command, GitBranch, ArrowUpRight } from 'lucide-react'
 import { handleNavClick } from '../utils/navigation'
 import Logo from './Logo'
 
-export default function Navbar({ onOpenCommandMenu }) {
+export default function Navbar({ onOpenCommandMenu, currentView = 'home', onNavigate }) {
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -13,6 +13,15 @@ export default function Navbar({ onOpenCommandMenu }) {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  const handleBrandClick = (e) => {
+    e.preventDefault()
+    if (onNavigate) {
+      onNavigate('home', 'top')
+    } else {
+      handleNavClick(e, 'top')
+    }
+  }
 
   return (
     <header className={`sticky top-0 z-40 w-full transition-all duration-200 ${
@@ -25,7 +34,7 @@ export default function Navbar({ onOpenCommandMenu }) {
         <div className="flex items-center gap-3 shrink-0">
           <a 
             href="#" 
-            onClick={(e) => handleNavClick(e, 'top')}
+            onClick={handleBrandClick}
             className="flex items-center gap-2.5 group"
           >
             <Logo className="w-6 h-6 shrink-0 transition-transform group-hover:scale-105" />
@@ -40,47 +49,54 @@ export default function Navbar({ onOpenCommandMenu }) {
         </div>
 
         {/* Center: Navigation Links */}
-        <nav className="hidden md:flex items-center gap-5 lg:gap-7 text-[13px] font-medium text-ink-soft">
-          <a 
-            href="#pipeline" 
-            onClick={(e) => handleNavClick(e, 'pipeline')}
+        <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-[13px] font-medium text-ink-soft">
+          <button 
+            onClick={() => onNavigate && onNavigate('home', 'pipeline')}
             className="hover:text-ink transition-colors whitespace-nowrap"
           >
             Pipeline
-          </a>
-          <a 
-            href="#console" 
-            onClick={(e) => handleNavClick(e, 'console')}
+          </button>
+          <button 
+            onClick={() => onNavigate && onNavigate('home', 'console')}
             className="hover:text-ink transition-colors whitespace-nowrap flex items-center gap-1.5"
           >
             <span>Terminal</span>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
-          </a>
-          <a 
-            href="#biasing" 
-            onClick={(e) => handleNavClick(e, 'biasing')}
+          </button>
+          <button 
+            onClick={() => onNavigate && onNavigate('home', 'biasing')}
             className="hover:text-ink transition-colors whitespace-nowrap"
           >
             AST Biasing
-          </a>
-          <a 
-            href="#cli" 
-            onClick={(e) => handleNavClick(e, 'cli')}
+          </button>
+          <button 
+            onClick={() => onNavigate && onNavigate('home', 'cli')}
             className="hover:text-ink transition-colors whitespace-nowrap"
           >
             CLI Reference
-          </a>
-          <a 
-            href="#research" 
-            onClick={(e) => handleNavClick(e, 'research')}
+          </button>
+          <button 
+            onClick={() => onNavigate && onNavigate('home', 'research')}
             className="hover:text-ink transition-colors whitespace-nowrap"
           >
             Research
-          </a>
+          </button>
         </nav>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+          {/* Docs link */}
+          <button
+            onClick={() => onNavigate && onNavigate('docs')}
+            className={`text-[13px] font-medium transition-colors px-2.5 py-1 rounded-md ${
+              currentView === 'docs' 
+                ? 'bg-ink text-paper-light font-semibold' 
+                : 'text-ink-soft hover:text-ink hover:bg-paper-deep/60'
+            }`}
+          >
+            Docs
+          </button>
+
           {/* GitHub link */}
           <a
             href="https://github.com/toufiqfarhan0/ovio"

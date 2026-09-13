@@ -13,6 +13,12 @@
 
 ---
 
+<p align="center">
+  <img src="public/ovio-terminal.png" alt="ovio Voice Git & AST Biasing Engine Terminal Session" width="100%" />
+</p>
+
+---
+
 ## The 60-Second Overview
 
 Software engineers spend **45 seconds** per git commit switching mental context between complex code and writing structured [Conventional Commits](https://www.conventionalcommits.org/). Standard speech-to-text engines fail for developer workflows because:
@@ -283,43 +289,51 @@ ovio --help
    ovio
    ```
 
-2. **Hold Spacebar & Speak**:
+2. **Hold Spacebar & Dictate (`ovio`)**:
    ```text
-     ██████╗ ██╗   ██╗██╗ ██████╗       VOICE GIT ─────────────
-    ██╔═══██╗██║   ██║██║██╔═══██╗      assemblyai universal-3.5 pro
-    ██║   ██║██║   ██║██║██║   ██║      ast codebase biasing engine
-    ██║   ██║╚██╗ ██╔╝██║██║   ██║      ───────────────────────
-    ╚██████╔╝ ╚████╔╝ ██║╚██████╔╝      sub-second dictation sla
+   $ ovio
+
+     ██████╗ ██╗   ██╗██╗ ██████╗ 
+    ██╔═══██╗██║   ██║██║██╔═══██╗
+    ██║   ██║██║   ██║██║██║   ██║
+    ██║   ██║╚██╗ ██╔╝██║██║   ██║
+    ╚██████╔╝ ╚████╔╝ ██║╚██████╔╝
      ╚═════╝   ╚═══╝  ╚═╝ ╚═════╝ 
 
-   ────────────────────────────────────────────────────────────────────
-     version         1.0.0               branch          feature/auth
-     model           Universal-3.5 Pro   staged files    3
-     provider        AssemblyAI Dictation symbols biased  8
-   ────────────────────────────────────────────────────────────────────
+      ██╗   ██╗ ██████╗ ██╗ ██████╗███████╗    ██████╗ ██╗████████╗
+      ██║   ██║██╔═══██╗██║██╔════╝██╔════╝   ██╔════╝ ██║╚══██╔══╝
+      ██║   ██║██║   ██║██║██║     █████╗     ██║  ███╗██║   ██║   
+      ╚██╗ ██╔╝██║   ██║██║██║     ██╔══╝     ██║   ██║██║   ██║   
+       ╚████╔╝ ╚██████╔╝██║╚██████╗███████╗   ╚██████╔╝██║   ██║   
+        ╚═══╝   ╚═════╝ ╚═╝ ╚═════╝╚══════╝    ╚═════╝ ╚═╝   ╚═╝   
 
-     hold [ SPACEBAR ] to dictate — release when done
-     ● recording  ▁▂▃▄▅▄▃▂  2.8s  (voice active)
+   measure what the developer meant
 
-     # If silent for 2+ seconds, ovio prompts in real time:
-     ● recording  ·······  2.4s  (listening... please speak more)
-   ```
+   [LIVE] DICTATION model=Universal-3.5-Pro sla<800ms
 
-3. **Instant Turnaround & Commit**:
-   ```text
-     transcribed & formatted  [642ms  Universal-3.5 Pro]
-   ────────────────────────────────────────────────────────────────────
-     verbatim
-     uh so in auth service we added verifyToken to check the JWT_SECRET wait also handled expired token errors properly
+   feature/auth-flow LIVE — AssemblyAI Dictation Engine
 
-     conventional commit
-     feat(auth): add verifyToken and handle expired token errors
-     - Implement token verification against JWT_SECRET in authService
-     - Add explicit error handling for expired and malformed tokens
-   ────────────────────────────────────────────────────────────────────
+   branch          : feature/auth-flow
+   staged files    : 3 files (src/auth/jwt.ts, src/auth/token.ts, +1)
+   language        : en (English)
+   ast biasing     : 4 symbols [authService, verifyToken, JWT_SECRET, TokenExpiredError]
+   engine          : Universal-3.5 Pro (sub-second SLA < 800ms)
+   instruction     : Conventional Commit + AST symbol fidelity
+   BIAS HIT: 4 staged symbol(s) locked into STT vocabulary [authService, verifyToken, JWT_SECRET].
 
-     [Enter] commit & push  |  [c] commit only  |  [e] edit  |  [q] cancel
-     > 
+   hold SPACEBAR to dictate — release when done
+   ● recording  ▁▂▃▄▅▄▃▂  2.4s (voice active)
+
+   commit_transcribe TRANSCRIBED — in 640 ms (SLA < 800ms)
+
+   verbatim        : "uh so in auth service we added verifyToken to check the JWT_SECRET wait also handled expired token errors properly"
+
+   conventional    : feat(auth): add verifyToken and handle expired token errors
+                     - Implement token verification against JWT_SECRET in authService
+                     - Add explicit error handling for expired and malformed tokens
+
+   [Enter] commit & push  |  [c] commit only  |  [e] edit  |  [q] cancel
+   VERIFY OK: committed to local branch feature/auth-flow; pushed to origin/feature/auth-flow
    ```
 
 ---
@@ -515,30 +529,38 @@ VERIFY OK: committed to local branch main; pushed to origin/main
 Zero-latency synthetic dry run for CI/CD environments or developers testing without audio inputs:
 ```text
 PS C:\Users\toufi\Desktop\test-apy-sync> ovio --demo
-  ██████╗ ██╗   ██╗██╗ ██████╗       VOICE GIT ─────────────
- ██╔═══██╗██║   ██║██║██╔═══██╗      assemblyai universal-3.5 pro
- ██║   ██║██║   ██║██║██║   ██║      ast codebase biasing engine
- ██║   ██║╚██╗ ██╔╝██║██║   ██║      ───────────────────────
- ╚██████╔╝ ╚████╔╝ ██║╚██████╔╝      sub-second dictation sla
-  ╚═════╝   ╚═══╝  ╚═╝ ╚═════╝ 
+
+ovio — voice git & codebase dictation engine
+
+measure what the developer meant
+
+[DEMO]  SYNTHETIC      model=Universal-3.5-Pro  dry-run=True
 
 ────────────────────────────────────────────────────────────────────
-  version         1.0.0               branch          main
-  model           Universal-3.5 Pro   staged files    0
-  provider        AssemblyAI Dictation symbols biased  0
+ main   DEMO — Synthetic Speech Fixture
+────────────────────────────────────────────────────────────────────
+ branch          : main
+ staged files    : 3 files (src/auth/jwt.ts, src/auth/token.ts, +1)
+ language        : en  (English)
+ ast biasing     : 4 symbols [authService, verifyToken, JWT_SECRET, TokenExpiredError]
+ engine          : Universal-3.5 Pro (sub-second SLA < 800ms)
+ instruction     : Conventional Commit + AST symbol fidelity
+ BIAS HIT: 4 staged symbol(s) locked into STT vocabulary [authService, verifyToken, JWT_SECRET].
 ────────────────────────────────────────────────────────────────────
 
-  [DEMO MODE] Simulating developer voice input...
-  transcribed & formatted  [642ms  Universal-3.5 Pro]
 ────────────────────────────────────────────────────────────────────
-  verbatim
-  uh so in auth service we added verifyToken to check the JWT_SECRET wait also handled expired token errors properly
+ commit_transcribe   TRANSCRIBED — in 642 ms (SLA < 800ms)
+────────────────────────────────────────────────────────────────────
+ verbatim        : uh so in auth service we added verifyToken to check the JWT_SECRET wait also handled expired token errors properly
+ conventional    : feat(auth): add verifyToken and handle expired token errors
 
-  conventional commit
-  feat(auth): add verifyToken and handle expired token errors
-  - Implement token verification against JWT_SECRET in authService
-  - Add explicit error handling for expired and malformed tokens
+                   - Implement token verification against JWT_SECRET in authService
+                   - Add explicit error handling for expired and malformed tokens
 ────────────────────────────────────────────────────────────────────
+
+  [Enter] commit & push  │  [c] commit only  │  [e] edit  │  [q] cancel
+  > [Enter]
+VERIFY OK: committed to local branch feature/auth-flow; pushed to origin/feature/auth-flow
 ```
 
 ---

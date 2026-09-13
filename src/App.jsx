@@ -10,21 +10,36 @@ import Quickstart from './components/Quickstart'
 import ResearchLog from './components/ResearchLog'
 import Faq from './components/Faq'
 import Footer from './components/Footer'
+import DocsPage from './components/DocsPage'
 
 import { scrollToSection } from './utils/navigation'
 
 export default function App() {
   const [commandMenuOpen, setCommandMenuOpen] = useState(false)
   const [selectedPreset, setSelectedPreset] = useState('auth')
+  const [currentView, setCurrentView] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('view') === 'docs' || window.location.hash === '#docs') {
+        return 'docs'
+      }
+    }
+    return 'home'
+  })
 
   useEffect(() => {
-    // Force manual scroll restoration
+    if (currentView === 'docs') {
+      window.scrollTo(0, 0)
+      return
+    }
+
+    // Force manual scroll restoration for home view
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual'
     }
 
     const resetToCleanRoot = () => {
-      if (window.location.hash) {
+      if (window.location.hash && window.location.hash !== '#docs') {
         window.history.replaceState(null, '', window.location.pathname + window.location.search)
       }
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
@@ -41,7 +56,7 @@ export default function App() {
       frameId = requestAnimationFrame(enforceTop)
     }
 
-    if (window.location.hash || window.__HAD_INITIAL_HASH__) {
+    if (window.location.hash && window.location.hash !== '#docs') {
       resetToCleanRoot()
     }
 
@@ -52,7 +67,27 @@ export default function App() {
       window.removeEventListener('hashchange', resetToCleanRoot)
       window.removeEventListener('popstate', resetToCleanRoot)
     }
-  }, [])
+  }, [currentView])
+
+  const handleNavigate = (view, section) => {
+    if (view === 'docs') {
+      setCurrentView('docs')
+      window.scrollTo({ top: 0, behavior: 'instant' })
+      window.history.replaceState(null, '', '#docs')
+    } else {
+      setCurrentView('home')
+      if (window.location.hash === '#docs') {
+        window.history.replaceState(null, '', window.location.pathname)
+      }
+      if (section) {
+        setTimeout(() => {
+          scrollToSection(section)
+        }, 50)
+      } else {
+        window.scrollTo({ top: 0, behavior: 'instant' })
+      }
+    }
+  }
 
   const handleSelectPreset = (presetKey) => {
     setSelectedPreset(presetKey)
@@ -66,44 +101,52 @@ export default function App() {
   return (
     <div className="min-h-screen bg-paper text-ink font-sans flex flex-col selection:bg-ink selection:text-paper-light">
       {/* Top Navbar & Quick Command Menu */}
-      <Navbar onOpenCommandMenu={() => setCommandMenuOpen(true)} />
+      <Navbar 
+        currentView={currentView}
+        onNavigate={handleNavigate}
+        onOpenCommandMenu={() => setCommandMenuOpen(true)} 
+      />
       <CommandMenu isOpen={commandMenuOpen} onClose={setCommandMenuOpen} />
 
-      {/* Main Editorial Content Sequence */}
-      <main className="flex-1 w-full">
-        {/* 1. Editorial Hero */}
-        <Hero 
-          onStartDemo={handleStartDemo} 
-          onSelectPreset={handleSelectPreset} 
-        />
+      {/* Main View Switching */}
+      {currentView === 'docs' ? (
+        <DocsPage onBack={() => handleNavigate('home')} />
+      ) : (
+        <main className="flex-1 w-full">
+          {/* 1. Editorial Hero */}
+          <Hero 
+            onStartDemo={handleStartDemo} 
+            onSelectPreset={handleSelectPreset} 
+          />
 
-        {/* 2. Interactive Terminal Console & Push-to-Talk */}
-        <ConsoleWindow 
-          selectedPreset={selectedPreset} 
-          onSelectPreset={setSelectedPreset} 
-        />
+          {/* 2. Interactive Terminal Console & Push-to-Talk */}
+          <ConsoleWindow 
+            selectedPreset={selectedPreset} 
+            onSelectPreset={setSelectedPreset} 
+          />
 
-        {/* 3. Founding Brief Quote */}
-        <Quote />
+          {/* 3. Founding Brief Quote */}
+          <Quote />
 
-        {/* 4. 5-Step Architecture Pipeline */}
-        <Pipeline />
+          {/* 4. 5-Step Architecture Pipeline */}
+          <Pipeline />
 
-        {/* 5. AST Symbol Extraction & Decoding Gap Inspector (Step 3) */}
-        <InteractiveGraph />
+          {/* 5. AST Symbol Extraction & Decoding Gap Inspector (Step 3) */}
+          <InteractiveGraph />
 
-        {/* 6. CLI Quickstart Guide */}
-        <Quickstart />
+          {/* 6. CLI Quickstart Guide */}
+          <Quickstart />
 
-        {/* 8. Benchmark Research Log */}
-        <ResearchLog />
+          {/* 8. Benchmark Research Log */}
+          <ResearchLog />
 
-        {/* 9. Frequently Asked Questions */}
-        <Faq />
-      </main>
+          {/* 9. Frequently Asked Questions */}
+          <Faq />
+        </main>
+      )}
 
       {/* Footer */}
-      <Footer />
+      <Footer onNavigate={handleNavigate} />
     </div>
   )
 }
