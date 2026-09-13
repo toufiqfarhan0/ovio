@@ -64,6 +64,17 @@ export const TERMINAL_SESSIONS = {
 }
 
 export const MULTILANG_SESSIONS = {
+  en: {
+    lang: 'en',
+    label: 'English (en)',
+    verbatim: 'In auth routes, we implemented refreshToken endpoint and tokenBlacklist for session logout.',
+    commitTitle: 'feat(auth): implement refreshToken endpoint and tokenBlacklist for session logout',
+    commitBullets: [
+      '- Added refreshToken endpoint in auth/routes',
+      '- Implemented tokenBlacklist for session logout'
+    ],
+    latency: 2445,
+  },
   fr: {
     lang: 'fr',
     label: 'French (fr)',
@@ -128,7 +139,7 @@ const RULE = '──────────────────────
 export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
   const [internalSession, setInternalSession] = useState('auth')
   const [activeCommand, setActiveCommand] = useState('ovio') // 'ovio', 'lang', 'gate', 'verify'
-  const [selectedLang, setSelectedLang] = useState('fr')
+  const [selectedLang, setSelectedLang] = useState('en')
   const activeSession = selectedPreset || internalSession
   const session = TERMINAL_SESSIONS[activeSession] || TERMINAL_SESSIONS.auth
   const [copied, setCopied] = useState(false)
