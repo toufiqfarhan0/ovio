@@ -4,7 +4,6 @@
 > Built for the **AssemblyAI Voice Hackathon Week: Hack into Dictation** (Sept 2026).  
 > Powered by **AssemblyAI Universal-3.5 Pro** via the official `assemblyai` Python SDK Dictation API.
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-161413)](LICENSE)
 [![AssemblyAI SDK](https://img.shields.io/badge/AssemblyAI%20SDK-DictationTranscriber-0052FF)](https://www.assemblyai.com/docs/dictation)
 [![Engine](https://img.shields.io/badge/engine-Universal--3.5%20Pro-107846)](https://www.assemblyai.com/docs/dictation)
 [![CLI UI](https://img.shields.io/badge/CLI-Rich%20%2B%20Typer-orange)](https://github.com/Textualize/rich)

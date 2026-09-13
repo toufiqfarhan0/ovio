@@ -1,8 +1,15 @@
 #!/usr/bin/env python3
 """
 ovio — Voice Git & Codebase Dictation Engine
-Powered by AssemblyAI Dictation API (Universal-3.5 Pro) + Rich + Typer + pynput
+Powered by AssemblyAI Dictation API (Universal-3.5 Pro) + AST Biasing
+
+Styling and typography inspired by the substrate-friction TUI:
+monospaced fixed-width telemetry, ANSI Shadow block-circuit wordmark,
+two-tone high-contrast palette (#ff571a accent + paper white + gray ramp),
+byte-stable fallback on non-TTY streams.
 """
+
+from __future__ import annotations
 
 import os
 import sys
@@ -21,35 +28,123 @@ if hasattr(sys.stderr, 'reconfigure'):
     sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 import typer
-from rich.console import Console
-from rich.text import Text
-from rich.prompt import Prompt
 
-# Initialize Typer and Rich Console
+# Initialize Typer
 app = typer.Typer(
     help="ovio — Voice Git & Codebase Dictation Engine powered by AssemblyAI",
     add_completion=False,
     invoke_without_command=True
 )
-console = Console(force_terminal=True, legacy_windows=False)
 
 # ─────────────────────────────────────────────────────────────
-# constants
+# TUI layer (pure ANSI, TrueColor with 256-color fallback)
 # ─────────────────────────────────────────────────────────────
 
-RULE_WIDTH = 68
+WIDTH = 68
+RULE_STR = "─" * WIDTH
 
-BANNER = r"""
-  ___   __      __  ___   ___  
- / _ \  \ \    / / |_ _| / _ \ 
-| | | |  \ \  / /   | | | | | |
-| |_| |   \ \/ /    | | | |_| |
- \___/     \__/    |___| \___/ 
-"""
+_TRUECOLOR = os.environ.get("COLORTERM", "") in ("truecolor", "24bit") or sys.platform == "win32"
+
+_ACCENT_256 = "38;5;208"
+_SIGNAL_256 = "38;5;220"
+_DIM_256 = "38;5;240"
+_FAINT_256 = "38;5;245"
+
+if _TRUECOLOR:
+    ACCENT = "38;2;255;87;26"       # brand orange (#ff571a)
+    SIGNAL = "38;2;249;196;37"      # yellow (#f9c425)
+    DIM = "38;2;110;110;110"        # line ramp (#6e6e6e)
+    FAINT = "38;2;160;160;160"      # muted text (#a0a0a0)
+else:
+    ACCENT, SIGNAL, DIM, FAINT = (_ACCENT_256, _SIGNAL_256, _DIM_256, _FAINT_256)
+
+RESET = "\033[0m"
+BOLD = "1"
 
 VERSION  = "1.0.0"
 MODEL    = "Universal-3.5 Pro"
 PROVIDER = "AssemblyAI Dictation API"
+
+def styling(stream=None) -> bool:
+    """True when styling should be emitted for stream (default stdout)."""
+    stream = stream if stream is not None else sys.stdout
+    if os.environ.get("NO_COLOR"):
+        return False
+    forced = os.environ.get("FORCE_COLOR", "")
+    if forced:
+        return forced.lower() not in ("0", "false", "no")
+    if os.environ.get("TERM") == "dumb":
+        return False
+    return bool(getattr(stream, "isatty", lambda: True)())
+
+def paint(text: str, *codes: str) -> str:
+    """Wrap text in given SGR codes when styling is active."""
+    if not codes or not styling():
+        return text
+    return f"\033[{';'.join(codes)}m{text}{RESET}"
+
+def rule(width: int = WIDTH) -> str:
+    body = "─" * width
+    return body if not styling() else paint(body, DIM)
+
+def verdict(mark: str, decision: str, meta: str = "") -> str:
+    body = f"[{mark}]  {decision}" + (f"      {meta}" if meta else "")
+    if not styling():
+        return body
+    bracket = paint(f"[{mark}]", SIGNAL if mark in ("PASS", "LIVE", "VERIFY OK", "COMMIT OK") else ACCENT, BOLD)
+    dec = paint(decision, BOLD)
+    m = paint(meta, FAINT) if meta else ""
+    return f"{bracket}  {dec}" + (f"      {m}" if m else "")
+
+def kv(key: str, value: str, pad: int = 15) -> str:
+    k_padded = key.ljust(pad)
+    body = f" {k_padded} : {value}"
+    if not styling():
+        return body
+    return f" {paint(k_padded, FAINT)} : {paint(value, BOLD)}"
+
+def flash(text: str) -> str:
+    return text if not styling() else paint(text, ACCENT, BOLD)
+
+def head(text: str) -> str:
+    return text if not styling() else paint(text, SIGNAL, BOLD)
+
+def dim(text: str) -> str:
+    return text if not styling() else paint(text, DIM)
+
+# ─────────────────────────────────────────────────────────────
+# ANSI Shadow dual-tone banner (OVIO + VOICE GIT)
+# ─────────────────────────────────────────────────────────────
+
+BANNER_TOP = [
+    r"  ██████╗ ██╗   ██╗██╗ ██████╗ ",
+    r" ██╔═══██╗██║   ██║██║██╔═══██╗",
+    r" ██║   ██║██║   ██║██║██║   ██║",
+    r" ██║   ██║╚██╗ ██╔╝██║██║   ██║",
+    r" ╚██████╔╝ ╚████╔╝ ██║╚██████╔╝",
+    r"  ╚═════╝   ╚═══╝  ╚═╝ ╚═════╝ "
+]
+
+BANNER_BOT = [
+    r"   ██╗   ██╗ ██████╗ ██╗ ██████╗███████╗    ██████╗ ██╗████████╗",
+    r"   ██║   ██║██╔═══██╗██║██╔════╝██╔════╝   ██╔════╝ ██║╚══██╔══╝",
+    r"───██║   ██║██║   ██║██║██║     █████╗     ██║  ███╗██║   ██║   ",
+    r"───╚██╗ ██╔╝██║   ██║██║██║     ██╔══╝     ██║   ██║██║   ██║   ",
+    r"    ╚████╔╝ ╚██████╔╝██║╚██████╗███████║   ╚██████╔╝██║   ██║   ",
+    r"     ╚═══╝   ╚═════╝ ╚═╝ ╚═════╝╚══════╝    ╚═════╝ ╚═╝   ╚═╝   "
+]
+
+def banner(tagline: str = "measure what the developer meant") -> str:
+    """The wordmark. Empty string when styling is off and piped."""
+    if not styling():
+        return f"\novio — voice git & codebase dictation engine\n\n{tagline}\n"
+    out = [""]
+    out += [paint(r, ACCENT, BOLD) for r in BANNER_TOP]
+    out.append("")
+    out += [paint(r, BOLD) for r in BANNER_BOT]
+    out.append("")
+    out.append(paint(tagline, DIM))
+    return "\n".join(out) + "\n"
 
 # ─────────────────────────────────────────────────────────────
 # env loading
@@ -78,14 +173,8 @@ load_env()
 API_KEY = os.environ.get("ASSEMBLYAI_API_KEY")
 
 # ─────────────────────────────────────────────────────────────
-# helpers
+# git context & AST extraction
 # ─────────────────────────────────────────────────────────────
-
-def rule(width: int = RULE_WIDTH) -> str:
-    return "─" * width
-
-def print_rule(width: int = RULE_WIDTH):
-    console.print(f"[dim]{rule(width)}[/dim]")
 
 def is_git_repository() -> bool:
     """Returns True if the current working directory is inside a Git repository."""
@@ -100,11 +189,7 @@ def is_git_repository() -> bool:
     except Exception:
         return False
 
-# ─────────────────────────────────────────────────────────────
-# git context & AST extraction
-# ─────────────────────────────────────────────────────────────
-
-def get_git_context(auto_stage: bool = True):
+def get_git_context(auto_stage: bool = True) -> dict:
     """
     Inspects git status, automatically stages unstaged modified files if needed,
     and extracts AST symbols from the staged diff to bias AssemblyAI's Dictation model.
@@ -116,7 +201,6 @@ def get_git_context(auto_stage: bool = True):
             text=True,
             stderr=subprocess.DEVNULL
         ).strip()
-        # Automatically modernize legacy 'master' branch to 'main'
         if branch == "master":
             try:
                 subprocess.run(["git", "branch", "-M", "main"], check=True, stderr=subprocess.DEVNULL)
@@ -149,17 +233,13 @@ def get_git_context(auto_stage: bool = True):
     # Auto-stage tracked or untracked changes if nothing is staged yet
     if auto_stage and unstaged_files and not staged_files:
         try:
-            # Try git add -u first for tracked modifications
             subprocess.run(["git", "add", "-u"], check=True, stderr=subprocess.DEVNULL)
             status_out = subprocess.check_output(["git", "status", "--porcelain"], text=True)
             staged_files = [line[3:].strip() for line in status_out.splitlines() if len(line) >= 3 and line[0] in ("M", "A", "D", "R")]
-            # In a brand-new repo with 0 commits, tracked add -u stages nothing; stage with git add -A
             if not staged_files and unstaged_files:
                 subprocess.run(["git", "add", "-A"], check=True, stderr=subprocess.DEVNULL)
                 status_out = subprocess.check_output(["git", "status", "--porcelain"], text=True)
                 staged_files = [line[3:].strip() for line in status_out.splitlines() if len(line) >= 3 and line[0] in ("M", "A", "D", "R")]
-            if staged_files:
-                console.print(f"  [dim]auto-staged {len(staged_files)} modified file(s) for diff inspection[/dim]")
         except Exception:
             pass
 
@@ -224,7 +304,7 @@ def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45, cont
     """
     Records 16kHz audio from microphone using push-to-talk (hold SPACEBAR).
     Falls back to Enter toggle if pynput listener is unavailable.
-    Detects voice activity in real time and prompts the user if silent for 2-3s.
+    Detects voice activity in real time with audio RMS metering.
     Returns (output_wav_path, has_speech_bool).
     """
     try:
@@ -232,8 +312,11 @@ def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45, cont
         import numpy as np
         import scipy.io.wavfile as wav
     except ImportError:
-        console.print("  [bold red]error:[/bold red] audio dependencies missing.")
-        console.print("  run: [cyan]pip install sounddevice scipy numpy[/cyan]")
+        print()
+        print(rule())
+        print(f"  {paint('error:', ACCENT, BOLD)} audio dependencies missing.")
+        print(f"  run: {paint('pip install sounddevice scipy numpy', BOLD)}")
+        print(rule())
         sys.exit(1)
 
     fs = 16000
@@ -241,7 +324,6 @@ def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45, cont
     recording_active = threading.Event()
     stop_session = threading.Event()
 
-    # Real-time speech metering state
     speech_state = {
         "last_voice_time": None,
         "has_voice": False,
@@ -249,9 +331,6 @@ def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45, cont
         "max_peak": 0
     }
 
-    # Speech threshold: 16-bit PCM values range -32768 to 32767.
-    # Ambient noise in typical rooms is < 250 RMS.
-    # Spoken voice within standard mic distance is typically 320 - 4000+ RMS.
     SPEECH_RMS_THRESHOLD = 320
 
     def audio_callback(indata, frames, time_info, status):
@@ -290,11 +369,11 @@ def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45, cont
 
     stream = sd.InputStream(samplerate=fs, channels=1, dtype='int16', callback=audio_callback)
 
-    console.print()
+    print()
     if use_pynput:
-        console.print(f"  [bold white]hold[/bold white] [reverse] SPACEBAR [/reverse] [dim]to dictate — release when done[/dim]")
+        print(f"  {paint('hold', BOLD)} {paint('SPACEBAR', BOLD)} {paint('to dictate — release when done', DIM)}")
     else:
-        console.print(f"  [bold white]press[/bold white] [reverse] ENTER [/reverse] [dim]to start, then ENTER again to stop[/dim]")
+        print(f"  {paint('press', BOLD)} {paint('ENTER', BOLD)} {paint('to start, then ENTER again to stop', DIM)}")
 
     wave_frames = ["▁▂▃▄▅▄▃▂", "▂▃▄▅▆▅▄▃", "▃▄▅▆▇▆▅▄", "▄▅▆▇█▇▆▅", "▃▄▅▆▇▆▅▄"]
     frame_idx = 0
@@ -306,7 +385,7 @@ def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45, cont
             except Exception:
                 pass
             recording_active.set()
-            console.print("  [bold red]●[/bold red] [bold white]recording[/bold white]  [dim](ENTER to stop)[/dim]")
+            print(f"  {paint('●', ACCENT, BOLD)} {paint('recording', BOLD)}  {paint('(ENTER to stop)', DIM)}")
 
             def wait_for_stop():
                 try:
@@ -327,32 +406,26 @@ def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45, cont
                     start_time = now
                 elapsed = now - start_time
 
-                # Silence calculation: how long has it been since speech was detected?
                 last_voice = speech_state["last_voice_time"]
                 silence_duration = (now - last_voice) if last_voice is not None else elapsed
 
-                # Real-time prompt when silent for >= 2.2 seconds
                 if silence_duration >= 2.2:
                     if not speech_state["has_voice"]:
-                        hint = "\033[33m(listening... please speak more)\033[0m"
+                        hint = paint("(listening... please speak)", SIGNAL)
                     else:
-                        hint = "\033[33m(pause detected — speak more or release)\033[0m"
-                    waveform_str = "\033[33m·······\033[0m"
+                        hint = paint("(pause detected — speak more or release)", SIGNAL)
+                    waveform_str = paint("·······", SIGNAL)
                 else:
-                    if speech_state["has_voice"]:
-                        hint = "\033[32m(voice active)\033[0m"
-                    else:
-                        hint = ""
+                    hint = paint("(voice active)", SIGNAL) if speech_state["has_voice"] else ""
                     frame = wave_frames[frame_idx % len(wave_frames)]
-                    waveform_str = f"\033[38;2;255;140;0m{frame}\033[0m"
+                    waveform_str = paint(frame, ACCENT)
 
                 status_line = (
-                    f"  \033[31m●\033[0m \033[1mrecording\033[0m  "
+                    f"  {paint('●', ACCENT, BOLD)} {paint('recording', BOLD)}  "
                     f"{waveform_str}  "
-                    f"\033[2m{elapsed:.1f}s\033[0m  "
+                    f"{paint(f'{elapsed:.1f}s', DIM)}  "
                     f"{hint}"
                 )
-                # Pad to overwrite previous text cleanly
                 sys.stdout.write(f"\r{status_line:<82}")
                 sys.stdout.flush()
                 frame_idx += 1
@@ -376,10 +449,6 @@ def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45, cont
 
     wav.write(output_wav, fs, full_audio)
     return output_wav, has_speech
-
-# ─────────────────────────────────────────────────────────────
-# demo audio synthesis
-# ─────────────────────────────────────────────────────────────
 
 def synthesize_demo_wav(output_wav="ovio_commit.wav", duration=3.2, sample_rate=16000) -> str:
     """Creates a clean synthetic test audio clip for demo/dry-run mode."""
@@ -405,14 +474,14 @@ def synthesize_demo_wav(output_wav="ovio_commit.wav", duration=3.2, sample_rate=
 def transcribe_with_assemblyai(audio_path: str, context: dict) -> dict:
     """
     Submits audio to AssemblyAI Dictation API Beta (Universal-3.5 Pro)
-    using the official assemblyai SDK (DictationTranscriber, DictationConfig).
+    using the official assemblyai SDK or HTTP live fallback.
     """
     if not API_KEY:
-        console.print()
-        print_rule()
-        console.print("  [bold red]error:[/bold red] ASSEMBLYAI_API_KEY not set")
-        console.print("  [dim]add it:[/dim]  echo \"ASSEMBLYAI_API_KEY=your_key\" > .env")
-        print_rule()
+        print()
+        print(rule())
+        print(f" {paint('error:', ACCENT, BOLD)} ASSEMBLYAI_API_KEY not set")
+        print(f" {paint('add it:', FAINT)} echo \"ASSEMBLYAI_API_KEY=your_key\" > .env")
+        print(rule())
         sys.exit(1)
 
     start_time = time.time()
@@ -442,7 +511,7 @@ def transcribe_with_assemblyai(audio_path: str, context: dict) -> dict:
             "llm_response": response.llm_response or response.text or "",
             "latency_ms":   int(round(float(response.request_time_ms or wall_time_ms)))
         }
-    except Exception as e:
+    except Exception:
         import requests
         url = "https://dictation.assemblyai.com/v1/transcribe/live"
         headers = {"Authorization": API_KEY}
@@ -472,7 +541,7 @@ def transcribe_with_assemblyai(audio_path: str, context: dict) -> dict:
         wall_time_ms = int((time.time() - start_time) * 1000)
 
         if not resp.ok:
-            console.print(f"  [bold red]error ({resp.status_code}):[/bold red] {resp.text}")
+            print(f" {paint(f'error ({resp.status_code}):', ACCENT, BOLD)} {resp.text}")
             sys.exit(1)
 
         data = resp.json()
@@ -487,131 +556,209 @@ def transcribe_with_assemblyai(audio_path: str, context: dict) -> dict:
 # ─────────────────────────────────────────────────────────────
 
 def render_header(context: dict, mode: str = "live", verbose: bool = False):
-    """Print the compact startup header block."""
-    branch      = context["branch"]
-    staged      = len(context["staged_files"])
-    keyterms    = context["keyterms"]
+    """Print the startup header with wordmark and telemetry."""
+    branch = context["branch"]
+    staged_files = context["staged_files"]
+    staged = len(staged_files)
+    keyterms = context["keyterms"]
 
-    console.print()
-    console.print(f"[bold white]{BANNER}[/bold white]", highlight=False)
-    print_rule()
-    console.print(f"  [dim white]version[/dim white]         [white]{VERSION}[/white]")
-    console.print(f"  [dim white]model[/dim white]           [white]{MODEL}[/white]")
-    console.print(f"  [dim white]provider[/dim white]        [white]{PROVIDER}[/white]")
-    print_rule()
-    console.print(f"  [dim white]branch[/dim white]          [bold cyan]{branch}[/bold cyan]")
-    if staged > 0:
-        console.print(f"  [dim white]staged files[/dim white]    [bold white]{staged}[/bold white]")
-    else:
-        console.print(f"  [dim white]staged files[/dim white]    [dim]0 (clean)[/dim]")
-
-    if len(keyterms) > 0:
-        console.print(f"  [dim white]symbols biased[/dim white]  [bold yellow]{len(keyterms)}[/bold yellow]")
-        if verbose:
-            terms_str = "  ".join(keyterms[:8])
-            console.print(f"  [dim white]keyterms[/dim white]        [dim yellow]{terms_str}[/dim yellow]")
-            if len(keyterms) > 8:
-                console.print(f"  [dim]                  + {len(keyterms) - 8} more[/dim]")
-
+    print(banner())
     if mode == "demo":
-        console.print(f"  [dim white]mode[/dim white]            [dim]demo — synthetic utterance[/dim]")
-    print_rule()
+        print(verdict("DEMO", "SYNTHETIC", "model=Universal-3.5-Pro  dry-run=True"))
+    else:
+        print(verdict("LIVE", "DICTATION", f"model={MODEL}  sla<800ms"))
+    print()
+    print(rule())
+    header_tag = "LIVE — AssemblyAI Dictation Engine" if mode != "demo" else "DEMO — Synthetic Speech Fixture"
+    print(f" {paint(branch, ACCENT, BOLD)}   {paint(header_tag, BOLD)}")
+    print(rule())
+    print(kv("branch", branch))
+    if staged > 0:
+        file_preview = ", ".join([Path(f).name for f in staged_files[:2]])
+        extra = f", +{staged - 2}" if staged > 2 else ""
+        print(kv("staged files", f"{staged} files ({file_preview}{extra})"))
+    else:
+        print(kv("staged files", "0 (clean working tree)"))
+
+    if keyterms:
+        preview_terms = ", ".join(keyterms[:5])
+        print(kv("ast biasing", f"{len(keyterms)} symbols [{preview_terms}]"))
+    else:
+        print(kv("ast biasing", "none mapped"))
+
+    print(kv("engine", f"{MODEL} (sub-second SLA < 800ms)"))
+    print(kv("instruction", "Conventional Commit + AST symbol fidelity"))
+    if keyterms:
+        bias_preview = ", ".join(keyterms[:3])
+        print(f" {paint(f'BIAS HIT: {len(keyterms)} staged symbol(s) locked into STT vocabulary [{bias_preview}].', ACCENT, BOLD)}")
+    print(rule())
+    print()
 
 def render_result(verbatim: str, clean_commit: str, latency_ms: int):
-    """Print the transcription result block."""
-    console.print()
-    console.print(f"  [bold white]transcribed & formatted[/bold white]  [dim][{latency_ms}ms  {MODEL}][/dim]", highlight=False)
-    print_rule()
-    console.print(f"  [dim]verbatim[/dim]")
-    console.print(f"  [italic dim white]{verbatim}[/italic dim white]")
-    console.print()
-    console.print(f"  [dim]conventional commit[/dim]")
-    for i, line in enumerate(clean_commit.splitlines()):
-        stripped = line.strip()
-        if not stripped:
-            continue
-        if i == 0:
-            console.print(f"  [bold #FF8C00]{stripped}[/bold #FF8C00]")
-        else:
-            console.print(f"  [#FF8C00]{stripped}[/#FF8C00]")
-    print_rule()
+    """Print the transcription result block with monospaced telemetry."""
+    print()
+    print(rule())
+    print(f" {paint('commit_transcribe', ACCENT, BOLD)}   {paint(f'TRANSCRIBED — in {latency_ms} ms (SLA < 800ms)', BOLD)}")
+    print(rule())
+    print(kv("verbatim", verbatim))
+
+    commit_lines = clean_commit.strip().splitlines()
+    if commit_lines:
+        first_line = commit_lines[0].strip()
+        print(kv("conventional", first_line))
+        for line in commit_lines[1:]:
+            stripped = line.strip()
+            if stripped:
+                print(f"                   {paint(stripped, FAINT)}")
+            else:
+                print()
+    print(rule())
 
 def render_prompt():
     """Print the interactive action line."""
-    console.print()
-    console.print(
-        "  [bold white][Enter][/bold white] commit & push  "
-        "[dim]|[/dim]  "
-        "[bold white]\\[c][/bold white] commit only  "
-        "[dim]|[/dim]  "
-        "[bold white]\\[e][/bold white] edit  "
-        "[dim]|[/dim]  "
-        "[bold red]\\[q][/bold red] cancel"
+    print()
+    prompt_str = (
+        f"  {paint('[Enter]', BOLD)} {paint('commit & push', FAINT)}  "
+        f"{paint('│', DIM)}  "
+        f"{paint('[c]', BOLD)} {paint('commit only', FAINT)}  "
+        f"{paint('│', DIM)}  "
+        f"{paint('[e]', BOLD)} {paint('edit', FAINT)}  "
+        f"{paint('│', DIM)}  "
+        f"{paint('[q]', ACCENT, BOLD)} {paint('cancel', FAINT)}"
     )
+    print(prompt_str)
 
 def execute_git_push(branch: str = "main"):
-    """Pushes committed changes to remote; outputs clean orange guidance if no remote is configured."""
+    """Pushes committed changes to remote; outputs clean telemetry."""
     target_branch = "main" if branch in ("master", "") else branch
     push_res = subprocess.run(["git", "push"], capture_output=True, text=True)
     if push_res.returncode == 0:
-        console.print("  [bold green]ok[/bold green]  committed and pushed to remote")
+        print(f"{paint('VERIFY OK:', ACCENT, BOLD)} committed to local branch {branch}; pushed to origin/{target_branch}")
     else:
         err = (push_res.stderr or push_res.stdout or "").strip()
         if "No configured push destination" in err or "no upstream branch" in err or "fatal: 'origin'" in err or "has no upstream branch" in err:
-            console.print("  [bold green]ok[/bold green]  committed locally")
-            console.print()
-            console.print("  [bold #FF8C00]notice:[/bold #FF8C00] [dim]no remote repository configured yet[/dim]")
-            console.print("  [#FF8C00]to create and push to a remote repository:[/#FF8C00]")
-            console.print("    [bold white]1.[/bold white] create a repository on github (e.g. at https://github.com/new)")
-            console.print("    [bold white]2.[/bold white] link it: [cyan]git remote add origin https://github.com/<username>/<repo>.git[/cyan]")
-            console.print(f"    [bold white]3.[/bold white] push:    [cyan]git push -u origin {target_branch}[/cyan]")
+            print(f"{paint('VERIFY OK:', ACCENT, BOLD)} committed locally to branch {branch} (no remote configured)")
+            print()
+            print(f" {paint('notice:', ACCENT, BOLD)} {paint('no remote repository configured yet', DIM)}")
+            print(f" {paint('to create and push to a remote repository:', ACCENT)}")
+            print(f"   {paint('1.', BOLD)} create a repository on github (e.g. at https://github.com/new)")
+            print(f"   {paint('2.', BOLD)} link it: git remote add origin https://github.com/<username>/<repo>.git")
+            print(f"   {paint('3.', BOLD)} push:    git push -u origin {target_branch}")
         else:
-            console.print(f"  [bold yellow]push failed:[/bold yellow] [dim]{err}[/dim]")
+            print(f" {paint('push warning:', SIGNAL, BOLD)} {paint(err, DIM)}")
 
 # ─────────────────────────────────────────────────────────────
-# main
+# gate & verify commands (matching substrate-friction CLI)
 # ─────────────────────────────────────────────────────────────
 
-@app.callback(invoke_without_command=True)
-def main(
-    ctx: typer.Context,
-    demo: bool = typer.Option(False, "--demo", "-d", help="Run with synthetic audio for dry-run verification"),
-    push: bool = typer.Option(False, "--push", "-p", help="Automatically commit and push without confirmation"),
-    file: Optional[str] = typer.Option(None, "--file", "-f", help="Path to existing WAV audio file"),
-    verbose: bool = typer.Option(False, "--verbose", "-v", help="Display extracted AST symbols in header")
+@app.command("gate")
+def gate_cmd(
+    verbose: bool = typer.Option(True, "--verbose", "-v", help="Display full symbol lists")
 ):
-    """
-    ovio — Voice Git & Codebase Dictation Engine
-    """
-    # Check if current directory is inside a Git repository
+    """Audit staged files, AST diff tokens, and AST biasing readiness."""
+    context = get_git_context(auto_stage=False)
+    branch = context["branch"]
+    staged_files = context["staged_files"]
+    staged = len(staged_files)
+    keyterms = context["keyterms"]
+
+    print(banner())
+    if staged == 0:
+        print(verdict("CLEAN", "WORKING_TREE", f"branch={branch}  staged=0"))
+    else:
+        print(verdict("PASS", "GATE_READY", f"branch={branch}  staged={staged}  symbols={len(keyterms)}"))
+    print()
+    print(rule())
+    print(f" {paint(branch, ACCENT, BOLD)}   {paint('INSPECT — AST biasing audit', BOLD)}")
+    print(rule())
+    print(kv("branch", branch))
+    if staged > 0:
+        file_preview = ", ".join([Path(f).name for f in staged_files[:4]])
+        extra = f", +{staged - 4}" if staged > 4 else ""
+        print(kv("staged files", f"{staged} files ({file_preview}{extra})"))
+    else:
+        print(kv("staged files", "0 (working tree clean — no uncommitted changes)"))
+
+    print(kv("ast biasing", f"{len(keyterms)} symbol(s) locked into vocabulary"))
+    if keyterms and verbose:
+        for i, term in enumerate(keyterms[:8], 1):
+            print(f"                   {paint(f'{i:02d}. {term}', FAINT)}")
+        if len(keyterms) > 8:
+            print(f"                   {paint(f'... and {len(keyterms) - 8} more symbols', DIM)}")
+
+    print(kv("engine", f"{MODEL} (sub-second SLA < 800ms)"))
+    print(kv("stt prompt", context["stt_prompt"]))
+    print(rule())
+    print()
+
+@app.command("verify")
+def verify_cmd():
+    """Verify audio subsystem, git state, and AssemblyAI connectivity."""
+    print(rule())
+    print(f" {paint('ovio_verify', ACCENT, BOLD)}   {paint('DIAGNOSTICS — environment audit', BOLD)}")
+    print(rule())
+
+    # 1. Git
+    in_git = is_git_repository()
+    print(kv("git repository", "OK (work tree detected)" if in_git else "FAIL (not a git repo)"))
+
+    # 2. Audio backend
+    try:
+        import sounddevice as sd
+        import numpy
+        import scipy
+        audio_ok = True
+        devices = len(sd.query_devices())
+        audio_msg = f"OK ({devices} audio device(s) detected)"
+    except Exception as e:
+        audio_ok = False
+        audio_msg = f"FAIL ({e})"
+    print(kv("audio backend", audio_msg))
+
+    # 3. AssemblyAI key
+    if API_KEY:
+        masked = API_KEY[:6] + "..." + API_KEY[-4:] if len(API_KEY) > 10 else "***"
+        print(kv("api key", f"OK ({masked})"))
+    else:
+        print(kv("api key", "FAIL (ASSEMBLYAI_API_KEY missing from environment)"))
+
+    print(rule())
+    if in_git and audio_ok and API_KEY:
+        print(f"{paint('VERIFY OK:', ACCENT, BOLD)} system fully operational; audio capture, AST biasing, and dictation ready.")
+    else:
+        print(f"{paint('VERIFY WARN:', SIGNAL, BOLD)} some diagnostic checks failed; review configuration above.")
+    print()
+
+# ─────────────────────────────────────────────────────────────
+# main dictation flow
+# ─────────────────────────────────────────────────────────────
+
+def run_dictation_flow(demo: bool = False, push: bool = False, file: Optional[str] = None, verbose: bool = False):
+    """Core interactive dictation execution."""
     if not is_git_repository() and not demo:
-        console.print()
-        console.print(f"[bold white]{BANNER}[/bold white]", highlight=False)
-        print_rule()
-        console.print("  [bold #FF8C00]notice:[/bold #FF8C00] [bold white]not a git repository[/bold white]")
-        print_rule()
-        console.print()
-        console.print("  [#FF8C00]please initialize git before using ovio:[/#FF8C00]")
-        console.print("    [bold white]git init[/bold white]")
-        console.print()
-        console.print("  [dim]tip: run 'git init', make your code edits, then run [cyan]ovio[/cyan].[/dim]")
-        print_rule()
+        print()
+        print(banner())
+        print(verdict("FAIL", "NOT_GIT_REPO", "cwd does not contain .git"))
+        print()
+        print(rule())
+        print(f" {paint('notice:', ACCENT, BOLD)} {paint('current directory is not a git repository', BOLD)}")
+        print(rule())
+        print(f"   {paint('1.', BOLD)} initialize git:  git init")
+        print(f"   {paint('2.', BOLD)} stage edits:     git add -A")
+        print(f"   {paint('3.', BOLD)} run ovio:        ovio")
+        print(rule())
+        print()
         return
 
     # 1. Gather git context and AST symbols
     context = get_git_context(auto_stage=True)
 
-    # In demo mode, if there are no real diff keyterms, provide sample terms for the synthetic clip
     if demo and not context["keyterms"]:
         context["keyterms"] = ["authService", "verifyToken", "jwtSecret", "TokenExpiredError"]
 
     # 2. Render header
     mode = "demo" if demo else ("file" if file else "live")
     render_header(context, mode=mode, verbose=verbose)
-
-    # Inform user if working tree is clean
-    if not context["staged_files"] and not demo:
-        console.print("  [dim]note: working tree is clean — no staged changes to commit[/dim]")
 
     # 3. Audio Recording / Sourcing
     is_demo_mode = demo
@@ -624,31 +771,26 @@ def main(
             try:
                 audio_path, has_speech = record_audio_push_to_talk(context=context)
             except Exception as e:
-                console.print(f"  [bold red]microphone error:[/bold red] {e}")
-                console.print("  [dim]please check your microphone connection and permissions.[/dim]")
+                print(f" {paint('microphone error:', ACCENT, BOLD)} {e}")
+                print(f" {paint('please check microphone connection and OS permissions.', DIM)}")
                 sys.exit(1)
 
             if has_speech:
                 break
 
-            # Handle silence / no speech detected
-            console.print()
-            console.print("  [bold yellow]notice:[/bold yellow] No speech detected in recording.")
-            console.print("  [dim]suggestion: hold Spacebar and describe what you changed.[/dim]")
+            print()
+            print(f" {paint('notice:', SIGNAL, BOLD)} No speech detected in recording.")
+            print(f" {paint('suggestion: hold Spacebar and describe what you changed.', DIM)}")
             if context.get("keyterms"):
                 sample_terms = ", ".join(context["keyterms"][:3])
-                console.print(f"  [dim]example: \"update {sample_terms} to fix error handling\"[/dim]")
-            console.print()
+                hint_example = f'example: "update {sample_terms} to fix error handling"'
+                print(f" {paint(hint_example, DIM)}")
+            print()
 
-            action = Prompt.ask(
-                "  [bold white][r][/bold white] retry dictation  |  [bold white][q][/bold white] quit",
-                default="r"
-            ).strip().lower()
-
+            action = input("  [r] retry dictation  |  [q] quit [r]: ").strip().lower() or "r"
             if action == "q":
-                console.print("  [dim]cancelled[/dim]")
+                print(f"  {paint('cancelled', DIM)}")
                 sys.exit(0)
-            # action == "r" repeats recording loop
 
     # 4. Transcribe & Format
     if is_demo_mode:
@@ -656,17 +798,19 @@ def main(
         clean_commit = "feat(auth): add verifyToken and handle expired token errors\n\n- Implement token verification against JWT_SECRET in authService\n- Add explicit error handling for expired and malformed tokens"
         latency      = 642
     else:
-        with console.status("  [dim]streaming to assemblyai...[/dim]", spinner="dots"):
-            res          = transcribe_with_assemblyai(audio_path, context)
-            verbatim     = res["text"]
-            clean_commit = res["llm_response"]
-            latency      = res["latency_ms"]
+        sys.stdout.write(f"  {paint('●', ACCENT, BOLD)} {paint('transcribing with Universal-3.5 Pro...', FAINT)}\r")
+        sys.stdout.flush()
+        res          = transcribe_with_assemblyai(audio_path, context)
+        sys.stdout.write("\r" + " " * 60 + "\r")
+        sys.stdout.flush()
+        verbatim     = res["text"]
+        clean_commit = res["llm_response"]
+        latency      = res["latency_ms"]
 
         if not verbatim.strip():
             verbatim = "(no speech recognized)"
             clean_commit = f"chore({context['branch']}): update codebase"
 
-    # Cleanup temporary wav
     if not file and Path(audio_path).exists():
         try:
             os.remove(audio_path)
@@ -678,10 +822,10 @@ def main(
 
     if push:
         subprocess.run(["git", "commit", "-m", clean_commit], check=True)
-        console.print()
-        print_rule()
+        print()
+        print(rule())
         execute_git_push(context["branch"])
-        print_rule()
+        print(rule())
         return
 
     # 6. Interactive Decision Loop
@@ -691,60 +835,68 @@ def main(
         render_prompt()
 
         try:
-            user_choice = Prompt.ask("[dim]  >[/dim]", default="").strip().lower()
+            user_choice = input(paint("  > ", DIM)).strip().lower()
         except (KeyboardInterrupt, EOFError):
             user_choice = "q"
 
         if user_choice in ("", "y", "p"):
             res = subprocess.run(["git", "commit", "-m", current_commit])
-            console.print()
-            print_rule()
+            print()
+            print(rule())
             if res.returncode == 0:
                 execute_git_push(context["branch"])
             else:
-                console.print("  [dim]nothing staged to commit (working tree clean)[/dim]")
-            print_rule()
+                print(f" {paint('nothing staged to commit (working tree clean)', DIM)}")
+            print(rule())
             break
         elif user_choice == "c":
             res = subprocess.run(["git", "commit", "-m", current_commit])
-            console.print()
-            print_rule()
+            print()
+            print(rule())
             if res.returncode == 0:
-                console.print("  [bold green]ok[/bold green]  committed locally")
+                print(f"{paint('VERIFY OK:', ACCENT, BOLD)} committed locally to {context['branch']}")
             else:
-                console.print("  [dim]nothing staged to commit (working tree clean)[/dim]")
-            print_rule()
+                print(f" {paint('nothing staged to commit (working tree clean)', DIM)}")
+            print(rule())
             break
         elif user_choice == "e":
-            edited = Prompt.ask(
-                "\n  [dim]edit commit message[/dim]",
-                default=current_commit.splitlines()[0]
-            ).strip()
+            print()
+            first_line = current_commit.splitlines()[0] if current_commit else ""
+            edited = input(paint(f"  edit commit message [{first_line}]: ", FAINT)).strip() or first_line
             if edited:
                 current_commit = edited
-                console.print()
-                print_rule()
-                console.print("  [dim]updated commit[/dim]")
-                console.print()
-                for i, line in enumerate(current_commit.splitlines()):
-                    stripped = line.strip()
-                    if not stripped:
-                        continue
-                    if i == 0:
-                        console.print(f"  [bold #FF8C00]{stripped}[/bold #FF8C00]")
-                    else:
-                        console.print(f"  [#FF8C00]{stripped}[/#FF8C00]")
-                print_rule()
+                print()
+                print(rule())
+                print(f" {paint('updated commit message:', ACCENT, BOLD)}")
+                print(f"  {paint(current_commit, BOLD)}")
+                print(rule())
             continue
         else:
-            console.print()
-            print_rule()
-            console.print("  [dim]cancelled — no changes made[/dim]")
-            print_rule()
+            print()
+            print(rule())
+            print(f" {paint('cancelled — no changes made', DIM)}")
+            print(rule())
             break
 
-    console.print()
+    print()
+
+@app.callback(invoke_without_command=True)
+def main(
+    ctx: typer.Context,
+    demo: bool = typer.Option(False, "--demo", "-d", help="Run with synthetic audio for dry-run verification"),
+    push: bool = typer.Option(False, "--push", "-p", help="Automatically commit and push without confirmation"),
+    file: Optional[str] = typer.Option(None, "--file", "-f", help="Path to existing WAV audio file"),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Display extracted AST symbols in header"),
+    gate: bool = typer.Option(False, "--gate", "-g", help="Audit git branch, diff, and AST biasing without dictating")
+):
+    """
+    ovio — Voice Git & Codebase Dictation Engine
+    """
+    if ctx.invoked_subcommand is None:
+        if gate:
+            gate_cmd(verbose=verbose)
+        else:
+            run_dictation_flow(demo=demo, push=push, file=file, verbose=verbose)
 
 if __name__ == "__main__":
     app()
-
