@@ -24,7 +24,7 @@ export default function Footer({ onNavigate }) {
             </div>
 
             <p className="text-[13px] text-ink-soft leading-relaxed max-w-sm">
-              Voice Git & codebase dictation engine. Extracts local repository <TechTooltip term="AST" position="top">AST</TechTooltip> symbols to bias AssemblyAI&apos;s streaming Dictation API for zero-hallucination conventional commits in under 800ms.
+              Voice Git & codebase dictation engine. Extracts local repository diff symbols to bias AssemblyAI&apos;s streaming Dictation API for rapid conventional commits with exact symbol fidelity.
             </p>
 
             <div className="flex items-center gap-3 pt-2">
@@ -60,7 +60,7 @@ export default function Footer({ onNavigate }) {
                   onClick={(e) => handleNavClick(e, 'biasing')}
                   className="hover:text-ink transition-colors"
                 >
-                  AST Biasing Engine
+                  Diff Biasing Engine
                 </a>
               </li>
               <li>

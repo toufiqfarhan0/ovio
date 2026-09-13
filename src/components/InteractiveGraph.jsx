@@ -145,7 +145,7 @@ export default function InteractiveGraph() {
               </div>
 
               <p className="text-xs text-ink-soft mb-3 leading-relaxed">
-                Click a symbol to inspect decoder probability:
+                Click a symbol to inspect decoding fidelity:
               </p>
 
               {/* Symbol Badges */}
@@ -166,8 +166,8 @@ export default function InteractiveGraph() {
                         <div className="truncate">{sym.name}</div>
                         <div className="text-[10px] text-muted font-normal">{sym.type}</div>
                       </div>
-                      <span className="text-[11px] text-emerald-700 font-medium">
-                        {(sym.confidenceBiased * 100).toFixed(0)}%
+                      <span className="text-[10px] text-emerald-700 font-mono font-semibold px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200">
+                        EXACT
                       </span>
                     </button>
                   )
@@ -185,7 +185,7 @@ export default function InteractiveGraph() {
             <div>
               <div className="flex items-center justify-between pb-3 hairline-border-b mb-4">
                 <span className="micro-label text-ink">DECODER COMPARISON</span>
-                <span className="text-[10px] font-mono text-emerald-800 font-medium">REAL RECEIPT</span>
+                <span className="text-[10px] font-mono text-emerald-800 font-medium">FIDELITY AUDIT</span>
               </div>
 
               {(() => {
@@ -200,7 +200,7 @@ export default function InteractiveGraph() {
                           <span>Standard <TechTooltip term="STT" position="top">STT</TechTooltip> (Unbiased)</span>
                         </span>
                         <span className="text-rose-700 font-bold">
-                          {(current.confidenceUnbiased * 100).toFixed(0)}% confidence
+                          Phonetic decay
                         </span>
                       </div>
                       <div className="font-mono text-sm text-rose-950 bg-white/80 p-2 rounded border border-rose-100">
@@ -211,7 +211,7 @@ export default function InteractiveGraph() {
                       </p>
                     </div>
 
-                    {/* Arm B: ovio with AST Biasing */}
+                    {/* Arm B: ovio with Diff Symbol Biasing */}
                     <div className="p-3.5 rounded-lg bg-emerald-50/70 border border-emerald-200">
                       <div className="flex items-center justify-between mb-1.5 text-xs font-mono">
                         <span className="text-emerald-950 font-medium flex items-center gap-1">
@@ -219,14 +219,14 @@ export default function InteractiveGraph() {
                           <span>ovio Universal-3.5 Pro</span>
                         </span>
                         <span className="text-emerald-800 font-bold">
-                          {(current.confidenceBiased * 100).toFixed(0)}% confidence
+                          Biased exact match
                         </span>
                       </div>
                       <div className="font-mono text-sm text-emerald-950 bg-white/80 p-2 rounded border border-emerald-100 font-semibold">
                         "{current.biased}"
                       </div>
                       <p className="text-[11px] text-emerald-800/80 mt-1.5 leading-snug">
-                        Exact <TechTooltip term="AST" position="top">AST</TechTooltip> symbol preserved verbatim in commit message bullet points.
+                        Exact code symbol preserved verbatim in commit message bullet points.
                       </p>
                     </div>
                   </div>
@@ -235,8 +235,8 @@ export default function InteractiveGraph() {
             </div>
 
             <div className="mt-4 pt-3 hairline-border-t flex items-center justify-between text-xs font-mono text-muted">
-              <span>Biasing Precision Delta</span>
-              <span className="text-emerald-800 font-bold">+52% Accuracy</span>
+              <span>Identifier Biasing</span>
+              <span className="text-emerald-800 font-bold">Exact Match on Tested Fixtures</span>
             </div>
           </div>
         </div>

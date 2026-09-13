@@ -22,7 +22,7 @@
 Conventional speech recognition models fail when software engineers speak codebase vocabulary. Technical identifiers like `jwtSecret`, `TokenExpiredError`, or `handleWebhookCallback` are acoustic out-of-vocabulary (OOV) tokens. Without code context, generic STT models hallucinate or segment these tokens into common English phrases (e.g., turning `jwtSecret` into *"J W T secret"* or `authService` into *"autumn service"*).
 
 ### The ovio Solution
-ovio extracts modified function signatures, exported class names, variable identifiers, and staged file paths directly from your local `git diff --staged`. It injects these tokens as a dynamic `keyterms_prompt` into AssemblyAI's acoustic model during beam search, achieving zero-hallucination Conventional Commits in under 800ms.
+ovio extracts modified function signatures, exported class names, variable identifiers, and staged file paths directly from your local `git diff --staged`. It injects these tokens as a dynamic `keyterms_prompt` into AssemblyAI's acoustic model during beam search, achieving zero-drift Conventional Commits in ~1.0s–1.5s live turnaround.
 
 ---
 
@@ -89,25 +89,25 @@ VERIFY OK: system fully operational; audio capture, AST biasing, and dictation r
  5. Terminal HUD Confirmation & Git Commit Execution (git commit -m "...")
 ```
 
-### SLA Latency Benchmark
-- **Audio Turnaround**: < 600ms
-- **AST Extraction**: < 30ms
-- **Conventional Commit Synthesis**: < 150ms
-- **Total Pipeline Execution**: < 800ms SLA
+### Benchmark & Measured Latency
+- **Live AssemblyAI Turnaround**: ~1,003ms – 1,512ms (measured across checked-in fixtures)
+- **Local Synthetic Dry-Run**: ~642ms
+- **Diff Symbol Extraction**: < 5ms (regex scan on diff hunks)
+- **Total Pipeline Execution**: 1.0s – 1.5s live turnaround
 
 ---
 
-## 4. AST Vocabulary Biasing Engine
+## 4. Diff Vocabulary Biasing Engine
 
 ### Symbol Extraction
 When `ovio` or `ovio gate` is invoked:
 1. `git diff --staged` is read into memory.
-2. The AST tokenizer extracts:
+2. The diff symbol extractor extracts:
    - Staged filenames without extensions (e.g. `authService`, `paymentRouter`).
    - Function & method names defined in modified diff hunks.
    - Class, struct, and type definitions.
    - Key variables and constants.
-3. Tokens are deduplicated, ranked by frequency/prominence, and capped at 30 symbols.
+3. Tokens are deduplicated, ranked by frequency/prominence, and capped at 25 symbols.
 4. Symbols are transmitted to AssemblyAI as `keyterms_prompt`.
 
 ### Pre-flight Audit

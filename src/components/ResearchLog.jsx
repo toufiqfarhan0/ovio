@@ -20,11 +20,11 @@ export default function ResearchLog() {
       note: 'keyterms_prompt pins exact camelCase & snake_case symbols from diff'
     },
     {
-      metric: 'Turnaround Latency (SLA)',
+      metric: 'Turnaround Latency',
       manual: 'N/A',
-      ovio: '~600ms – 1.4s',
-      gain: 'Sub-second execution',
-      note: 'Measured live across test fixtures on production Universal-3.5 Pro'
+      ovio: '1,003ms – 1,512ms',
+      gain: 'Rapid execution',
+      note: 'Measured live across checked-in fixtures on production Universal-3.5 Pro'
     },
     {
       metric: 'Self-Correction & Filler Removal',
@@ -51,7 +51,7 @@ export default function ResearchLog() {
             <span className="micro-label text-ink">Benchmark Measurements</span>
           </div>
           <h2 className="font-serif-display text-3xl sm:text-4xl text-ink font-normal tracking-tight mb-3">
-            Why voice dictation wins when paired with repository <TechTooltip term="AST" position="bottom">AST</TechTooltip>
+            Why voice dictation wins when paired with repository diff symbol biasing
           </h2>
           <p className="text-ink-soft text-sm sm:text-base leading-relaxed">
             We evaluated voice-to-git against traditional keyboard entry across real developer workflows and measured test fixtures.

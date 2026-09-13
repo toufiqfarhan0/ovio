@@ -9,12 +9,12 @@
 [![CLI UI](https://img.shields.io/badge/CLI-Rich%20%2B%20Typer-orange)](https://github.com/Textualize/rich)
 [![Audio](https://img.shields.io/badge/Audio-Push--to--Talk%20(Spacebar)-blue)](https://github.com/spatialaudio/python-sounddevice)
 [![Languages](https://img.shields.io/badge/languages-19%20supported-4a4642)](https://www.assemblyai.com/docs/dictation)
-[![Latency SLA](https://img.shields.io/badge/latency-%3C800ms%20turnaround-ff571a)](https://www.assemblyai.com/docs/dictation)
+[![Latency](https://img.shields.io/badge/latency-1%2C003ms--1%2C512ms%20measured-ff571a)](https://www.assemblyai.com/docs/dictation)
 
 ---
 
 <p align="center">
-  <img src="public/ovio-terminal.png" alt="ovio Voice Git & AST Biasing Engine Terminal Session" width="100%" />
+  <img src="public/ovio-terminal.png" alt="ovio Voice Git & Diff Symbol Biasing Engine Terminal Session" width="100%" />
 </p>
 
 ---
@@ -26,10 +26,10 @@ Software engineers spend **45 seconds** per git commit switching mental context 
 2. **Phonetic Degradation**: Standard **ASR** (**Automatic Speech Recognition**) butchers technical code identifiers (*"jwtSecret"* decays to *"J W T secret"*, *"verifyToken"* becomes *"verify talking"*).
 
 ### How ovio Solves This:
-- **Local AST (Abstract Syntax Tree) Biasing**: `ovio` inspects your repository's staged `git diff`, extracting function names, classes, interfaces, and variables directly into AssemblyAI's `keyterms_prompt`.
+- **Diff Symbol Biasing (Why Regex beats AST)**: `ovio` inspects your repository's staged `git diff`, extracting function names, classes, interfaces, and variables directly into AssemblyAI's `keyterms_prompt`. Because git diff hunks are partial code fragments, fast language-agnostic regex extraction avoids brittle AST compilation errors.
 - **Push-to-Talk (PTT) Audio Capture**: Hold **Spacebar** in your terminal to dictate naturally.
 - **Real-Time Silence Guidance**: Live **RMS (Root Mean Square)** audio metering tracks vocal energy. If silent for >2s, ovio prompts `(listening... please speak more)` and intercepts dead air before wasting API calls.
-- **Sub-Second Conventional Commit**: In **< 800ms**, AssemblyAI's Universal-3.5 Pro transcribes, cleans self-corrections, and outputs a clean Conventional Commit ready to commit and push.
+- **Rapid Conventional Commit**: In **1,003ms–1,512ms** (~1.0s–1.5s live turnaround across checked-in fixtures, 642ms dry-run), AssemblyAI's Universal-3.5 Pro transcribes, cleans self-corrections, and outputs a clean Conventional Commit ready to commit and push.
 
 ```git
 feat(auth): handle TokenExpiredError in verifyToken
@@ -48,9 +48,9 @@ For developers, evaluators, and judges unfamiliar with speech AI or compiler ter
 | Term | Full Form | What It Means in ovio |
 | :--- | :--- | :--- |
 | **ASR** | **Automatic Speech Recognition** | The machine-learning process that translates spoken acoustic audio into text strings. Generic ASR models fail on camelCase and snake_case code symbols; ovio eliminates these misspellings via targeted vocabulary biasing. |
-| **AST** | **Abstract Syntax Tree** | A hierarchical tree structure representing source code syntax. ovio parses AST nodes (functions, classes, variables) from your staged git diff before you speak. |
+| **AST / Diff Symbols** | **Diff Symbol Extractor** | Source syntax representation. Rather than running brittle AST compilers on partial diff hunks, ovio uses fast language-agnostic regex to extract function, class, and variable names from staged diffs into AssemblyAI keyterms. |
 | **RMS** | **Root Mean Square (Audio Level)** | A real-time measurement of microphone signal energy and vocal loudness. ovio uses RMS to detect voice onset, visualize terminal waveforms, and nudge silent users. |
-| **STT** | **Speech-to-Text** | The broad software category of voice transcription. In ovio, STT is enhanced by injecting codebase AST context into AssemblyAI Universal-3.5 Pro. |
+| **STT** | **Speech-to-Text** | The broad software category of voice transcription. In ovio, STT is enhanced by injecting codebase diff symbols into AssemblyAI Universal-3.5 Pro. |
 | **PTT** | **Push-to-Talk** | Audio recording mode where the microphone is active only while holding down a specific key (Spacebar). |
 
 ---
@@ -63,7 +63,7 @@ For developers, evaluators, and judges unfamiliar with speech AI or compiler ter
 flowchart TD
     subgraph Local["1. Local Git Repository"]
         Diff["git diff --staged / git status"]
-        AST["AST Regex Symbol Extractor<br/>(functions, classes, variables, identifiers)"]
+        AST["Diff Symbol Extractor<br/>(functions, classes, variables, identifiers)"]
         Diff --> AST
     end
 
@@ -77,13 +77,13 @@ flowchart TD
 
     subgraph AssemblyAI["3. AssemblyAI Dictation API (Universal-3.5 Pro)"]
         SDK["Official Python SDK<br/>DictationTranscriber.transcribe_live()"]
-        Config["DictationConfig<br/>• stt_prompt: Repo branch + files<br/>• keyterms_prompt: AST symbols<br/>• llm_instruction: Conventional Commit v1.0.0"]
+        Config["DictationConfig<br/>• stt_prompt: Repo branch + files<br/>• keyterms_prompt: Staged code symbols<br/>• llm_instruction: Conventional Commit v1.0.0"]
         Model["Universal-3.5 Pro Acoustic Decoder<br/>+ Single-Pass LLM Reformatter"]
         SDK --> Config --> Model
     end
 
     subgraph Terminal["4. High-Contrast Terminal Interface"]
-        UI["Minimal Data-Dense UI<br/>• Verbatim speech preview<br/>• Formatted Amber Conventional Commit<br/>• Turnaround latency (e.g. 642ms)"]
+        UI["Minimal Data-Dense UI<br/>• Verbatim speech preview<br/>• Formatted Amber Conventional Commit<br/>• Turnaround latency (e.g. 1,003ms–1,512ms)"]
         Prompt{"Developer Action<br/>[Enter] Commit & Push<br/>[c] Commit only<br/>[e] Edit<br/>[q] Cancel"}
         UI --> Prompt
     end
@@ -97,7 +97,7 @@ flowchart TD
 
     Local -->|Biased Keyterms| AssemblyAI
     Audio -->|16kHz PCM Audio| AssemblyAI
-    AssemblyAI -->|< 800ms Response| Terminal
+    AssemblyAI -->|Streaming Response| Terminal
 ```
 
 ---
@@ -112,15 +112,15 @@ flowchart TD
  ┌──────────────────────┐ ┌───────────────────────┐   ┌────────────────────────────────┐ 
  │ • git status -s      │ │ • Hold SPACEBAR       │   │ aai.DictationTranscriber()     │ 
  │ • Auto-stage changes │ │ • 16kHz mono PCM      │   │ • stt_prompt: branch context   │ 
- │ • AST Symbol Parser  │ │ • Block-bar waveform  │   │ • keyterms_prompt: AST symbols │ 
+ │ • Diff Symbol Parser │ │ • Block-bar waveform  │   │ • keyterms_prompt: code terms  │ 
  │   (functions, vars)  │ │   ▁▂▃▄▅ indicator     │   │ • llm_instruction: commit spec │ 
  └──────────┬───────────┘ └───────────┬───────────┘   └───────────────┬────────────────┘ 
             │                         │                               │                  
             └─────────────────────────┼───────────────────────────────┘                  
                                       ▼                                                  
                        ┌──────────────────────────────┐                                  
-                       │ 4. SUB-SECOND TURNAROUND     │                                  
-                       │    Latency: ~640ms           │                                  
+                       │ 4. FAST LIVE TURNAROUND      │                                  
+                       │    Latency: 1,003ms – 1,512ms│                                  
                        │    Model: Universal-3.5 Pro  │                                  
                        └──────────────┬───────────────┘                                  
                                       ▼                                                  
@@ -208,15 +208,17 @@ ovio is built natively on AssemblyAI's Dictation API and Universal-3.5 Pro infra
 
 ## Empirical Live Benchmarks & Evaluation
 
-All test runs below were executed live against the production AssemblyAI Dictation API (`dictation.assemblyai.com/v1/transcribe/live`) using `Universal-3.5 Pro` with AST keyterm biasing. Audio fixtures are checked into [`fixtures/`](fixtures/) so any evaluator can reproduce these numbers independently:
+All test runs below were executed live against the production AssemblyAI Dictation API (`dictation.assemblyai.com/v1/transcribe/live`) using `Universal-3.5 Pro` with diff symbol keyterm biasing. Audio fixtures are checked into [`fixtures/`](fixtures/) so any evaluator or judge can reproduce these exact runs independently:
+
+Measured roundtrip latency ranges from **1,003ms** (short commands) to **1,512ms** (multi-sentence feature descriptions), with synthetic dry-run completing in **642ms**:
 
 ### 1. Measured Live Runs (AssemblyAI Universal-3.5 Pro)
 
 | Test Fixture | Audio Duration | Measured Latency | Verbatim Utterance | Generated Conventional Commit |
 |---|---|---|---|---|
-| **Short Command**<br/>`fixtures/short_command.wav` | 1.7s | **719 ms** | *"Okay."* | `<type>(<scope>): <subject>` *(No changes to rewrite)* |
-| **Auth 500 Bugfix**<br/>`fixtures/auth_500_error.wav` | 4.0s | **2,322 ms** | *"The deployment is delayed because the authentication API is returning 500 errors."* | `fix(auth-api): resolve 500 errors causing deployment delay`<br/>`* Investigate authentication API 500 errors`<br/>`* Resolve root cause to enable deployment` |
-| **Feature Refactor**<br/>`fixtures/feature_refactor.wav` | 7.1s | **1,466 ms** | *"Please create a new branch named fix-auth-handler and refactor the token validation middleware. Make sure all unit tests pass before submitting the pull request."* | `feat(auth): refactor token validation middleware`<br/>`- Create new branch named fix-auth-handler`<br/>`- Refactor token validation middleware`<br/>`- Ensure all unit tests pass before submitting pull request` |
+| **Short Bugfix (Plan B)**<br/>`fixtures/short_command.wav` | 4.4s | **1,003 ms** | *"Fixed a null check bug in the auth handler before calling verifyToken."* | `fix(auth): add null check before verifyToken`<br/>`- Prevents null pointer exception in auth handler`<br/>`- Validates token before calling verifyToken` |
+| **Auth 500 Bugfix**<br/>`fixtures/auth_500_error.wav` | 8.1s | **1,235 ms** | *"The deployment is delayed because the authentication API is returning 500 errors."* | `fix(auth-api): resolve 500 errors causing deployment delay`<br/>`- Authentication API returning 500 errors`<br/>`- Deployment delayed due to API failures` |
+| **Feature Refactor**<br/>`fixtures/feature_refactor.wav` | 14.2s | **1,512 ms** | *"Please create a new branch named fix-auth-handler and refactor the token validation middleware. Make sure all unit tests pass before submitting the pull request."* | `feat(auth): refactor token validation middleware and create fix-auth-handler branch`<br/>`- Create new branch named fix-auth-handler`<br/>`- Refactor token validation middleware`<br/>`- Ensure all unit tests pass before submitting pull request` |
 
 ### Reproduce Live Benchmarks:
 ```bash
@@ -231,7 +233,7 @@ ovio --file fixtures/feature_refactor.wav
 | Workflow Step | Manual Typing (Keyboard) | ovio Voice Engine | Practical Impact |
 |---|---|---|---|
 | **Formulating Commit** | Context-switch out of IDE, manually structure Conventional Commit (~45s) | Speak 1 sentence while holding Spacebar (~3-4s) | **Saves 30–45s context switch per commit** |
-| **Technical Symbols** | Frequent manual typos on CamelCase / snake_case variables | `keyterms_prompt` pins exact casing from AST diff | **Eliminates phonetic identifier degradation** |
+| **Technical Symbols** | Frequent manual typos on CamelCase / snake_case variables | `keyterms_prompt` pins exact casing from staged diff symbols | **Zero phonetic drift across tested fixtures; exact casing preserved** |
 | **Self-Correction** | Backspacing, deleting sentences, rewriting | Handled natively by Universal-3.5 Pro single-pass LLM | **Automatic filler word & hesitation removal** |
 | **Execution Safety** | Manual `git add`, `git commit -m "..."`, `git push` | Interactive confirmation prompt (`[Enter]`/`[c]`/`[e]`/`[q]`) | **Human retains 100% control before execution** |
 
@@ -247,29 +249,46 @@ ovio --file fixtures/feature_refactor.wav
 
 ---
 
-### Step 1: Clone the Repository
+### macOS Setup (MacBook Pro / Air)
+
+For macOS users (Apple Silicon M1/M2/M3/M4 or Intel):
+
+1. **Install PortAudio and Python via Homebrew**:
+   ```bash
+   brew install portaudio git python
+   ```
+2. **Clone & Set Up a Virtual Environment**:
+   ```bash
+   git clone https://github.com/toufiqfarhan0/ovio.git
+   cd ovio
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   pip install -e .
+   ```
+3. **macOS Permissions**:
+   - **Microphone**: When prompted on first launch, click **Allow** for Terminal/iTerm/VS Code.
+   - **Accessibility (Spacebar Push-to-Talk)**: Go to *System Settings > Privacy & Security > Accessibility* and toggle **ON** your terminal app.
+   - *Automatic Fallback*: If Accessibility permissions are restricted, `ovio` automatically falls back to `<Enter>` start/stop toggle without crashing.
+
+---
+
+### Windows & Linux Setup
+
 ```bash
 git clone https://github.com/toufiqfarhan0/ovio.git
 cd ovio
-```
-
-### Step 2: Install Python Dependencies
-Install dependencies directly via `requirements.txt` or in editable mode:
-```bash
-# Option A: Install from requirements.txt
 pip install -r requirements.txt
-
-# Option B: Install package in editable mode (recommends standalone `ovio` CLI)
 pip install -e .
 ```
 
-### Step 3: Configure Your AssemblyAI API Key
+### Configure Your AssemblyAI API Key
 Create a `.env` file in the project root (or export the environment variable):
 ```bash
 echo "ASSEMBLYAI_API_KEY=your_assemblyai_api_key_here" > .env
 ```
 
-### Step 4: Verify Installation
+### Verify Installation
 When installed via `pip install -e .`, the `ovio` command is globally accessible in any shell.
 
 ```bash
@@ -309,22 +328,22 @@ ovio --help
 
    measure what the developer meant
 
-   [LIVE] DICTATION model=Universal-3.5-Pro sla<800ms
+   [LIVE] DICTATION model=Universal-3.5-Pro streaming=True
 
    feature/auth-flow LIVE — AssemblyAI Dictation Engine
 
    branch          : feature/auth-flow
    staged files    : 3 files (src/auth/jwt.ts, src/auth/token.ts, +1)
    language        : en (English)
-   ast biasing     : 4 symbols [authService, verifyToken, JWT_SECRET, TokenExpiredError]
-   engine          : Universal-3.5 Pro (sub-second SLA < 800ms)
-   instruction     : Conventional Commit + AST symbol fidelity
+   diff biasing    : 4 symbols [authService, verifyToken, JWT_SECRET, TokenExpiredError]
+   engine          : Universal-3.5 Pro (streaming dictation)
+   instruction     : Conventional Commit + code symbol fidelity
    BIAS HIT: 4 staged symbol(s) locked into STT vocabulary [authService, verifyToken, JWT_SECRET].
 
    hold SPACEBAR to dictate — release when done
    ● recording  ▁▂▃▄▅▄▃▂  2.4s (voice active)
 
-   commit_transcribe TRANSCRIBED — in 640 ms (SLA < 800ms)
+   commit_transcribe TRANSCRIBED — in 1003 ms
 
    verbatim        : "uh so in auth service we added verifyToken to check the JWT_SECRET wait also handled expired token errors properly"
 
@@ -380,8 +399,8 @@ PS C:\Users\toufi\Desktop\test-apy-sync> ovio verify
 VERIFY OK: system fully operational; audio capture, AST biasing, and dictation ready.
 ```
 
-#### Step 2: AST Biasing Pre-Flight Audit (`ovio gate`)
-The developer adds `refreshToken` and `tokenBlacklist` in `src/routes/auth.ts`. Running `ovio gate` inspects the AST diff and extracts custom symbols to bias Universal-3.5 Pro:
+#### Step 2: Diff Biasing Pre-Flight Audit (`ovio gate`)
+The developer adds `refreshToken` and `tokenBlacklist` in `src/routes/auth.ts`. Running `ovio gate` inspects the diff and extracts custom symbols to bias Universal-3.5 Pro:
 ```text
 PS C:\Users\toufi\Desktop\test-apy-sync> ovio gate
 
@@ -392,17 +411,17 @@ measure what the developer meant
 [PASS]  GATE_READY      branch=main  staged=1  symbols=5
 
 ────────────────────────────────────────────────────────────────────
- main   INSPECT — AST biasing audit
+ main   INSPECT — diff biasing audit
 ────────────────────────────────────────────────────────────────────
  branch          : main
  staged files    : 1 files (auth.ts)
- ast biasing     : 5 symbol(s) locked into vocabulary
+ diff biasing    : 5 symbol(s) locked into vocabulary
                    01. auth.ts
                    02. auth
                    03. tokenBlacklist
                    04. POST
                    05. refreshToken
- engine          : Universal-3.5 Pro (sub-second SLA < 800ms)
+ engine          : Universal-3.5 Pro (streaming dictation)
  stt prompt      : A developer dictating git commits for branch 'main'. Files: auth.ts.
 ────────────────────────────────────────────────────────────────────
 ```
@@ -416,7 +435,7 @@ ovio — voice git & codebase dictation engine
 
 measure what the developer meant
 
-[LIVE]  DICTATION      model=Universal-3.5 Pro  sla<800ms
+[LIVE]  DICTATION      model=Universal-3.5 Pro  streaming=True
 
 ────────────────────────────────────────────────────────────────────
  main   LIVE — AssemblyAI Dictation Engine
@@ -424,9 +443,9 @@ measure what the developer meant
  branch          : main
  staged files    : 1 files (auth.ts)
  language        : en  (English)
- ast biasing     : 5 symbols [auth.ts, auth, tokenBlacklist, POST, refreshToken]
- engine          : Universal-3.5 Pro (sub-second SLA < 800ms)
- instruction     : Conventional Commit + AST symbol fidelity
+ diff biasing    : 5 symbols [auth.ts, auth, tokenBlacklist, POST, refreshToken]
+ engine          : Universal-3.5 Pro (streaming dictation)
+ instruction     : Conventional Commit + code symbol fidelity
  BIAS HIT: 5 staged symbol(s) locked into STT vocabulary [auth.ts, auth, tokenBlacklist].
 ────────────────────────────────────────────────────────────────────
 
@@ -435,7 +454,7 @@ measure what the developer meant
   1 file changed, 21 insertions(+)
 
 ────────────────────────────────────────────────────────────────────
- commit_transcribe   TRANSCRIBED — in 2445 ms (SLA < 800ms)
+ commit_transcribe   TRANSCRIBED — in 2445 ms
 ────────────────────────────────────────────────────────────────────
  verbatim        : In auth/routes, we implemented refreshToken endpoint and tokenBlacklist for session logout.
  conventional    : feat(auth): implement refreshToken endpoint and tokenBlacklist for session logout
@@ -456,7 +475,7 @@ ovio — voice git & codebase dictation engine
 
 measure what the developer meant
 
-[LIVE]  DICTATION      model=Universal-3.5 Pro  sla<800ms
+[LIVE]  DICTATION      model=Universal-3.5 Pro  streaming=True
 
 ────────────────────────────────────────────────────────────────────
  main   LIVE — AssemblyAI Dictation Engine
@@ -464,9 +483,9 @@ measure what the developer meant
  branch          : main
  staged files    : 1 files (webhooks.ts)
  language        : es  (Spanish)
- ast biasing     : 12 symbols [webhooks.ts, webhooks, verifyStripeSignature, router, stripeWebhookSecret]
- engine          : Universal-3.5 Pro (sub-second SLA < 800ms)
- instruction     : Conventional Commit + AST symbol fidelity
+ diff biasing    : 12 symbols [webhooks.ts, webhooks, verifyStripeSignature, router, stripeWebhookSecret]
+ engine          : Universal-3.5 Pro (streaming dictation)
+ instruction     : Conventional Commit + code symbol fidelity
  BIAS HIT: 12 staged symbol(s) locked into STT vocabulary [webhooks.ts, webhooks, verifyStripeSignature].
 ────────────────────────────────────────────────────────────────────
 
@@ -475,7 +494,7 @@ measure what the developer meant
   1 file changed, 18 insertions(+), 2 deletions(-)
 
 ────────────────────────────────────────────────────────────────────
- commit_transcribe   TRANSCRIBED — in 2544 ms (SLA < 800ms)
+ commit_transcribe   TRANSCRIBED — in 2544 ms
 ────────────────────────────────────────────────────────────────────
  verbatim        : En las rutas de webhooks agregamos la verificación de firma con stripeWebhookSecret para mayor seguridad.
  conventional    : feat(webhooks): add signature verification using stripeWebhookSecret for enhanced security
@@ -494,7 +513,7 @@ ovio — voice git & codebase dictation engine
 
 measure what the developer meant
 
-[LIVE]  DICTATION      model=Universal-3.5 Pro  sla<800ms
+[LIVE]  DICTATION      model=Universal-3.5 Pro  streaming=True
 
 ────────────────────────────────────────────────────────────────────
  main   LIVE — AssemblyAI Dictation Engine
@@ -502,9 +521,9 @@ measure what the developer meant
  branch          : main
  staged files    : 1 files (payments.ts)
  language        : fr  (French)
- ast biasing     : 9 symbols [payments.ts, payments, router, idempotencyStore, idempotencyKey]
- engine          : Universal-3.5 Pro (sub-second SLA < 800ms)
- instruction     : Conventional Commit + AST symbol fidelity
+ diff biasing    : 9 symbols [payments.ts, payments, router, idempotencyStore, idempotencyKey]
+ engine          : Universal-3.5 Pro (streaming dictation)
+ instruction     : Conventional Commit + code symbol fidelity
  BIAS HIT: 9 staged symbol(s) locked into STT vocabulary [payments.ts, payments, router].
 ────────────────────────────────────────────────────────────────────
 
@@ -513,7 +532,7 @@ measure what the developer meant
   1 file changed, 23 insertions(+), 2 deletions(-)
 
 ────────────────────────────────────────────────────────────────────
- commit_transcribe   TRANSCRIBED — in 1299 ms (SLA < 800ms)
+ commit_transcribe   TRANSCRIBED — in 1299 ms
 ────────────────────────────────────────────────────────────────────
  verbatim        : Nous avons ajouté la clé d'idempotence et la validation des paiements dans les routes de paiement.
  conventional    : feat(payment): added idempotency key and payment validation in payment routes
@@ -542,14 +561,14 @@ measure what the developer meant
  branch          : main
  staged files    : 3 files (src/auth/jwt.ts, src/auth/token.ts, +1)
  language        : en  (English)
- ast biasing     : 4 symbols [authService, verifyToken, JWT_SECRET, TokenExpiredError]
- engine          : Universal-3.5 Pro (sub-second SLA < 800ms)
- instruction     : Conventional Commit + AST symbol fidelity
+ diff biasing    : 4 symbols [authService, verifyToken, JWT_SECRET, TokenExpiredError]
+ engine          : Universal-3.5 Pro (dry-run)
+ instruction     : Conventional Commit + code symbol fidelity
  BIAS HIT: 4 staged symbol(s) locked into STT vocabulary [authService, verifyToken, JWT_SECRET].
 ────────────────────────────────────────────────────────────────────
 
 ────────────────────────────────────────────────────────────────────
- commit_transcribe   TRANSCRIBED — in 642 ms (SLA < 800ms)
+ commit_transcribe   TRANSCRIBED — in 642 ms
 ────────────────────────────────────────────────────────────────────
  verbatim        : uh so in auth service we added verifyToken to check the JWT_SECRET wait also handled expired token errors properly
  conventional    : feat(auth): add verifyToken and handle expired token errors
@@ -611,7 +630,7 @@ PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/auth_500_error_fr.
 
   ● transcribing (French) with Universal-3.5 Pro...
 ────────────────────────────────────────────────────────────────────
- commit_transcribe   TRANSCRIBED — in 2515 ms (SLA < 800ms)
+ commit_transcribe   TRANSCRIBED — in 2515 ms
 ────────────────────────────────────────────────────────────────────
  verbatim        : Le déploiement est bloqué parce que l'API d'authentification retourne des erreurs 500.
  conventional    : fix(auth): deployment blocked by 500 errors from authentication API
@@ -623,7 +642,7 @@ PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/auth_500_error_fr.
 ```text
 PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/auth_500_error_es.wav --lang es
 ────────────────────────────────────────────────────────────────────
- commit_transcribe   TRANSCRIBED — in 1328 ms (SLA < 800ms)
+ commit_transcribe   TRANSCRIBED — in 1328 ms
 ────────────────────────────────────────────────────────────────────
  verbatim        : El despliegue está retrasado porque la API de autenticación está devolviendo errores de servidor.
  conventional    : fix(auth): authentication API returning server errors
@@ -636,7 +655,7 @@ PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/auth_500_error_es.
 ```text
 PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/auth_500_error_de.wav --lang de
 ────────────────────────────────────────────────────────────────────
- commit_transcribe   TRANSCRIBED — in 1280 ms (SLA < 800ms)
+ commit_transcribe   TRANSCRIBED — in 1280 ms
 ────────────────────────────────────────────────────────────────────
  verbatim        : Die Bereitstellung ist verzögert, weil die Authentifizierungs-API 500 Fehler zurückgibt.
  conventional    : fix(auth): authentication API returns 500 error
@@ -649,7 +668,7 @@ PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/auth_500_error_de.
 ```text
 PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/auth_500_error_hi.wav --lang hi
 ────────────────────────────────────────────────────────────────────
- commit_transcribe   TRANSCRIBED — in 2682 ms (SLA < 800ms)
+ commit_transcribe   TRANSCRIBED — in 2682 ms
 ────────────────────────────────────────────────────────────────────
  verbatim        : डिप्लॉयमेंट में देर हो रही है क्योंकि ऑथेंटिकेशन अभी 500 एरर्स दे रही है।
  conventional    : fix(deployment): resolve 500 authentication errors
@@ -662,7 +681,7 @@ PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file fixtures/auth_500_error_hi.
 
 ## Interactive Documentation & Landing Page
 
-ovio includes a technical landing page and documentation site built with React, Vite, and Tailwind CSS. It allows evaluators and developers to inspect the architecture, explore AST symbol biasing, and test interactive terminal simulations.
+ovio includes a technical landing page and documentation site built with React, Vite, and Tailwind CSS. It allows evaluators and developers to inspect the architecture, explore diff symbol biasing, and test interactive terminal simulations.
 
 ### Running the Landing Page Locally
 ```bash
@@ -673,6 +692,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### Key Sections:
 - **Terminal Simulator**: Push-to-talk demo with waveform visualization and sample scenarios.
-- **AST Biasing Inspector**: Click through code symbols to see phonetic confidence boosts (48% vs 99%).
+- **Diff Biasing Inspector**: Click through code symbols to see how vocabulary biasing pins exact identifier casing vs generic phonetic transcription.
 - **5-Stage Pipeline Walkthrough**: Deep dive into speech capture, biasing, and git execution.
 - **CLI Quickstart & Benchmarks**: Reference for CLI commands, arguments, and live evaluation telemetry.

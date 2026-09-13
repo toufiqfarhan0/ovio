@@ -44,7 +44,7 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
           className="text-base sm:text-lg text-ink-soft max-w-2xl font-normal leading-relaxed mb-8"
         >
           A pure terminal-native voice assistant (<code className="px-1.5 py-0.5 rounded bg-paper-deep text-xs font-mono text-ink font-semibold">ovio</code>). 
-          Biases your staged <code className="px-1.5 py-0.5 rounded bg-paper-deep text-xs font-mono text-ink font-semibold">git diff</code> <TechTooltip term="AST" position="bottom">AST</TechTooltip> into AssemblyAI's Dictation API, turning rambling developer mutterings into production-ready Conventional Commits in under 800ms.
+          Biases your staged <code className="px-1.5 py-0.5 rounded bg-paper-deep text-xs font-mono text-ink font-semibold">git diff</code> <TechTooltip term="AST" position="bottom">symbols</TechTooltip> into AssemblyAI's Dictation API, turning rambling developer mutterings into production-ready Conventional Commits with rapid turnaround.
         </motion.p>
 
         {/* Action pills */}
@@ -74,7 +74,7 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
           </a>
 
           <div className="flex items-center gap-2 pl-2 text-xs font-mono text-muted">
-            <span className="text-emerald-700 font-medium">● 0.6s latency</span>
+            <span className="text-emerald-700 font-medium">● ~1.0s turnaround</span>
             <span>·</span>
             <span>Zero web-recording bloat</span>
           </div>
@@ -118,7 +118,7 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
           <div className="flex items-center gap-3 text-muted">
             <span>Zero filler words</span>
             <span>•</span>
-            <span><TechTooltip term="AST" position="top">AST</TechTooltip> symbol extraction</span>
+            <span>Diff symbol extraction</span>
             <span>•</span>
             <span>Silence detection</span>
           </div>

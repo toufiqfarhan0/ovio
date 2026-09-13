@@ -362,14 +362,14 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                   <span className="text-[#a0a0a0]">language</span>
                   <span className="text-white font-bold">: en  (English)</span>
 
-                  <span className="text-[#a0a0a0]">ast biasing</span>
+                  <span className="text-[#a0a0a0]">diff biasing</span>
                   <span className="text-white font-bold">: {session.keyterms.length} symbols [{session.keyterms.join(', ')}]</span>
 
                   <span className="text-[#a0a0a0]">engine</span>
-                  <span className="text-white font-bold">: Universal-3.5 Pro (sub-second SLA &lt; 800ms)</span>
+                  <span className="text-white font-bold">: Universal-3.5 Pro (streaming dictation)</span>
 
                   <span className="text-[#a0a0a0]">instruction</span>
-                  <span className="text-white font-bold">: Conventional Commit + AST symbol fidelity</span>
+                  <span className="text-white font-bold">: Conventional Commit + code symbol fidelity</span>
                 </div>
 
                 <div className="text-[#F5EE27] font-bold text-xs py-1">
@@ -398,7 +398,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                 <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
                 <div className="py-0.5 text-xs sm:text-[13px] flex items-center gap-3">
                   <span className="text-[#F5EE27] font-bold">commit_transcribe</span>
-                  <span className="text-white font-bold">TRANSCRIBED — in {session.latency} ms (SLA &lt; 800ms)</span>
+                  <span className="text-white font-bold">TRANSCRIBED — in {session.latency} ms</span>
                 </div>
                 <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
 
@@ -597,7 +597,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                 <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
                 <div className="py-0.5 text-xs sm:text-[13px] flex items-center gap-3">
                   <span className="text-[#F5EE27] font-bold">main</span>
-                  <span className="text-white font-bold">INSPECT — AST biasing audit</span>
+                  <span className="text-white font-bold">INSPECT — symbol biasing audit</span>
                 </div>
                 <div className="text-[#3a3834] select-none text-xs">{RULE}</div>
 
@@ -608,7 +608,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                   <span className="text-[#a0a0a0]">staged files</span>
                   <span className="text-white font-bold">: 1 files (src/index.ts)</span>
 
-                  <span className="text-[#a0a0a0]">ast biasing</span>
+                  <span className="text-[#a0a0a0]">diff biasing</span>
                   <div>
                     <span className="text-white font-bold">: 4 symbol(s) locked into vocabulary</span>
                     <div className="mt-1 space-y-0.5 text-[#a8a59c] text-xs">
@@ -620,7 +620,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                   </div>
 
                   <span className="text-[#a0a0a0]">engine</span>
-                  <span className="text-white font-bold">: Universal-3.5 Pro (sub-second SLA &lt; 800ms)</span>
+                  <span className="text-white font-bold">: Universal-3.5 Pro (streaming dictation)</span>
 
                   <span className="text-[#a0a0a0]">stt prompt</span>
                   <span className="text-[#a8a59c]">: A developer dictating git commits for branch 'main'. Files: index.ts.</span>
@@ -651,7 +651,7 @@ export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
                 <div className="text-[#3a3834] select-none text-xs mb-3">{RULE}</div>
 
                 <div className="text-xs font-bold text-[#F5EE27]">
-                  VERIFY OK: system fully operational; audio capture, AST biasing, and dictation ready.
+                  VERIFY OK: system fully operational; audio capture, diff biasing, and dictation ready.
                 </div>
               </>
             )}

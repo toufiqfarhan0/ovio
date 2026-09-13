@@ -27,8 +27,8 @@ export default function Quickstart() {
       code: `ovio\n# or specify language: ovio --lang en`
     },
     {
-      title: <>Audit <TechTooltip term="AST" position="top">AST</TechTooltip> Biasing & Diagnostics</>,
-      code: `ovio gate     # inspects staged AST symbols\novio verify   # tests mic and API connectivity`
+      title: <>Audit <TechTooltip term="AST" position="top">Symbol</TechTooltip> Biasing & Diagnostics</>,
+      code: `ovio gate     # inspects staged diff symbols\novio verify   # tests mic and API connectivity`
     }
   ]
 

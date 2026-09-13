@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ovio — Voice Git & Codebase Dictation Engine
-Powered by AssemblyAI Dictation API (Universal-3.5 Pro) + AST Biasing
+Powered by AssemblyAI Dictation API (Universal-3.5 Pro) + Diff Symbol Biasing
 
 Styling and typography inspired by the substrate-friction TUI:
 monospaced fixed-width telemetry, ANSI Shadow block-circuit wordmark,
@@ -173,7 +173,7 @@ load_env()
 API_KEY = os.environ.get("ASSEMBLYAI_API_KEY")
 
 # ─────────────────────────────────────────────────────────────
-# git context & AST extraction
+# git context & diff symbol extraction
 # ─────────────────────────────────────────────────────────────
 
 def is_git_repository() -> bool:
@@ -192,7 +192,7 @@ def is_git_repository() -> bool:
 def get_git_context(auto_stage: bool = True) -> dict:
     """
     Inspects git status, automatically stages unstaged modified files if needed,
-    and extracts AST symbols from the staged diff to bias AssemblyAI's Dictation model.
+    and extracts codebase symbols from the staged diff to bias AssemblyAI's Dictation model.
     """
     # 1. Current branch
     try:
@@ -260,7 +260,7 @@ def get_git_context(auto_stage: bool = True) -> dict:
     except Exception:
         pass
 
-    # 4. Extract AST symbols (functions, classes, interfaces, variables, constants)
+    # 4. Extract diff symbols (functions, classes, interfaces, variables, constants)
     symbols = []
     if diff_out:
         fn_matches    = re.findall(r'(?:def|function|fn|pub fn)\s+([a-zA-Z0-9_]+)', diff_out)
@@ -596,7 +596,7 @@ def render_header(context: dict, mode: str = "live", verbose: bool = False, lang
     if mode == "demo":
         print(verdict("DEMO", "SYNTHETIC", "model=Universal-3.5-Pro  dry-run=True"))
     else:
-        print(verdict("LIVE", "DICTATION", f"model={MODEL}  sla<800ms"))
+        print(verdict("LIVE", "DICTATION", f"model={MODEL}  streaming=True"))
     print()
     print(rule())
     header_tag = "LIVE — AssemblyAI Dictation Engine" if mode != "demo" else "DEMO — Synthetic Speech Fixture"
@@ -614,12 +614,12 @@ def render_header(context: dict, mode: str = "live", verbose: bool = False, lang
 
     if keyterms:
         preview_terms = ", ".join(keyterms[:5])
-        print(kv("ast biasing", f"{len(keyterms)} symbols [{preview_terms}]"))
+        print(kv("diff biasing", f"{len(keyterms)} symbols [{preview_terms}]"))
     else:
-        print(kv("ast biasing", "none mapped"))
+        print(kv("diff biasing", "none mapped"))
 
-    print(kv("engine", f"{MODEL} (sub-second SLA < 800ms)"))
-    print(kv("instruction", "Conventional Commit + AST symbol fidelity"))
+    print(kv("engine", f"{MODEL} (streaming dictation)"))
+    print(kv("instruction", "Conventional Commit + code symbol fidelity"))
     if keyterms:
         bias_preview = ", ".join(keyterms[:3])
         print(f" {paint(f'BIAS HIT: {len(keyterms)} staged symbol(s) locked into STT vocabulary [{bias_preview}].', ACCENT, BOLD)}")
@@ -630,7 +630,7 @@ def render_result(verbatim: str, clean_commit: str, latency_ms: int):
     """Print the transcription result block with monospaced telemetry."""
     print()
     print(rule())
-    print(f" {paint('commit_transcribe', ACCENT, BOLD)}   {paint(f'TRANSCRIBED — in {latency_ms} ms (SLA < 800ms)', BOLD)}")
+    print(f" {paint('commit_transcribe', ACCENT, BOLD)}   {paint(f'TRANSCRIBED — in {latency_ms} ms', BOLD)}")
     print(rule())
     print(kv("verbatim", verbatim))
 
@@ -687,7 +687,7 @@ def execute_git_push(branch: str = "main"):
 def gate_cmd(
     verbose: bool = typer.Option(True, "--verbose", "-v", help="Display full symbol lists")
 ):
-    """Audit staged files, AST diff tokens, and AST biasing readiness."""
+    """Audit staged files, diff symbols, and vocabulary biasing readiness."""
     context = get_git_context(auto_stage=False)
     branch = context["branch"]
     staged_files = context["staged_files"]
@@ -701,7 +701,7 @@ def gate_cmd(
         print(verdict("PASS", "GATE_READY", f"branch={branch}  staged={staged}  symbols={len(keyterms)}"))
     print()
     print(rule())
-    print(f" {paint(branch, ACCENT, BOLD)}   {paint('INSPECT — AST biasing audit', BOLD)}")
+    print(f" {paint(branch, ACCENT, BOLD)}   {paint('INSPECT — symbol biasing audit', BOLD)}")
     print(rule())
     print(kv("branch", branch))
     if staged > 0:
@@ -711,14 +711,14 @@ def gate_cmd(
     else:
         print(kv("staged files", "0 (working tree clean — no uncommitted changes)"))
 
-    print(kv("ast biasing", f"{len(keyterms)} symbol(s) locked into vocabulary"))
+    print(kv("diff biasing", f"{len(keyterms)} symbol(s) locked into vocabulary"))
     if keyterms and verbose:
         for i, term in enumerate(keyterms[:8], 1):
             print(f"                   {paint(f'{i:02d}. {term}', FAINT)}")
         if len(keyterms) > 8:
             print(f"                   {paint(f'... and {len(keyterms) - 8} more symbols', DIM)}")
 
-    print(kv("engine", f"{MODEL} (sub-second SLA < 800ms)"))
+    print(kv("engine", f"{MODEL} (streaming dictation)"))
     print(kv("stt prompt", context["stt_prompt"]))
     print(rule())
     print()
@@ -756,7 +756,7 @@ def verify_cmd():
 
     print(rule())
     if in_git and audio_ok and API_KEY:
-        print(f"{paint('VERIFY OK:', ACCENT, BOLD)} system fully operational; audio capture, AST biasing, and dictation ready.")
+        print(f"{paint('VERIFY OK:', ACCENT, BOLD)} system fully operational; audio capture, diff biasing, and dictation ready.")
     else:
         print(f"{paint('VERIFY WARN:', SIGNAL, BOLD)} some diagnostic checks failed; review configuration above.")
     print()
@@ -792,7 +792,7 @@ def run_dictation_flow(demo: bool = False, push: bool = False, file: Optional[st
         print()
         return
 
-    # 1. Gather git context and AST symbols
+    # 1. Gather git context and diff symbols
     context = get_git_context(auto_stage=True)
 
     if demo and not context["keyterms"]:
@@ -929,8 +929,8 @@ def main(
     demo: bool = typer.Option(False, "--demo", "-d", help="Run with synthetic audio for dry-run verification"),
     push: bool = typer.Option(False, "--push", "-p", help="Automatically commit and push without confirmation"),
     file: Optional[str] = typer.Option(None, "--file", "-f", help="Path to existing WAV audio file"),
-    verbose: bool = typer.Option(False, "--verbose", "-v", help="Display extracted AST symbols in header"),
-    gate: bool = typer.Option(False, "--gate", "-g", help="Audit git branch, diff, and AST biasing without dictating"),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Display extracted code symbols in header"),
+    gate: bool = typer.Option(False, "--gate", "-g", help="Audit git branch, diff, and symbol biasing without dictating"),
     lang: str = typer.Option("en", "--lang", "-l", help="BCP-47 language code for dictation (en, fr, de, es, hi, ja, zh, ...)"),
 ):
     """

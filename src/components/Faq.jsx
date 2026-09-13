@@ -83,13 +83,37 @@ export default function Faq() {
               <strong className="text-ink">ASR (Automatic Speech Recognition)</strong>: The AI model that decodes acoustic speech audio into text strings.
             </li>
             <li>
-              <strong className="text-ink">AST (Abstract Syntax Tree)</strong>: The tree representation of code syntax. ovio parses function, class, and variable names from your staged diff AST to bias speech recognition.
+              <strong className="text-ink">AST / Diff Symbols</strong>: Source syntax representation. Rather than running brittle AST compilers on partial diff hunks, ovio uses fast language-agnostic regex to extract function, class, and variable names from staged diffs into AssemblyAI keyterms.
             </li>
             <li>
               <strong className="text-ink">RMS (Root Mean Square)</strong>: Live microphone energy calculation used for real-time silence detection and waveform visualization.
             </li>
             <li>
               <strong className="text-ink">STT (Speech-to-Text)</strong>: General automated voice transcription into written words.
+            </li>
+          </ul>
+        </div>
+      )
+    },
+    {
+      q: 'Does ovio support macOS (MacBook Pro / Air)? What permissions are required?',
+      a: (
+        <div className="space-y-2">
+          <p>
+            Yes, ovio natively supports macOS across both Apple Silicon (M1/M2/M3/M4) and Intel architectures.
+          </p>
+          <ul className="space-y-1.5 list-disc pl-5 text-xs font-sans">
+            <li>
+              <strong>Homebrew Audio Dependency</strong>: Run <code className="font-mono">brew install portaudio git python</code> before installing.
+            </li>
+            <li>
+              <strong>Microphone Access</strong>: Click <em>Allow</em> when macOS displays the microphone access prompt on your terminal app.
+            </li>
+            <li>
+              <strong>Push-to-Talk Spacebar</strong>: To enable Spacebar push-to-talk, grant Accessibility to Terminal/iTerm in <em>System Settings &gt; Privacy &amp; Security &gt; Accessibility</em>.
+            </li>
+            <li>
+              <strong>Built-in Fallbacks</strong>: If Accessibility permissions are restricted, ovio automatically switches to the <code className="font-mono">&lt;Enter&gt;</code> key toggle. You can also run zero-mic tests anytime with <code className="font-mono">ovio --demo</code> or <code className="font-mono">ovio --file &lt;fixture&gt;</code>.
             </li>
           </ul>
         </div>

@@ -8,14 +8,14 @@ export const GLOSSARY = {
     fullName: 'Automatic Speech Recognition',
     category: 'SPEECH-TO-TEXT ENGINE',
     summary: 'The AI technology that transcribes spoken acoustic audio into text. Raw ASR models are trained on conversational prose and frequently fail on programming identifiers, turning camelCase variables like "jwtSecret" into "JSON secret".',
-    ovioRole: 'ovio eliminates ASR misspellings by pre-loading your local git diff AST symbols directly into the speech model prompt.'
+    ovioRole: 'ovio eliminates ASR misspellings by pre-loading your local git diff code symbols directly into the speech model keyterms.'
   },
   AST: {
     term: 'AST',
     fullName: 'Abstract Syntax Tree',
     category: 'COMPILER DATA STRUCTURE',
-    summary: 'A hierarchical tree structure produced by compilers and parsers representing source code syntax. It extracts exact function, class, type, and variable names without runtime overhead.',
-    ovioRole: 'ovio parses your staged git diff into AST keyterms before you speak, biasing speech decoding toward your codebase with 99% accuracy.'
+    summary: 'Code syntax representation. While full AST compilers choke on partial git diff hunks, ovio uses fast language-agnostic regex symbol extraction on staged diffs to extract identifiers without requiring a compile-ready file.',
+    ovioRole: 'ovio extracts staged diff symbols into keyterms before you speak, guaranteeing exact casing and zero phonetic typos for codebase identifiers.'
   },
   RMS: {
     term: 'RMS',

@@ -16,9 +16,9 @@ export default function Pipeline() {
     },
     {
       step: '02',
-      title: 'AST Symbol Biasing',
-      badge: 'REGEX & AST PARSER',
-      desc: 'Parses function, class, and identifier declarations into keyterms_prompt for targeted acoustic biasing.',
+      title: 'Diff Symbol Biasing',
+      badge: 'DIFF REGEX EXTRACTOR',
+      desc: 'Extracts function, class, and identifier declarations into keyterms_prompt for targeted acoustic biasing.',
       icon: FileCode,
       detail: (
         <>

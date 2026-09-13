@@ -236,8 +236,8 @@ export default function DocsPage({ onBack }) {
                 <span className="text-ink font-semibold">Universal-3.5</span>
               </div>
               <div className="flex items-center justify-between text-muted">
-                <span>Latency SLA</span>
-                <span className="text-emerald-700 font-semibold">&lt;800ms</span>
+                <span>Measured Latency</span>
+                <span className="text-emerald-700 font-semibold">1,003ms – 1,512ms</span>
               </div>
               <div className="flex items-center justify-between text-muted">
                 <span>Biasing Slot Limit</span>
@@ -261,7 +261,7 @@ export default function DocsPage({ onBack }) {
               Voice Git & Codebase Dictation Engine
             </h1>
             <p className="text-ink-soft text-base leading-relaxed">
-              <strong>ovio</strong> bridges spoken intent and Git execution. Standard speech-to-text engines fail when software engineers speak codebase vocabulary—turning camelCase variables and AST tokens into generic phonetic approximations. ovio extracts your staged Git abstract syntax tree (AST) tokens and dynamically biases AssemblyAI&apos;s streaming Dictation API for sub-second, zero-hallucination Conventional Commits.
+              <strong>ovio</strong> bridges spoken intent and Git execution. Standard speech-to-text engines fail when software engineers speak codebase vocabulary—turning camelCase variables and code symbols into generic phonetic approximations. ovio extracts your staged Git diff symbols and dynamically biases AssemblyAI&apos;s streaming Dictation API for rapid, zero-drift Conventional Commits.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
@@ -275,7 +275,7 @@ export default function DocsPage({ onBack }) {
 
               <div className="p-4 rounded-lg border border-emerald-600/30 bg-emerald-500/5">
                 <div className="text-xs font-mono text-emerald-700 mb-1">THE OVIO APPROACH</div>
-                <h4 className="font-semibold text-sm mb-1 text-emerald-900">AST-Biased Universal-3.5</h4>
+                <h4 className="font-semibold text-sm mb-1 text-emerald-900">Diff-Biased Universal-3.5</h4>
                 <p className="text-xs text-ink-soft">
                   Staged symbols are pre-injected into the acoustic vocabulary via <code className="font-mono text-[11px]">keyterms_prompt</code>. Exact symbol casing and scope are guaranteed.
                 </p>
@@ -292,12 +292,12 @@ export default function DocsPage({ onBack }) {
               Installation & Initial Setup
             </h2>
             <p className="text-ink-soft text-sm">
-              ovio requires Python 3.9+ and an AssemblyAI API key.
+              ovio requires Python 3.10+ and an AssemblyAI API key.
             </p>
 
             <h3 className="font-semibold text-base pt-2">1. Install Package</h3>
             <CodeBlock
-              code="pip install ovio"
+              code={`# On macOS, install portaudio via Homebrew first:\n# brew install portaudio git python\n\npip install -e .`}
               language="bash"
               label="Terminal Installation"
             />
@@ -322,8 +322,12 @@ export default function DocsPage({ onBack }) {
               label="Environment Diagnostics"
             />
 
+            <Callout type="tip" title="macOS (MacBook Pro / Air) Setup & Permissions">
+              On macOS, grant <strong>Microphone Access</strong> when prompted. For Spacebar push-to-talk, grant <strong>Accessibility</strong> in <em>System Settings &gt; Privacy &amp; Security &gt; Accessibility</em>. If running without accessibility, ovio automatically switches to the <code>&lt;Enter&gt;</code> toggle fallback.
+            </Callout>
+
             <Callout type="tip" title="Zero-Mic Dry Run">
-              Don&apos;t have an active microphone or running in a headless VM? Test ovio instantly with synthetic developer audio using <code className="font-mono">ovio --demo</code>.
+              Don&apos;t have an active microphone or running in a headless VM? Test ovio instantly with synthetic developer audio using <code className="font-mono">ovio --demo</code> or test live API fixtures with <code className="font-mono">ovio --file fixtures/short_command.wav</code>.
             </Callout>
           </section>
 
@@ -405,19 +409,19 @@ export default function DocsPage({ onBack }) {
             </p>
 
             <div className="space-y-3 text-xs">
-              <h4 className="font-semibold text-sm">Extraction Algorithm</h4>
+              <h4 className="font-semibold text-sm">Extraction Algorithm (Why Regex Beats AST on Diffs)</h4>
               <p className="text-ink-soft">
-                When you run <code className="font-mono">ovio</code> or <code className="font-mono">ovio gate</code>, the CLI scans the hunk headers (<code className="font-mono">@@ ... @@</code>) and modified lines in <code className="font-mono">git diff --staged</code>:
+                When you run <code className="font-mono">ovio</code> or <code className="font-mono">ovio gate</code>, the CLI scans the hunk headers (<code className="font-mono">@@ ... @@</code>) and modified lines in <code className="font-mono">git diff --staged</code> using targeted regular expressions rather than an AST compiler parser. Because diff hunks are incomplete fragments, full AST compilers choke on partial syntax; regex extraction operates in &lt;5ms across any programming language without requiring compilable source files:
               </p>
 
               <CodeBlock
-                code={`# Extracted Diff AST Symbols\n1. Staged file base names without extension: ["auth", "tokens", "paymentRoutes"]\n2. Function and method declarations: ["verifyToken", "refreshToken", "handleWebhook"]\n3. Class and struct names: ["TokenBlacklist", "PaymentGateway"]\n4. Variable and property identifiers: ["jwtSecret", "expiresIn", "idempotencyKey"]`}
+                code={`# Extracted Diff Symbols\n1. Staged file base names without extension: ["auth", "tokens", "paymentRoutes"]\n2. Function and method declarations: ["verifyToken", "refreshToken", "handleWebhook"]\n3. Class and struct names: ["TokenBlacklist", "PaymentGateway"]\n4. Variable and property identifiers: ["jwtSecret", "expiresIn", "idempotencyKey"]`}
                 language="yaml"
-                label="AST Biasing Dictionary Payload"
+                label="Symbol Biasing Dictionary Payload"
               />
 
               <p className="text-ink-soft">
-                These symbols are compiled into an array of up to 30 prioritized keyterms. The keyterms are sent as part of the <code className="font-mono">keyterms_prompt</code> parameter to AssemblyAI, increasing the acoustic probability of these exact strings during phonetic beam search.
+                These symbols are compiled into an array of up to 25 prioritized keyterms. The keyterms are sent as part of the <code className="font-mono">keyterms_prompt</code> parameter to AssemblyAI, increasing the acoustic probability of these exact strings during phonetic decoding.
               </p>
 
               <h4 className="font-semibold text-sm pt-2">Audit with `ovio gate`</h4>
@@ -599,7 +603,7 @@ export default function DocsPage({ onBack }) {
                   <span>&quot;No staged changes found&quot; Warning</span>
                 </h4>
                 <p className="text-ink-soft">
-                  ovio automatically stages tracked modifications, but for brand-new files you must run <code className="font-mono">git add &lt;file&gt;</code> before dictating so that the AST parser can analyze their content.
+                  ovio automatically stages tracked modifications, but for brand-new files you must run <code className="font-mono">git add &lt;file&gt;</code> before dictating so that the diff symbol extractor can analyze their content.
                 </p>
               </div>
             </div>
@@ -608,7 +612,7 @@ export default function DocsPage({ onBack }) {
           {/* Bottom Colophon */}
           <div className="pt-8 border-t border-line flex items-center justify-between text-xs text-muted font-mono">
             <span>ovio documentation v0.1.0</span>
-            <span>Universal-3.5 Pro • Sub-800ms SLA</span>
+            <span>Universal-3.5 Pro • 1,003ms – 1,512ms</span>
           </div>
 
         </main>

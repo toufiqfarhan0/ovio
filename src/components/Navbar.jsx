@@ -67,7 +67,7 @@ export default function Navbar({ onOpenCommandMenu, currentView = 'home', onNavi
             onClick={() => onNavigate && onNavigate('home', 'biasing')}
             className="hover:text-ink transition-colors whitespace-nowrap"
           >
-            AST Biasing
+            Symbol Biasing
           </button>
           <button 
             onClick={() => onNavigate && onNavigate('home', 'cli')}

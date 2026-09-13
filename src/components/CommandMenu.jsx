@@ -32,8 +32,8 @@ export default function CommandMenu({ isOpen, onClose, onSelectCommand }) {
     {
       category: 'Documentation & Architecture',
       items: [
-        { id: 'pipeline', title: 'The 5-Step Pipeline', desc: 'Speech → AST Biasing → Universal-3.5 Pro → Conventional Commit', icon: GitCommit, action: () => { scrollToSection('pipeline'); onClose(false); } },
-        { id: 'biasing', title: 'AST Keyterms Biasing', desc: 'How ovio extracts symbols to eliminate misspellings', icon: FileCode, action: () => { scrollToSection('biasing'); onClose(false); } },
+        { id: 'pipeline', title: 'The 5-Step Pipeline', desc: 'Speech → Diff Symbol Biasing → Universal-3.5 Pro → Conventional Commit', icon: GitCommit, action: () => { scrollToSection('pipeline'); onClose(false); } },
+        { id: 'biasing', title: 'Diff Symbol Biasing', desc: 'How ovio extracts symbols to eliminate misspellings', icon: FileCode, action: () => { scrollToSection('biasing'); onClose(false); } },
         { id: 'cli', title: 'CLI Quickstart (`ovio`)', desc: 'Install and configure the terminal tool in 30 seconds', icon: Terminal, action: () => { scrollToSection('cli'); onClose(false); } },
       ]
     },
