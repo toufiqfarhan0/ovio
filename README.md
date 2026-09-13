@@ -279,26 +279,23 @@ ovio --help
 
 1. **Stage or modify code in any repo**:
    ```bash
-   # Make code edits, then simply run:
+   # Make code edits, then run:
    ovio
    ```
 
 2. **Hold Spacebar & Speak**:
    ```text
-      ___   __      __  ___   ___  
-     / _ \  \ \    / / |_ _| / _ \ 
-    | | | |  \ \  / /   | | | | | |
-    | |_| |   \ \/ /    | | | |_| |
-     \___/     \__/    |___| \___/ 
+     ██████╗ ██╗   ██╗██╗ ██████╗       VOICE GIT ─────────────
+    ██╔═══██╗██║   ██║██║██╔═══██╗      assemblyai universal-3.5 pro
+    ██║   ██║██║   ██║██║██║   ██║      ast codebase biasing engine
+    ██║   ██║╚██╗ ██╔╝██║██║   ██║      ───────────────────────
+    ╚██████╔╝ ╚████╔╝ ██║╚██████╔╝      sub-second dictation sla
+     ╚═════╝   ╚═══╝  ╚═╝ ╚═════╝ 
 
    ────────────────────────────────────────────────────────────────────
-     version         1.0.0
-     model           Universal-3.5 Pro
-     provider        AssemblyAI Dictation API
-   ────────────────────────────────────────────────────────────────────
-     branch          feature/auth-flow
-     staged files    3
-     symbols biased  8
+     version         1.0.0               branch          feature/auth
+     model           Universal-3.5 Pro   staged files    3
+     provider        AssemblyAI Dictation symbols biased  8
    ────────────────────────────────────────────────────────────────────
 
      hold [ SPACEBAR ] to dictate — release when done
@@ -327,15 +324,122 @@ ovio --help
 
 ---
 
-### Command Flags & Options
+### Command Matrix & Subcommands
 
-| Command / Flag | Short | Description |
+| Command | Arguments / Flags | Description |
 |---|---|---|
-| `ovio` | - | **Primary command**: Runs interactive voice dictation workflow |
-| `ovio --demo` | `-d` | Dry-run simulation using synthetic developer voice (no mic required) |
-| `ovio --verbose` | `-v` | Displays the exact extracted AST symbols in the terminal header |
-| `ovio --push` | `-p` | Automatically commits and pushes without interactive confirmation |
-| `ovio --file <path>` | `-f` | Transcribes an existing WAV audio file (e.g. `ovio --file fixtures/auth_500_error.wav`) |
+| `ovio` | `--demo` (`-d`), `--file <path>` (`-f`), `--push` (`-p`), `--verbose` (`-v`) | **Primary workflow**: Push-to-talk voice recording, AST biasing, and commit generation |
+| `ovio gate` | `--verbose` (`-v`) | **AST Biasing Audit**: Pre-flight inspection of staged changes, AST diff tokens, and vocabulary biasing readiness |
+| `ovio verify` | None | **Diagnostics**: Verifies Git work tree, audio input devices (sounddevice/numpy), and AssemblyAI API key authentication |
+| `ovio --demo` | `-d` | **Dry-Run Simulation**: Runs instant turnaround test with synthetic developer audio (no mic required) |
+| `ovio --file <path>` | `-f` | **Audio Playback**: Transcribes an existing WAV fixture directly through AssemblyAI Dictation API |
+| `ovio --push` | `-p` | **Automated Push**: Directly commits and pushes upon confirmation without secondary prompt |
+
+---
+
+### Real-World Execution Telemetry (Tested on `test-apy-sync`)
+
+All commands were verified live on an external target repository (`test-apy-sync`):
+
+#### 1. Pre-Flight Diagnostics (`ovio verify`)
+```text
+PS C:\Users\toufi\Desktop\test-apy-sync> ovio verify
+────────────────────────────────────────────────────────────────────
+ ovio_verify   DIAGNOSTICS — environment audit
+────────────────────────────────────────────────────────────────────
+git repository  OK (work tree detected)
+audio backend   OK (21 audio device(s) detected)
+api key         OK (49db5e...9ace)
+────────────────────────────────────────────────────────────────────
+VERIFY OK: system fully operational; audio capture, AST biasing, and dictation ready.
+```
+
+#### 2. AST Biasing Audit (`ovio gate`)
+When changes in `src/index.ts` are staged, `ovio gate` parses AST tokens and registers them for vocabulary injection:
+```text
+PS C:\Users\toufi\Desktop\test-apy-sync> ovio gate
+  ██████╗ ██╗   ██╗██╗ ██████╗       VOICE GIT ─────────────
+ ██╔═══██╗██║   ██║██║██╔═══██╗      assemblyai universal-3.5 pro
+ ██║   ██║██║   ██║██║██║   ██║      ast codebase biasing engine
+ ██║   ██║╚██╗ ██╔╝██║██║   ██║      ───────────────────────
+ ╚██████╔╝ ╚████╔╝ ██║╚██████╔╝      sub-second dictation sla
+  ╚═════╝   ╚═══╝  ╚═╝ ╚═════╝ 
+
+[PASS]  GATE_READY      branch=main  staged=1  symbols=4
+
+────────────────────────────────────────────────────────────────────
+ main   INSPECT — AST biasing audit
+────────────────────────────────────────────────────────────────────
+branch          main
+staged files    1 files (index.ts)
+ast biasing     4 symbol(s) locked into vocabulary
+                   01. index.ts
+                   02. index
+                   03. teamsRouter
+                   04. GET
+engine          Universal-3.5 Pro (sub-second SLA < 800ms)
+stt prompt      A developer dictating git commits for branch 'main'. Files: index.ts.
+────────────────────────────────────────────────────────────────────
+```
+
+#### 3. Real Audio Transcription via AssemblyAI Dictation API (`ovio --file`)
+Transcribing `fixtures/auth_500_error.wav` through production AssemblyAI Dictation API Beta:
+```text
+PS C:\Users\toufi\Desktop\test-apy-sync> ovio --file C:\Users\toufi\Desktop\ovio\fixtures\auth_500_error.wav
+  ██████╗ ██╗   ██╗██╗ ██████╗       VOICE GIT ─────────────
+ ██╔═══██╗██║   ██║██║██╔═══██╗      assemblyai universal-3.5 pro
+ ██║   ██║██║   ██║██║██║   ██║      ast codebase biasing engine
+ ██║   ██║╚██╗ ██╔╝██║██║   ██║      ───────────────────────
+ ╚██████╔╝ ╚████╔╝ ██║╚██████╔╝      sub-second dictation sla
+  ╚═════╝   ╚═══╝  ╚═╝ ╚═════╝ 
+
+────────────────────────────────────────────────────────────────────
+  version         1.0.0               branch          main
+  model           Universal-3.5 Pro   staged files    0
+  provider        AssemblyAI Dictation symbols biased  0
+────────────────────────────────────────────────────────────────────
+
+  file playback: C:\Users\toufi\Desktop\ovio\fixtures\auth_500_error.wav (4.0s)
+  transcribed & formatted  [2642ms  Universal-3.5 Pro]
+────────────────────────────────────────────────────────────────────
+  verbatim
+  The deployment is delayed because the authentication API is returning 500 errors.
+
+  conventional commit
+  fix(auth-api): resolve 500 errors causing deployment delay
+  * Investigate authentication API 500 errors
+  * Resolve root cause to enable deployment
+────────────────────────────────────────────────────────────────────
+```
+
+#### 4. Synthetic Developer Turnaround (`ovio --demo`)
+```text
+PS C:\Users\toufi\Desktop\test-apy-sync> ovio --demo
+  ██████╗ ██╗   ██╗██╗ ██████╗       VOICE GIT ─────────────
+ ██╔═══██╗██║   ██║██║██╔═══██╗      assemblyai universal-3.5 pro
+ ██║   ██║██║   ██║██║██║   ██║      ast codebase biasing engine
+ ██║   ██║╚██╗ ██╔╝██║██║   ██║      ───────────────────────
+ ╚██████╔╝ ╚████╔╝ ██║╚██████╔╝      sub-second dictation sla
+  ╚═════╝   ╚═══╝  ╚═╝ ╚═════╝ 
+
+────────────────────────────────────────────────────────────────────
+  version         1.0.0               branch          main
+  model           Universal-3.5 Pro   staged files    0
+  provider        AssemblyAI Dictation symbols biased  0
+────────────────────────────────────────────────────────────────────
+
+  [DEMO MODE] Simulating developer voice input...
+  transcribed & formatted  [642ms  Universal-3.5 Pro]
+────────────────────────────────────────────────────────────────────
+  verbatim
+  uh so in auth service we added verifyToken to check the JWT_SECRET wait also handled expired token errors properly
+
+  conventional commit
+  feat(auth): add verifyToken and handle expired token errors
+  - Implement token verification against JWT_SECRET in authService
+  - Add explicit error handling for expired and malformed tokens
+────────────────────────────────────────────────────────────────────
+```
 
 ---
 

@@ -25,14 +25,14 @@ export default function Quickstart() {
       cmd: `pip install -e .`
     },
     {
-      title: 'Run Voice Dictation Anywhere',
-      code: `ovio\n# or dry-run demo simulation: ovio --demo`,
+      title: 'Run Voice Git Anywhere',
+      code: `ovio\n# or dry-run demo simulation: ovio --demo\n# or transcribe file: ovio --file clip.wav`,
       cmd: `ovio`
     },
     {
-      title: <>Inspect <TechTooltip term="AST" position="top">AST</TechTooltip> Biased Symbols</>,
-      code: `ovio -v\n# displays extracted codebase symbols in header`,
-      cmd: `ovio -v`
+      title: <>Audit <TechTooltip term="AST" position="top">AST</TechTooltip> Biasing & Diagnostics</>,
+      code: `ovio gate     # inspects staged AST symbols\novio verify   # tests mic and API connectivity`,
+      cmd: `ovio gate`
     }
   ]
 
