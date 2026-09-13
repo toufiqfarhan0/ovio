@@ -23,6 +23,7 @@ Software engineers spend **45 seconds** per git commit switching mental context 
 ### How ovio Solves This:
 - **Local AST Biasing**: `ovio` inspects your repository's staged `git diff`, extracting function names, classes, interfaces, and variables directly into AssemblyAI's `keyterms_prompt`.
 - **Push-to-Talk Audio Capture**: Hold **Spacebar** in your terminal to dictate naturally.
+- **Real-Time Silence Guidance**: Live RMS audio metering tracks vocal energy. If silent for >2s, ovio prompts `(listening... please speak more)` and intercepts dead air before wasting API calls.
 - **Sub-Second Conventional Commit**: In **< 800ms**, AssemblyAI's Universal-3.5 Pro transcribes, cleans self-corrections, and outputs a clean Conventional Commit ready to commit and push.
 
 ```git
@@ -135,9 +136,11 @@ Standard speech recognition fails on code tokens like `authService`, `verifyToke
 - **Cased Identifiers**: CamelCase and `UPPER_SNAKE_CASE` tokens from additions (`+`).
 These symbols populate `keyterms_prompt` on the AssemblyAI Dictation API, providing targeted acoustic biasing for technical identifiers that standard speech models routinely misrecognize.
 
-### Stage 3: Audio Capture with Push-to-Talk (Spacebar)
+### Stage 3: Audio Capture with Push-to-Talk & Real-Time Silence Guidance
 - Using `pynput`, ovio captures a global keyboard hook on `Key.space`.
 - Holding **Spacebar** starts the `sounddevice` 16kHz mono audio stream and activates a live animated block-bar waveform indicator (`▁▂▃▄▅▄▃▂`).
+- **Real-Time Voice Metering & Silence Nudge**: In-flight RMS audio energy metering tracks vocal activity. If silent for >2 seconds or if a pause occurs during dictation, ovio dynamically prompts the user: `(listening... please speak more)`.
+- **Zero-Speech Intercept**: If Spacebar is released on total silence, ovio catches it locally before calling AssemblyAI, displaying contextual suggestions based on your staged symbols and offering a one-key `[r]` retry loop.
 - Releasing Spacebar terminates the stream and immediately begins live transcription.
 - *Fallback*: If running in a headless or remote SSH terminal, pressing `<Enter>` cleanly toggles recording.
 
@@ -277,7 +280,10 @@ ovio --help
    ────────────────────────────────────────────────────────────────────
 
      hold [ SPACEBAR ] to dictate — release when done
-     ● recording  ▁▂▃▄▅▄▃▂  2.8s
+     ● recording  ▁▂▃▄▅▄▃▂  2.8s  (voice active)
+
+     # If silent for 2+ seconds, ovio prompts in real time:
+     ● recording  ·······  2.4s  (listening... please speak more)
    ```
 
 3. **Instant Turnaround & Commit**:

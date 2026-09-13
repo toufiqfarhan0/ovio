@@ -87,6 +87,19 @@ def rule(width: int = RULE_WIDTH) -> str:
 def print_rule(width: int = RULE_WIDTH):
     console.print(f"[dim]{rule(width)}[/dim]")
 
+def is_git_repository() -> bool:
+    """Returns True if the current working directory is inside a Git repository."""
+    try:
+        res = subprocess.run(
+            ["git", "rev-parse", "--is-inside-work-tree"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=True
+        )
+        return res.returncode == 0
+    except Exception:
+        return False
+
 # ─────────────────────────────────────────────────────────────
 # git context & AST extraction
 # ─────────────────────────────────────────────────────────────
@@ -103,6 +116,13 @@ def get_git_context(auto_stage: bool = True):
             text=True,
             stderr=subprocess.DEVNULL
         ).strip()
+        # Automatically modernize legacy 'master' branch to 'main'
+        if branch == "master":
+            try:
+                subprocess.run(["git", "branch", "-M", "main"], check=True, stderr=subprocess.DEVNULL)
+                branch = "main"
+            except Exception:
+                branch = "main"
     except Exception:
         branch = "main"
 
@@ -126,12 +146,18 @@ def get_git_context(auto_stage: bool = True):
     except Exception:
         pass
 
-    # Auto-stage tracked changes if nothing is staged yet
+    # Auto-stage tracked or untracked changes if nothing is staged yet
     if auto_stage and unstaged_files and not staged_files:
         try:
+            # Try git add -u first for tracked modifications
             subprocess.run(["git", "add", "-u"], check=True, stderr=subprocess.DEVNULL)
             status_out = subprocess.check_output(["git", "status", "--porcelain"], text=True)
             staged_files = [line[3:].strip() for line in status_out.splitlines() if len(line) >= 3 and line[0] in ("M", "A", "D", "R")]
+            # In a brand-new repo with 0 commits, tracked add -u stages nothing; stage with git add -A
+            if not staged_files and unstaged_files:
+                subprocess.run(["git", "add", "-A"], check=True, stderr=subprocess.DEVNULL)
+                status_out = subprocess.check_output(["git", "status", "--porcelain"], text=True)
+                staged_files = [line[3:].strip() for line in status_out.splitlines() if len(line) >= 3 and line[0] in ("M", "A", "D", "R")]
             if staged_files:
                 console.print(f"  [dim]auto-staged {len(staged_files)} modified file(s) for diff inspection[/dim]")
         except Exception:
@@ -194,10 +220,12 @@ def get_git_context(auto_stage: bool = True):
 # audio recording
 # ─────────────────────────────────────────────────────────────
 
-def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45) -> str:
+def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45, context: Optional[dict] = None) -> tuple[str, bool]:
     """
     Records 16kHz audio from microphone using push-to-talk (hold SPACEBAR).
     Falls back to Enter toggle if pynput listener is unavailable.
+    Detects voice activity in real time and prompts the user if silent for 2-3s.
+    Returns (output_wav_path, has_speech_bool).
     """
     try:
         import sounddevice as sd
@@ -213,9 +241,30 @@ def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45) -> s
     recording_active = threading.Event()
     stop_session = threading.Event()
 
+    # Real-time speech metering state
+    speech_state = {
+        "last_voice_time": None,
+        "has_voice": False,
+        "current_rms": 0.0,
+        "max_peak": 0
+    }
+
+    # Speech threshold: 16-bit PCM values range -32768 to 32767.
+    # Ambient noise in typical rooms is < 250 RMS.
+    # Spoken voice within standard mic distance is typically 320 - 4000+ RMS.
+    SPEECH_RMS_THRESHOLD = 320
+
     def audio_callback(indata, frames, time_info, status):
         if recording_active.is_set():
             recorded_chunks.append(indata.copy())
+            frame_float = indata.astype(np.float32)
+            rms = float(np.sqrt(np.mean(frame_float ** 2)))
+            peak = int(np.max(np.abs(indata)))
+            speech_state["current_rms"] = rms
+            speech_state["max_peak"] = max(speech_state["max_peak"], peak)
+            if rms >= SPEECH_RMS_THRESHOLD:
+                speech_state["has_voice"] = True
+                speech_state["last_voice_time"] = time.time()
 
     use_pynput = False
     try:
@@ -273,15 +322,38 @@ def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45) -> s
         start_time = None
         while not stop_session.is_set():
             if recording_active.is_set():
+                now = time.time()
                 if start_time is None:
-                    start_time = time.time()
-                elapsed = time.time() - start_time
-                frame = wave_frames[frame_idx % len(wave_frames)]
-                sys.stdout.write(
-                    f"\r  \033[31m●\033[0m \033[1mrecording\033[0m  "
-                    f"\033[38;2;255;140;0m{frame}\033[0m  "
-                    f"\033[2m{elapsed:.1f}s\033[0m   "
+                    start_time = now
+                elapsed = now - start_time
+
+                # Silence calculation: how long has it been since speech was detected?
+                last_voice = speech_state["last_voice_time"]
+                silence_duration = (now - last_voice) if last_voice is not None else elapsed
+
+                # Real-time prompt when silent for >= 2.2 seconds
+                if silence_duration >= 2.2:
+                    if not speech_state["has_voice"]:
+                        hint = "\033[33m(listening... please speak more)\033[0m"
+                    else:
+                        hint = "\033[33m(pause detected — speak more or release)\033[0m"
+                    waveform_str = "\033[33m·······\033[0m"
+                else:
+                    if speech_state["has_voice"]:
+                        hint = "\033[32m(voice active)\033[0m"
+                    else:
+                        hint = ""
+                    frame = wave_frames[frame_idx % len(wave_frames)]
+                    waveform_str = f"\033[38;2;255;140;0m{frame}\033[0m"
+
+                status_line = (
+                    f"  \033[31m●\033[0m \033[1mrecording\033[0m  "
+                    f"{waveform_str}  "
+                    f"\033[2m{elapsed:.1f}s\033[0m  "
+                    f"{hint}"
                 )
+                # Pad to overwrite previous text cleanly
+                sys.stdout.write(f"\r{status_line:<82}")
                 sys.stdout.flush()
                 frame_idx += 1
             else:
@@ -289,16 +361,20 @@ def record_audio_push_to_talk(output_wav="ovio_commit.wav", max_seconds=45) -> s
                     break
             time.sleep(0.10)
 
-        sys.stdout.write("\r" + " " * 70 + "\r")
+        sys.stdout.write("\r" + " " * 84 + "\r")
         sys.stdout.flush()
 
     if not recorded_chunks:
         console.print("  [dim]no audio captured — falling back to synthetic clip[/dim]")
-        return synthesize_demo_wav(output_wav)
+        return synthesize_demo_wav(output_wav), False
 
     full_audio = np.concatenate(recorded_chunks, axis=0)
+    overall_rms = float(np.sqrt(np.mean(full_audio.astype(np.float32) ** 2)))
+    overall_peak = int(np.max(np.abs(full_audio)))
+    has_speech = speech_state["has_voice"] or (overall_rms >= SPEECH_RMS_THRESHOLD) or (overall_peak >= 800)
+
     wav.write(output_wav, fs, full_audio)
-    return output_wav
+    return output_wav, has_speech
 
 # ─────────────────────────────────────────────────────────────
 # demo audio synthesis
@@ -472,6 +548,25 @@ def render_prompt():
         "[bold red]\\[q][/bold red] cancel"
     )
 
+def execute_git_push(branch: str = "main"):
+    """Pushes committed changes to remote; outputs clean orange guidance if no remote is configured."""
+    target_branch = "main" if branch in ("master", "") else branch
+    push_res = subprocess.run(["git", "push"], capture_output=True, text=True)
+    if push_res.returncode == 0:
+        console.print("  [bold green]ok[/bold green]  committed and pushed to remote")
+    else:
+        err = (push_res.stderr or push_res.stdout or "").strip()
+        if "No configured push destination" in err or "no upstream branch" in err or "fatal: 'origin'" in err or "has no upstream branch" in err:
+            console.print("  [bold green]ok[/bold green]  committed locally")
+            console.print()
+            console.print("  [bold #FF8C00]notice:[/bold #FF8C00] [dim]no remote repository configured yet[/dim]")
+            console.print("  [#FF8C00]to create and push to a remote repository:[/#FF8C00]")
+            console.print("    [bold white]1.[/bold white] create a repository on github (e.g. at https://github.com/new)")
+            console.print("    [bold white]2.[/bold white] link it: [cyan]git remote add origin https://github.com/<username>/<repo>.git[/cyan]")
+            console.print(f"    [bold white]3.[/bold white] push:    [cyan]git push -u origin {target_branch}[/cyan]")
+        else:
+            console.print(f"  [bold yellow]push failed:[/bold yellow] [dim]{err}[/dim]")
+
 # ─────────────────────────────────────────────────────────────
 # main
 # ─────────────────────────────────────────────────────────────
@@ -487,6 +582,20 @@ def main(
     """
     ovio — Voice Git & Codebase Dictation Engine
     """
+    # Check if current directory is inside a Git repository
+    if not is_git_repository() and not demo:
+        console.print()
+        console.print(f"[bold white]{BANNER}[/bold white]", highlight=False)
+        print_rule()
+        console.print("  [bold #FF8C00]notice:[/bold #FF8C00] [bold white]not a git repository[/bold white]")
+        print_rule()
+        console.print()
+        console.print("  [#FF8C00]please initialize git before using ovio:[/#FF8C00]")
+        console.print("    [bold white]git init[/bold white]")
+        console.print()
+        console.print("  [dim]tip: run 'git init', make your code edits, then run [cyan]ovio[/cyan].[/dim]")
+        print_rule()
+        return
 
     # 1. Gather git context and AST symbols
     context = get_git_context(auto_stage=True)
@@ -510,12 +619,40 @@ def main(
     elif is_demo_mode:
         audio_path = synthesize_demo_wav()
     else:
-        try:
-            audio_path = record_audio_push_to_talk()
-        except Exception as e:
-            console.print(f"  [dim]microphone unavailable ({e}) — switching to demo mode[/dim]")
-            is_demo_mode = True
-            audio_path = synthesize_demo_wav()
+        while True:
+            try:
+                audio_path, has_speech = record_audio_push_to_talk(context=context)
+            except Exception as e:
+                console.print(f"  [dim]microphone unavailable ({e}) — switching to demo mode[/dim]")
+                is_demo_mode = True
+                audio_path = synthesize_demo_wav()
+                break
+
+            if has_speech:
+                break
+
+            # Handle silence / no speech detected
+            console.print()
+            console.print("  [bold yellow]notice:[/bold yellow] No speech detected in recording.")
+            console.print("  [dim]suggestion: hold Spacebar and describe what you changed.[/dim]")
+            if context.get("keyterms"):
+                sample_terms = ", ".join(context["keyterms"][:3])
+                console.print(f"  [dim]example: \"update {sample_terms} to fix error handling\"[/dim]")
+            console.print()
+
+            action = Prompt.ask(
+                "  [bold white][r][/bold white] retry dictation  |  [bold white][d][/bold white] test with demo audio  |  [bold white][q][/bold white] quit",
+                default="r"
+            ).strip().lower()
+
+            if action == "d":
+                is_demo_mode = True
+                audio_path = synthesize_demo_wav()
+                break
+            elif action == "q":
+                console.print("  [dim]cancelled[/dim]")
+                sys.exit(0)
+            # action == "r" repeats recording loop
 
     # 4. Transcribe & Format
     if is_demo_mode:
@@ -529,6 +666,10 @@ def main(
             clean_commit = res["llm_response"]
             latency      = res["latency_ms"]
 
+        if not verbatim.strip():
+            verbatim = "(no speech recognized)"
+            clean_commit = f"chore({context['branch']}): update codebase"
+
     # Cleanup temporary wav
     if not file and Path(audio_path).exists():
         try:
@@ -541,10 +682,9 @@ def main(
 
     if push:
         subprocess.run(["git", "commit", "-m", clean_commit], check=True)
-        subprocess.run(["git", "push"], check=True)
         console.print()
         print_rule()
-        console.print("  [bold green]ok[/bold green]  committed and pushed")
+        execute_git_push(context["branch"])
         print_rule()
         return
 
@@ -564,8 +704,7 @@ def main(
             console.print()
             print_rule()
             if res.returncode == 0:
-                console.print("  [bold green]ok[/bold green]  committed — pushing to remote...")
-                subprocess.run(["git", "push"])
+                execute_git_push(context["branch"])
             else:
                 console.print("  [dim]nothing staged to commit (working tree clean)[/dim]")
             print_rule()

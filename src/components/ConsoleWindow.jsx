@@ -44,6 +44,21 @@ export const TERMINAL_SESSIONS = {
       '- Resolve mobile drawer toggle click event boundary issue'
     ],
     latency: 580,
+  },
+  silence: {
+    id: 'silence',
+    title: '#4 Silence Guidance',
+    branch: 'fix/token-guard',
+    filesCount: 2,
+    keyterms: ['verifyToken', 'tokenExpiresAt', 'authService'],
+    statusNote: 'listening... please speak more',
+    verbatim: '[2.4s silence] -> ovio prompted: (listening... please speak more) -> developer dictated: "in auth service check tokenExpiresAt before verifyToken"',
+    commitTitle: 'fix(auth): check tokenExpiresAt prior to verifyToken',
+    commitBullets: [
+      '- Ensure tokenExpiresAt validation occurs before verifyToken invocation',
+      '- Prevent uncaught expiration crashes in authService'
+    ],
+    latency: 635,
   }
 }
 
@@ -55,11 +70,19 @@ const ASCII_BANNER = `  ___   __      __  ___   ___
 
 const RULE = '────────────────────────────────────────────────────────────────────'
 
-export default function ConsoleWindow() {
-  const [activeSession, setActiveSession] = useState('auth')
+export default function ConsoleWindow({ selectedPreset, onSelectPreset }) {
+  const [internalSession, setInternalSession] = useState('auth')
+  const activeSession = selectedPreset || internalSession
+  const session = TERMINAL_SESSIONS[activeSession] || TERMINAL_SESSIONS.auth
   const [copied, setCopied] = useState(false)
   const [copiedCmd, setCopiedCmd] = useState(false)
-  const session = TERMINAL_SESSIONS[activeSession]
+
+  const setActiveSession = (key) => {
+    setInternalSession(key)
+    if (onSelectPreset) {
+      onSelectPreset(key)
+    }
+  }
 
   const fullCommitText = `${session.commitTitle}\n\n${session.commitBullets.join('\n')}`
 
@@ -105,7 +128,7 @@ export default function ConsoleWindow() {
                     : 'text-ink-soft hover:text-ink'
                 }`}
               >
-                {key}
+                {key === 'silence' ? 'Silence Prompt' : key}
               </button>
             ))}
           </div>
@@ -178,10 +201,15 @@ export default function ConsoleWindow() {
               <div className="text-[#8e8b83] mb-1">
                 hold <span className="bg-white/20 text-white px-1.5 py-0.5 rounded text-[11px] font-bold">SPACEBAR</span> to dictate — release when done
               </div>
-              <div className="flex items-center gap-2 font-semibold">
+              <div className="flex flex-wrap items-center gap-2 font-semibold">
                 <span className="text-red-500">● recording</span>
-                <span className="text-[#FF8C00] tracking-wider">▁▂▃▄▅▄▃▂</span>
-                <span className="text-[#8e8b83] text-xs font-normal">2.8s</span>
+                <span className="text-[#FF8C00] tracking-wider">{session.statusNote ? '·······' : '▁▂▃▄▅▄▃▂'}</span>
+                <span className="text-[#8e8b83] text-xs font-normal">2.4s</span>
+                {session.statusNote ? (
+                  <span className="text-amber-400 text-xs font-mono font-normal">({session.statusNote})</span>
+                ) : (
+                  <span className="text-emerald-400 text-xs font-mono font-normal">(voice active)</span>
+                )}
               </div>
             </div>
 

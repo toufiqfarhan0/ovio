@@ -21,11 +21,11 @@ export default function Pipeline() {
     },
     {
       step: '03',
-      title: '16kHz Audio Stream',
-      badge: 'Live WAV / PCM',
-      desc: 'Audio frames stream directly into multipart/form-data with config arriving before first audio byte.',
+      title: 'Voice Meter & Silence Nudge',
+      badge: 'Live RMS / Push-to-Talk',
+      desc: 'Streams 16kHz mono audio on Spacebar with real-time RMS metering. If silent for >2s, prompts the user to speak.',
       icon: Mic,
-      detail: 'Saves upload latency by transcribing while the user is still speaking.'
+      detail: 'Intercepts dead air before API calls, prompting with repo-aware suggestions.'
     },
     {
       step: '04',

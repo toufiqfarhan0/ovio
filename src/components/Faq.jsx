@@ -20,6 +20,10 @@ export default function Faq() {
     {
       q: 'Can ovio accidentally commit unintended changes?',
       a: 'No. ovio is fail-safe: it formats and previews the commit on your screen and prompts for your explicit confirmation [Enter to commit / Esc to cancel] before executing any git command.'
+    },
+    {
+      q: 'What happens if I pause or stay silent while holding Spacebar?',
+      a: 'ovio includes real-time vocal energy metering. If you hold Spacebar for more than 2 seconds without speaking or pause mid-sentence, ovio dynamically prompts "(listening... please speak more)". If a recording is released in total silence, ovio intercepts it locally before making an API call, presenting contextual suggestions based on your staged symbols and offering a one-key [r] retry.'
     }
   ]
 

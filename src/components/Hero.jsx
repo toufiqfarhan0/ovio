@@ -100,12 +100,20 @@ export default function Hero({ onStartDemo, onSelectPreset }) {
             >
               #3 Tailwind Dark Mode
             </button>
+            <button 
+              onClick={() => onSelectPreset('silence')} 
+              className="px-2.5 py-1 rounded bg-paper-light hover:bg-paper-deep transition-colors hairline-border hover:border-ink/40 text-ink-soft"
+            >
+              #4 Silence Guidance
+            </button>
           </div>
 
           <div className="flex items-center gap-3 text-muted">
             <span>Zero filler words</span>
             <span>•</span>
             <span>AST symbol extraction</span>
+            <span>•</span>
+            <span>Silence detection</span>
           </div>
         </motion.div>
       </div>
