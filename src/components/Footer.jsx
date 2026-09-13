@@ -2,6 +2,7 @@ import React from 'react'
 import { Terminal, GitBranch, ExternalLink, ShieldCheck } from 'lucide-react'
 import TechTooltip from './TechTooltip'
 import { handleNavClick } from '../utils/navigation'
+import Logo from './Logo'
 
 export default function Footer() {
   return (
@@ -12,6 +13,7 @@ export default function Footer() {
           {/* Brand & Description (2 cols on lg) */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-2.5">
+              <Logo className="w-6 h-6 shrink-0" />
               <span className="font-serif-display text-2xl text-ink font-semibold tracking-tight">
                 ovio
               </span>

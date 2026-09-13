@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Terminal, Command, GitBranch, ArrowUpRight } from 'lucide-react'
 import { handleNavClick } from '../utils/navigation'
+import Logo from './Logo'
 
 export default function Navbar({ onOpenCommandMenu }) {
   const [scrolled, setScrolled] = useState(false)
@@ -25,8 +26,9 @@ export default function Navbar({ onOpenCommandMenu }) {
           <a 
             href="#" 
             onClick={(e) => handleNavClick(e, 'top')}
-            className="flex items-center gap-2 group"
+            className="flex items-center gap-2.5 group"
           >
+            <Logo className="w-6 h-6 shrink-0 transition-transform group-hover:scale-105" />
             <span className="font-serif-display text-2xl tracking-tight text-ink font-semibold group-hover:opacity-80 transition-opacity">
               ovio
             </span>
