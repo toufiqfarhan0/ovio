@@ -5,7 +5,7 @@
 > **Production developer voice interface for Git, diff symbol biasing, and codebase dictation.**  
 > Powered by **AssemblyAI Universal-3.5 Pro** via the official `assemblyai` Python SDK Dictation API.
 
-[![Demo Video](https://img.shields.io/badge/Demo%20Video-Google%20Drive-4285F4?logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1wsPWnnoFInNALscRP8VpbJMZYfrlCnr5?usp=sharing)
+[![Documentation](https://img.shields.io/badge/Documentation-DOCUMENTATION.md-0052FF?logo=markdown&logoColor=white)](./docs/DOCUMENTATION.md)
 [![Interactive Docs & Simulator](https://img.shields.io/badge/Web%20Docs%20%26%20Simulator-ovio--wine.vercel.app-7928CA?logo=vercel&logoColor=white)](https://ovio-wine.vercel.app/)
 [![Live GitHub Execution Proof](https://img.shields.io/badge/Live%20Tests%20(5%20Langs)-ovio--live--test-2ea44f?logo=github&logoColor=white)](https://github.com/toufiqfarhan0/ovio-live-test)
 [![AssemblyAI SDK](https://img.shields.io/badge/AssemblyAI%20SDK-DictationTranscriber-0052FF)](https://www.assemblyai.com/docs/dictation)
@@ -21,7 +21,7 @@
 
 | Resource | Link | Description |
 | :--- | :--- | :--- |
-| **Live Demo Video Walkthrough** | [**Google Drive Video Folder**](https://drive.google.com/drive/folders/1wsPWnnoFInNALscRP8VpbJMZYfrlCnr5?usp=sharing) | Video walkthrough demonstrating push-to-talk recording, live AssemblyAI Universal-3.5 Pro transcription, diff symbol biasing, and automated git push |
+| **Technical Documentation** | [**docs/DOCUMENTATION.md**](./docs/DOCUMENTATION.md) | Comprehensive technical specification, 5-stage pipeline deep dive, diff symbol extraction mechanics, and security guide |
 | **Interactive Documentation & Simulator** | [**ovio-wine.vercel.app**](https://ovio-wine.vercel.app/) | Production landing page featuring interactive terminal audio simulations, diff symbol inspector, and architecture diagrams |
 | **Live Push Target Repository** | [**github.com/toufiqfarhan0/ovio-live-test**](https://github.com/toufiqfarhan0/ovio-live-test) | External target repository containing real verified pushed commits across 5 languages (`en`, `es`, `fr`, `de`, `hi`) |
 | **Core Engine Repository** | [**github.com/toufiqfarhan0/ovio**](https://github.com/toufiqfarhan0/ovio) | Full source code for `ovio` CLI, Diff Symbol Extractor, and AssemblyAI Dictation API integration |
@@ -42,6 +42,7 @@ Jump directly to any section without scrolling:
 | :--- | :--- | :--- |
 | **The 60-Second Overview** | Context switching, ASR vs technical code, Diff Symbol Biasing, Acronym Reference | [Jump to Overview](#the-60-second-overview) |
 | **Architecture & Pipeline** | Mermaid dataflow diagram, high-contrast terminal architecture | [Jump to Architecture](#architecture--pipeline) |
+| **Repository Project Structure** | Tree diagram of CLI, web simulator, audio fixtures, and technical docs | [Jump to Project Structure](#repository-project-structure) |
 | **Deep Dive: 5-Stage Pipeline** | Auto-staging, Diff Symbol Extractor (Regex vs AST), PTT & RMS silence guidance, SDK integration, UI safety | [Jump to 5-Stage Pipeline](#deep-dive-the-5-stage-pipeline) |
 | **Live Benchmarks & Evaluation** | Measured latency table (1,003ms–1,512ms), CLI reproduction commands, manual vs ovio comparison | [Jump to Benchmarks](#empirical-live-benchmarks--evaluation) |
 | **Installation & Quickstart** | macOS (Homebrew + PortAudio), Windows, Linux, AssemblyAI API key setup, CLI verification | [Jump to Installation](#step-by-step-installation--quickstart) |
@@ -50,6 +51,7 @@ Jump directly to any section without scrolling:
 | **Multilingual Support (19 Langs)** | 19 language codes matrix, CLI usage examples, live multilingual test runs | [Jump to Multilingual](#multilingual-support-19-languages) |
 | **Bundled Audio Fixtures** | Reproducible WAV test files in `fixtures/` with scenario descriptions and CLI commands | [Jump to Fixtures](#bundled-audio-fixtures-directory-fixtures) |
 | **Interactive Documentation Site** | Local setup (`localhost:3000`), terminal simulator, diff symbol inspector | [Jump to Web Docs](#interactive-documentation--landing-page) |
+| **Technical System Documentation** | Comprehensive system reference guide (`docs/DOCUMENTATION.md`) | [Read docs/DOCUMENTATION.md](./docs/DOCUMENTATION.md) |
 
 <details>
 <summary><strong>Click here to expand complete detailed outline</strong></summary>
@@ -60,6 +62,7 @@ Jump directly to any section without scrolling:
 - [Architecture & Pipeline](#architecture--pipeline)
   - [End-to-End System Flow (Mermaid Flowchart)](#end-to-end-system-flow)
   - [Terminal Architecture Diagram](#terminal-architecture-diagram)
+- [Repository Project Structure](#repository-project-structure)
 - [Deep Dive: The 5-Stage Pipeline](#deep-dive-the-5-stage-pipeline)
   - [Stage 1: Git Context Extraction & Auto-Staging](#stage-1-git-context-extraction--auto-staging)
   - [Stage 2: Diff Symbol Biasing Engine (Why Regex beats AST)](#stage-2-diff-symbol-biasing-engine)
@@ -222,6 +225,51 @@ flowchart TD
                        │    git commit -m & git push  │                                  
                        └──────────────────────────────┘                                  
 ────────────────────────────────────────────────────────────────────
+```
+
+[Back to Top](#top) &nbsp;|&nbsp; [Quick Navigation](#quick-navigation)
+
+---
+
+## <a id="repository-project-structure"></a>Repository Project Structure
+
+> [!TIP]
+> **Looking for the deep technical architecture?** Check out the standalone in-depth documentation guide in [**`docs/DOCUMENTATION.md`**](./docs/DOCUMENTATION.md) for full pipeline specifications, diff symbol extraction mechanics, regex vs AST trade-offs, and security audits.
+
+```text
+ovio/
+├── cli/
+│   └── ovio.py                     # Core CLI engine (Rich + Typer, AssemblyAI SDK, Diff Extractor)
+├── docs/
+│   └── DOCUMENTATION.md            # In-depth technical architecture & system reference guide
+├── fixtures/                       # 10 bundled reproducible WAV audio test fixtures
+│   ├── auth_500_error.wav          # English: auth 500 error fix dictation
+│   ├── auth_500_error_de.wav       # German: auth 500 error fix dictation
+│   ├── auth_500_error_es.wav       # Spanish: auth 500 error fix dictation
+│   ├── auth_500_error_fr.wav       # French: auth 500 error fix dictation
+│   ├── auth_500_error_hi.wav       # Hindi: auth 500 error fix dictation
+│   ├── auth_refresh_en.wav         # English: refresh token & token blacklist
+│   ├── feature_refactor.wav        # English: session validation feature
+│   ├── payments_idempotency_fr.wav # French: idempotency key payment routes
+│   ├── short_command.wav           # English: quick git status & clean commit
+│   └── webhook_security_es.wav     # Spanish: stripeWebhookSecret signature
+├── public/
+│   ├── favicon.svg                 # ovio brand SVG favicon
+│   └── ovio-terminal.png           # High-resolution terminal execution screenshot
+├── src/                            # Web documentation & interactive simulator (React 19 + Vite)
+│   ├── components/                 # Terminal simulator, diff symbol inspector, pipeline diagrams
+│   ├── utils/                      # Audio recorder & scenario state
+│   ├── App.jsx                     # Interactive simulator root
+│   ├── index.css                   # Tailwind styling & dark terminal theme
+│   └── main.jsx                    # React entrypoint
+├── index.html                      # Web documentation entry point
+├── ovio_cli.py                     # Local convenience CLI entry point
+├── package.json                    # Node dependencies for the web documentation simulator
+├── pyproject.toml                  # Python package configuration (build-system, dependencies, CLI entrypoint)
+├── requirements.txt                # Python runtime dependencies (assemblyai, sounddevice, rich, typer, etc.)
+├── tailwind.config.js              # Tailwind CSS configuration for the documentation web app
+├── vite.config.js                  # Vite bundler & API proxy configuration
+└── README.md                       # Main comprehensive project documentation & benchmarks
 ```
 
 [Back to Top](#top) &nbsp;|&nbsp; [Quick Navigation](#quick-navigation)
@@ -469,13 +517,13 @@ ovio --help
 
 ## <a id="real-world-execution-telemetry"></a>Real-World Execution Telemetry (Tested on [`ovio-live-test`](https://github.com/toufiqfarhan0/ovio-live-test))
 
-All commands and workflows were executed and verified live end-to-end on the live demo target repository [**github.com/toufiqfarhan0/ovio-live-test**](https://github.com/toufiqfarhan0/ovio-live-test) (where the live demo video recording commit [`56b316a`](https://github.com/toufiqfarhan0/ovio-live-test/commit/56b316ad24f8b00ebe1df153bb47f224e508acb9) was made).
+All commands and workflows were executed and verified live end-to-end on the live demo target repository [**github.com/toufiqfarhan0/ovio-live-test**](https://github.com/toufiqfarhan0/ovio-live-test) (including the baseline test commit [`56b316a`](https://github.com/toufiqfarhan0/ovio-live-test/commit/56b316ad24f8b00ebe1df153bb47f224e508acb9)).
 
 Every single test below generated real production code changes that were staged, audited for staged diff symbols, transcribed through the production AssemblyAI Universal-3.5 Pro Dictation API, formatted into Conventional Commits, and **committed and pushed live to GitHub**. You can inspect each live commit directly on GitHub:
 
 | Target Repo | Live Commit Hash | Mode / Language | Live Commit Link & Conventional Commit Subject |
 |---|---|---|---|
-| [`ovio-live-test`](https://github.com/toufiqfarhan0/ovio-live-test) | [`56b316a`](https://github.com/toufiqfarhan0/ovio-live-test/commit/56b316ad24f8b00ebe1df153bb47f224e508acb9) | **Demo Recording** ([Google Drive Video](https://drive.google.com/drive/folders/1wsPWnnoFInNALscRP8VpbJMZYfrlCnr5?usp=sharing)) | [`feat(session): Added sessionBlacklist and validateSessionToken with MAX_RETRY_ATTEMPTS`](https://github.com/toufiqfarhan0/ovio-live-test/commit/56b316ad24f8b00ebe1df153bb47f224e508acb9) |
+| [`ovio-live-test`](https://github.com/toufiqfarhan0/ovio-live-test) | [`56b316a`](https://github.com/toufiqfarhan0/ovio-live-test/commit/56b316ad24f8b00ebe1df153bb47f224e508acb9) | **Full Execution Flow** | [`feat(session): Added sessionBlacklist and validateSessionToken with MAX_RETRY_ATTEMPTS`](https://github.com/toufiqfarhan0/ovio-live-test/commit/56b316ad24f8b00ebe1df153bb47f224e508acb9) |
 | [`ovio-live-test`](https://github.com/toufiqfarhan0/ovio-live-test) | [`b5ceac1`](https://github.com/toufiqfarhan0/ovio-live-test/commit/b5ceac1) | **English (`en`)** | [`feat(authRoutes): implemented refreshToken endpoint and tokenBlacklist for session logout`](https://github.com/toufiqfarhan0/ovio-live-test/commit/b5ceac1) |
 | [`ovio-live-test`](https://github.com/toufiqfarhan0/ovio-live-test) | [`9d3588f`](https://github.com/toufiqfarhan0/ovio-live-test/commit/9d3588f) | **Spanish (`es`)** | [`feat(webhooks): add signature verification using stripeWebhookSecret for enhanced security`](https://github.com/toufiqfarhan0/ovio-live-test/commit/9d3588f) |
 | [`ovio-live-test`](https://github.com/toufiqfarhan0/ovio-live-test) | [`820727e`](https://github.com/toufiqfarhan0/ovio-live-test/commit/820727e) | **French (`fr`)** | [`feat(payment): added idempotency key and payment validation in payment routes`](https://github.com/toufiqfarhan0/ovio-live-test/commit/820727e) |
